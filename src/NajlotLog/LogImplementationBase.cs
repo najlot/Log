@@ -7,7 +7,7 @@ namespace NajlotLog
 {
 	public abstract class LogImplementationBase : ILog
 	{
-		private ConcurrentQueue<string> StringsToLog = new ConcurrentQueue<string>();
+		private ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
 		private bool DequeueTaskRuns
 		{
 			get
@@ -38,23 +38,11 @@ namespace NajlotLog
 				{
 					DequeueTaskRuns = true;
 					
-					while (StringsToLog.TryDequeue(out string msg))
+					while (ActionsToExecute.TryDequeue(out Action action))
 					{
-						if(StringsToLog.Count > 5)
-						{
-							string bufMsg;
-							for (int i = 0; i < 5; i++)
-							{
-								if(StringsToLog.TryDequeue(out bufMsg))
-								{
-									msg += bufMsg;
-								}
-							}
-						}
-
 						try
 						{
-							Log(msg);
+							action();
 						}
 						catch
 						{
@@ -76,31 +64,61 @@ namespace NajlotLog
 		{
 			Debug = new Action<object>(o =>
 			{
-				StringsToLog.Enqueue(string.Concat(DateTime.Now, " DEBUG ", o, Environment.NewLine));
+				var time = DateTime.Now;
+
+				ActionsToExecute.Enqueue(new Action(() =>
+				{
+					Log(string.Concat(time, " DEBUG ", o, Environment.NewLine));
+				}));
+				
 				StartDequeueTaskIfNotRuns();
 			});
 
 			Info = new Action<object>(o =>
 			{
-				StringsToLog.Enqueue(string.Concat(DateTime.Now, " INFO ", o, Environment.NewLine));
+				var time = DateTime.Now;
+
+				ActionsToExecute.Enqueue(new Action(() =>
+				{
+					Log(string.Concat(time, " INFO ", o, Environment.NewLine));
+				}));
+				
 				StartDequeueTaskIfNotRuns();
 			});
 
 			Warn = new Action<object>(o =>
 			{
-				StringsToLog.Enqueue(string.Concat(DateTime.Now, " WARN ", o, Environment.NewLine));
+				var time = DateTime.Now;
+
+				ActionsToExecute.Enqueue(new Action(() =>
+				{
+					Log(string.Concat(time, " WARN ", o, Environment.NewLine));
+				}));
+				
 				StartDequeueTaskIfNotRuns();
 			});
 
 			Error = new Action<object>(o =>
 			{
-				StringsToLog.Enqueue(string.Concat(DateTime.Now, " ERROR ", o, Environment.NewLine));
+				var time = DateTime.Now;
+
+				ActionsToExecute.Enqueue(new Action(() =>
+				{
+					Log(string.Concat(time, " ERROR ", o, Environment.NewLine));
+				}));
+				
 				StartDequeueTaskIfNotRuns();
 			});
 			
 			Fatal = new Action<object>(o =>
 			{
-				StringsToLog.Enqueue(string.Concat(DateTime.Now, " FATAL ", o, Environment.NewLine));
+				var time = DateTime.Now;
+
+				ActionsToExecute.Enqueue(new Action(() =>
+				{
+					Log(string.Concat(time, " FATAL ", o, Environment.NewLine));
+				}));
+				
 				StartDequeueTaskIfNotRuns();
 			});
 		}
