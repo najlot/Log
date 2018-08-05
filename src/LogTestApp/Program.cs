@@ -8,19 +8,19 @@ namespace LogTestApp
 {
     class Program
     {
-		static Log log = LogBuilder
+		static ILog log = LogBuilder
 			.New
-			.SetLogLevel(LogLevel.Fatal, LogLevel.Fatal)
+			.SetLogLevel(LogLevel.Debug, LogLevel.Info)
 			//.AppendFileLog("app.log")
 			.AppendConsoleLog()
-			.Build() as Log;
+			.Build();
 
 		static long TestLogOnce()
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
-			for (int i = 0; i < 100000000; i++)
+			for (int i = 0; i < 100000; i++)
 			{
 				log.Info(i);
 			}
