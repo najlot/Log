@@ -8,19 +8,19 @@ namespace LogTestApp
 {
     class Program
     {
-		static ILog log = LogBuilder
+		static Log log = LogBuilder
 			.New
-			.SetLogLevel(LogLevel.Debug, LogLevel.Warn)
-			.AppendFileLog("app.log")
+			.SetLogLevel(LogLevel.Fatal, LogLevel.Fatal)
+			//.AppendFileLog("app.log")
 			.AppendConsoleLog()
-			.Build();
+			.Build() as Log;
 
 		static long TestLogOnce()
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
-			for (int i = 0; i < 100000; i++)
+			for (int i = 0; i < 100000000; i++)
 			{
 				log.Info(i);
 			}
@@ -34,11 +34,12 @@ namespace LogTestApp
 		{
 			var msMittelwert = new List<int>();
 			
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				var ms = TestLogOnce();
 				msMittelwert.Add((int)ms);
 				log.Warn(ms);
+				Console.WriteLine(ms);
 			}
 
 			log.Warn("".PadLeft(15, '-'));

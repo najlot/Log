@@ -1,31 +1,57 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NajlotLog
 {
 	internal class LogList : List<ILog>, ILog
 	{
-		public void Debug(object o)
-		{
-			foreach (var item in this)
-			{
-				item.Debug(o);
-			}
-		}
+		public Action<object> Debug { get; private set; }
+		public Action<object> Info { get; private set; }
+		public Action<object> Warn { get; private set; }
+		public Action<object> Error { get; private set; }
+		public Action<object> Fatal { get; private set; }
 
-		public void Error(object o)
+		public LogList()
 		{
-			foreach (var item in this)
+			Debug = new Action<object>(o =>
 			{
-				item.Error(o);
-			}
-		}
+				foreach (var item in this)
+				{
+					item.Debug(o);
+				}
+			});
 
-		public void Fatal(object o)
-		{
-			foreach (var item in this)
+			Info = new Action<object>(o =>
 			{
-				item.Fatal(o);
-			}
+				foreach (var item in this)
+				{
+					item.Info(o);
+				}
+			});
+
+			Warn = new Action<object>(o =>
+			{
+				foreach (var item in this)
+				{
+					item.Warn(o);
+				}
+			});
+
+			Error = new Action<object>(o =>
+			{
+				foreach (var item in this)
+				{
+					item.Error(o);
+				}
+			});
+
+			Fatal = new Action<object>(o =>
+			{
+				foreach (var item in this)
+				{
+					item.Fatal(o);
+				}
+			});
 		}
 
 		public void Flush()
@@ -33,22 +59,6 @@ namespace NajlotLog
 			foreach (var item in this)
 			{
 				item.Flush();
-			}
-		}
-
-		public void Info(object o)
-		{
-			foreach (var item in this)
-			{
-				item.Info(o);
-			}
-		}
-
-		public void Warn(object o)
-		{
-			foreach (var item in this)
-			{
-				item.Warn(o);
 			}
 		}
 	}

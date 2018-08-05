@@ -26,7 +26,7 @@ namespace NajlotLog
 				}
 			}
 		}
-
+		
 		private object DequeueTaskLock = new object();
 		private bool _dequeueTaskRuns = false;
 
@@ -66,36 +66,45 @@ namespace NajlotLog
 			}
 		}
 
-		public void Debug(object o)
+		public Action<object> Debug { get; private set; }
+		public Action<object> Info { get; private set; }
+		public Action<object> Warn { get; private set; }
+		public Action<object> Error { get; private set; }
+		public Action<object> Fatal { get; private set; }
+		
+		public LogImplementationBase()
 		{
-			StringsToLog.Enqueue(string.Concat(DateTime.Now, " DEBUG ", o, Environment.NewLine));
-			StartDequeueTaskIfNotRuns();
-		}
+			Debug = new Action<object>(o =>
+			{
+				StringsToLog.Enqueue(string.Concat(DateTime.Now, " DEBUG ", o, Environment.NewLine));
+				StartDequeueTaskIfNotRuns();
+			});
 
-		public void Error(object o)
-		{
-			StringsToLog.Enqueue(string.Concat(DateTime.Now, " ERROR ", o, Environment.NewLine));
-			StartDequeueTaskIfNotRuns();
-		}
+			Info = new Action<object>(o =>
+			{
+				StringsToLog.Enqueue(string.Concat(DateTime.Now, " INFO ", o, Environment.NewLine));
+				StartDequeueTaskIfNotRuns();
+			});
 
-		public void Fatal(object o)
-		{
-			StringsToLog.Enqueue(string.Concat(DateTime.Now, " FATAL ", o, Environment.NewLine));
-			StartDequeueTaskIfNotRuns();
-		}
+			Warn = new Action<object>(o =>
+			{
+				StringsToLog.Enqueue(string.Concat(DateTime.Now, " WARN ", o, Environment.NewLine));
+				StartDequeueTaskIfNotRuns();
+			});
 
-		public void Info(object o)
-		{
-			StringsToLog.Enqueue(string.Concat(DateTime.Now, " INFO ", o, Environment.NewLine));
-			StartDequeueTaskIfNotRuns();
+			Error = new Action<object>(o =>
+			{
+				StringsToLog.Enqueue(string.Concat(DateTime.Now, " ERROR ", o, Environment.NewLine));
+				StartDequeueTaskIfNotRuns();
+			});
+			
+			Fatal = new Action<object>(o =>
+			{
+				StringsToLog.Enqueue(string.Concat(DateTime.Now, " FATAL ", o, Environment.NewLine));
+				StartDequeueTaskIfNotRuns();
+			});
 		}
-
-		public void Warn(object o)
-		{
-			StringsToLog.Enqueue(string.Concat(DateTime.Now, " WARN ", o, Environment.NewLine));
-			StartDequeueTaskIfNotRuns();
-		}
-
+		
 		protected abstract void Log(string msg);
 
 		public void Flush()

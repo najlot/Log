@@ -2,16 +2,19 @@
 
 namespace NajlotLog
 {
-	internal class Log : ILog
+	public class Log : ILog
 	{
-		private bool DebugLog = false;
-		private bool InfoLog = false;
-		private bool WarnLog = false;
-		private bool ErrorLog = false;
-		private bool FatalLog = false;
 		private ILog Logger;
 
-		public Log(LogLevel logLevel, ILog log)
+		internal static Action<object> NoAction = new Action<object>(o =>{});
+
+		public Action<object> Debug { get; private set; } = NoAction;
+		public Action<object> Info { get; private set; } = NoAction;
+		public Action<object> Warn { get; private set; } = NoAction;
+		public Action<object> Error { get; private set; } = NoAction;
+		public Action<object> Fatal { get; private set; } = NoAction;
+
+		internal Log(LogLevel logLevel, ILog log)
 		{
 			Logger = log ?? throw new ArgumentNullException(nameof(log));
 			SetupLogLevel(logLevel);
@@ -22,72 +25,33 @@ namespace NajlotLog
 			switch (logLevel)
 			{
 				case LogLevel.Debug:
-					DebugLog = true;
-					InfoLog = true;
-					WarnLog = true;
-					ErrorLog = true;
-					FatalLog = true;
+					Debug = new Action<object>(o => Logger.Debug(o));
+					Info = new Action<object>(o => Logger.Info(o));
+					Warn = new Action<object>(o => Logger.Warn(o));
+					Error = new Action<object>(o => Logger.Error(o));
+					Fatal = new Action<object>(o => Logger.Fatal(o));
 					break;
 				case LogLevel.Info:
-					InfoLog = true;
-					WarnLog = true;
-					ErrorLog = true;
-					FatalLog = true;
+					Info = new Action<object>(o => Logger.Info(o));
+					Warn = new Action<object>(o => Logger.Warn(o));
+					Error = new Action<object>(o => Logger.Error(o));
+					Fatal = new Action<object>(o => Logger.Fatal(o));
 					break;
 				case LogLevel.Warn:
-					WarnLog = true;
-					ErrorLog = true;
-					FatalLog = true;
+					Warn = new Action<object>(o => Logger.Warn(o));
+					Error = new Action<object>(o => Logger.Error(o));
+					Fatal = new Action<object>(o => Logger.Fatal(o));
 					break;
 				case LogLevel.Error:
-					FatalLog = true;
+					Error = new Action<object>(o => Logger.Error(o));
+					Fatal = new Action<object>(o => Logger.Fatal(o));
 					break;
 				case LogLevel.Fatal:
-					FatalLog = true;
+					Fatal = new Action<object>(o => Logger.Fatal(o));
 					break;
 			}
 		}
-
-		public void Debug(object o)
-		{
-			if (DebugLog)
-			{
-				Logger.Debug(o);
-			}
-		}
-
-		public void Info(object o)
-		{
-			if (InfoLog)
-			{
-				Logger.Info(o);
-			}
-		}
-
-		public void Warn(object o)
-		{
-			if (WarnLog)
-			{
-				Logger.Warn(o);
-			}
-		}
-
-		public void Error(object o)
-		{
-			if (ErrorLog)
-			{
-				Logger.Error(o);
-			}
-		}
-
-		public void Fatal(object o)
-		{
-			if (FatalLog)
-			{
-				Logger.Fatal(o);
-			}
-		}
-
+		
 		public void Flush()
 		{
 			Logger.Flush();
