@@ -14,7 +14,7 @@ namespace NajlotLog
 
 		public ILoggerRequestor AppendConsoleLog()
 		{
-			LogList.Add(new ConsoleLogImplementation());
+			LogList.Add(new AsyncConsoleLogImplementation());
 			return this;
 		}
 
@@ -26,11 +26,11 @@ namespace NajlotLog
 
 		public ILoggerRequestor AppendFileLog(string path)
 		{
-			LogList.Add(new FileLogImplementation(path));
+			LogList.Add(new AsyncFileLogImplementation(path));
 			return this;
 		}
 
-		public ILog Build()
+		public Log Build()
 		{
 			if (LogList.Count == 0) throw new InvalidOperationException("No loggers appended");
 

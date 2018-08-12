@@ -2,12 +2,12 @@
 
 namespace NajlotLog
 {
-	internal class FileLogImplementation : LogImplementationBase, ILog
+	internal class AsyncFileLogImplementation : AsyncLogImplementationBase, ILog
 	{
 		private static object FileLock = new object();
 		private string FilePath;
 
-		public FileLogImplementation(string path)
+		public AsyncFileLogImplementation(string path)
 		{
 			path = Path.GetFullPath(path);
 

@@ -4,11 +4,11 @@ namespace NajlotLog
 {
 	public interface ILog
 	{
-		Action<object> Debug { get; }
-		Action<object> Error { get; }
-		Action<object> Fatal { get; }
-		Action<object> Info { get; }
-		Action<object> Warn { get; }
+		void Debug<T>(T o);
+		void Error<T>(T o);
+		void Fatal<T>(T o);
+		void Info<T>(T o);
+		void Warn<T>(T o);
 
 		void Flush();
 	}

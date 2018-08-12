@@ -6,6 +6,6 @@
 		ILoggerRequestor AppendFileLog(string path);
 		ILoggerRequestor AppendCustomLog(ILog log);
 
-		ILog Build();
+		Log Build();
 	}
 }

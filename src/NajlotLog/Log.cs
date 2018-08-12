@@ -4,19 +4,17 @@ namespace NajlotLog
 {
 	public class Log : ILog
 	{
-		private ILog Logger;
+		private InternalLogger Logger;
 
-		internal static Action<object> NoAction = new Action<object>(o =>{});
-
-		public Action<object> Debug { get; private set; } = NoAction;
-		public Action<object> Info { get; private set; } = NoAction;
-		public Action<object> Warn { get; private set; } = NoAction;
-		public Action<object> Error { get; private set; } = NoAction;
-		public Action<object> Fatal { get; private set; } = NoAction;
-
+		private bool LogDebug = false;
+		private bool LogInfo = false;
+		private bool LogWarn = false;
+		private bool LogError = false;
+		private bool LogFatal = false;
+		
 		internal Log(LogLevel logLevel, ILog log)
 		{
-			Logger = log ?? throw new ArgumentNullException(nameof(log));
+			Logger = new InternalLogger(log ?? throw new ArgumentNullException(nameof(log)));
 			SetupLogLevel(logLevel);
 		}
 		
@@ -25,30 +23,111 @@ namespace NajlotLog
 			switch (logLevel)
 			{
 				case LogLevel.Debug:
-					Debug = new Action<object>(o => Logger.Debug(o));
-					Info = new Action<object>(o => Logger.Info(o));
-					Warn = new Action<object>(o => Logger.Warn(o));
-					Error = new Action<object>(o => Logger.Error(o));
-					Fatal = new Action<object>(o => Logger.Fatal(o));
+					LogDebug = true;
+					LogInfo = true;
+					LogWarn = true;
+					LogError = true;
+					LogFatal = true;
 					break;
 				case LogLevel.Info:
-					Info = new Action<object>(o => Logger.Info(o));
-					Warn = new Action<object>(o => Logger.Warn(o));
-					Error = new Action<object>(o => Logger.Error(o));
-					Fatal = new Action<object>(o => Logger.Fatal(o));
+					LogInfo = true;
+					LogWarn = true;
+					LogError = true;
+					LogFatal = true;
 					break;
 				case LogLevel.Warn:
-					Warn = new Action<object>(o => Logger.Warn(o));
-					Error = new Action<object>(o => Logger.Error(o));
-					Fatal = new Action<object>(o => Logger.Fatal(o));
+					LogWarn = true;
+					LogError = true;
+					LogFatal = true;
 					break;
 				case LogLevel.Error:
-					Error = new Action<object>(o => Logger.Error(o));
-					Fatal = new Action<object>(o => Logger.Fatal(o));
+					LogError = true;
+					LogFatal = true;
 					break;
 				case LogLevel.Fatal:
-					Fatal = new Action<object>(o => Logger.Fatal(o));
+					LogFatal = true;
 					break;
+			}
+		}
+		
+		private class InternalLogger // That class speeds up the execution when not logging.
+									 // Implementing the ILog interface there makes execution slower... Does not matter - it is internal
+		{
+			private ILog Log;
+
+			public InternalLogger(ILog log)
+			{
+				Log = log;
+			}
+
+			public void Debug<T>(T o)
+			{
+				Log.Debug(o);
+			}
+
+			public void Info<T>(T o)
+			{
+				Log.Info(o);
+			}
+
+			public void Warn<T>(T o)
+			{
+				Log.Warn(o);
+			}
+
+			public void Error<T>(T o)
+			{
+				Log.Error(o);
+			}
+
+			public void Fatal<T>(T o)
+			{
+				Log.Fatal(o);
+			}
+
+			public void Flush()
+			{
+				Log.Flush();
+			}
+		}
+		
+		public void Debug<T>(T o)
+		{
+			if(LogDebug)
+			{
+				Logger.Debug(o);
+			}
+		}
+		
+		public void Info<T>(T o)
+		{
+			if (LogInfo)
+			{
+				Logger.Info(o);
+			}
+		}
+
+		public void Warn<T>(T o)
+		{
+			if (LogWarn)
+			{
+				Logger.Warn(o);
+			}
+		}
+
+		public void Error<T>(T o)
+		{
+			if (LogError)
+			{
+				Logger.Error(o);
+			}
+		}
+
+		public void Fatal<T>(T o)
+		{
+			if (LogFatal)
+			{
+				Logger.Fatal(o);
 			}
 		}
 		

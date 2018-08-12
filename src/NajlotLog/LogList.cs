@@ -5,53 +5,44 @@ namespace NajlotLog
 {
 	internal class LogList : List<ILog>, ILog
 	{
-		public Action<object> Debug { get; private set; }
-		public Action<object> Info { get; private set; }
-		public Action<object> Warn { get; private set; }
-		public Action<object> Error { get; private set; }
-		public Action<object> Fatal { get; private set; }
-
-		public LogList()
+		public void Debug<T>(T o)
 		{
-			Debug = new Action<object>(o =>
+			foreach (var item in this)
 			{
-				foreach (var item in this)
-				{
-					item.Debug(o);
-				}
-			});
+				item.Debug(o);
+			}
+		}
 
-			Info = new Action<object>(o =>
+		public void Info<T>(T o)
+		{
+			foreach (var item in this)
 			{
-				foreach (var item in this)
-				{
-					item.Info(o);
-				}
-			});
+				item.Info(o);
+			}
+		}
 
-			Warn = new Action<object>(o =>
+		public void Warn<T>(T o)
+		{
+			foreach (var item in this)
 			{
-				foreach (var item in this)
-				{
-					item.Warn(o);
-				}
-			});
+				item.Warn(o);
+			}
+		}
 
-			Error = new Action<object>(o =>
+		public void Error<T>(T o)
+		{
+			foreach (var item in this)
 			{
-				foreach (var item in this)
-				{
-					item.Error(o);
-				}
-			});
+				item.Error(o);
+			}
+		}
 
-			Fatal = new Action<object>(o =>
+		public void Fatal<T>(T o)
+		{
+			foreach (var item in this)
 			{
-				foreach (var item in this)
-				{
-					item.Fatal(o);
-				}
-			});
+				item.Fatal(o);
+			}
 		}
 
 		public void Flush()

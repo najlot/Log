@@ -8,10 +8,10 @@ namespace LogTestApp
 {
     class Program
     {
-		static ILog log = LogBuilder
-			.New
-			.SetLogLevel(LogLevel.Debug, LogLevel.Info)
-			//.AppendFileLog("app.log")
+		static Log log = LogBuilder
+			.New()
+			.SetLogLevel(LogLevel.Fatal, LogLevel.Fatal)
+			.AppendFileLog("app.log")
 			.AppendConsoleLog()
 			.Build();
 
@@ -20,7 +20,7 @@ namespace LogTestApp
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
-			for (int i = 0; i < 100000; i++)
+			for (int i = 0; i < 100000000; i++)
 			{
 				log.Info(i);
 			}
@@ -34,7 +34,7 @@ namespace LogTestApp
 		{
 			var msMittelwert = new List<int>();
 			
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 100; i++)
 			{
 				var ms = TestLogOnce();
 				msMittelwert.Add((int)ms);
@@ -50,16 +50,18 @@ namespace LogTestApp
 			{
 				sum += val;
 			}
-			
-			log.Warn("".PadLeft(15, '-'));
-			Console.WriteLine(sum / msMittelwert.Count);
-			log.Warn("".PadLeft(15, '-'));
 
+			Console.WriteLine("".PadLeft(16, '-'));
+			Console.WriteLine(sum / msMittelwert.Count);
+			Console.WriteLine("".PadLeft(16, '-'));
+
+			Console.WriteLine("----FLUSHING----");
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
 			log.Flush();
 			Console.WriteLine(sw.ElapsedMilliseconds);
+			sw.Stop();
 		}
 		
 		static void Main(string[] args)

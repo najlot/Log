@@ -2,7 +2,7 @@
 
 namespace NajlotLog
 {
-	internal class ConsoleLogImplementation : LogImplementationBase, ILog
+	internal class AsyncConsoleLogImplementation : AsyncLogImplementationBase, ILog
 	{
 		protected override void Log(string msg)
 		{

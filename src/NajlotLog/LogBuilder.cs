@@ -2,12 +2,9 @@
 {
 	public class LogBuilder
 	{
-		public static ILogLevelRequestor New
+		public static ILogLevelRequestor New()
 		{
-			get
-			{
-				return new LogLevelRequestor();
-			}
+			return new LogLevelRequestor();
 		}
 	}
 }
