@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NajlotLog
 {
-	internal class LogList : List<ILog>, ILog
+	internal class LoggerList : List<ILogger>, ILogger
 	{
 		public void Debug<T>(T o)
 		{

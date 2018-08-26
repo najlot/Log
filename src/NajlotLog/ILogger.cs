@@ -2,7 +2,7 @@
 
 namespace NajlotLog
 {
-	public interface ILog
+    public interface ILogger
 	{
 		void Debug<T>(T o);
 		void Error<T>(T o);
