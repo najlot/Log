@@ -64,7 +64,7 @@ namespace NajlotLog.Middleware
 						ex = ex.InnerException;
 					}
 
-					Console.Error.WriteLine(errorMessage);
+					Console.WriteLine("NajlotLog: " + errorMessage);
                 }
             }
 

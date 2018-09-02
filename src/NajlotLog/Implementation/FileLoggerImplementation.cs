@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NajlotLog.Configuration;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 
@@ -11,7 +12,7 @@ namespace NajlotLog.Implementation
 
 		private static ConcurrentDictionary<string, object> FileNameLockDictionary = new ConcurrentDictionary<string, object>();
 
-		public FileLoggerImplementation(string path) : base()
+		public FileLoggerImplementation(ILogConfiguration configuration, string path) : base(configuration)
 		{
 			path = Path.GetFullPath(path);
 			

@@ -7,11 +7,29 @@ namespace NajlotLog
 {
 	public class LoggerPool
 	{
-		public static LoggerPool Instance { get; } = new LoggerPool();
+		/// <summary>
+		/// Static LoggerPool instance
+		/// </summary>
+		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
 
+		/// <summary>
+		/// Creates new LoggerPool with a new configuration.
+		/// </summary>
+		/// <returns></returns>
+		public static LoggerPool CreateNew()
+		{
+			return new LoggerPool(new LogConfiguration());
+		}
+
+		private ILogConfiguration _logConfiguration;
 		private List<ILogger> _appenders = new List<ILogger>();
 		private Dictionary<Type, Logger> _loggerCache = new Dictionary<Type, Logger>();
-		
+
+		public LoggerPool(ILogConfiguration logConfiguration)
+		{
+			_logConfiguration = logConfiguration;
+		}
+
 		internal void AddAppender<T>(T appender) where T : LoggerPrototype<T>, ILogger
 		{
 			lock (_appenders) _appenders.Add(appender);
@@ -34,15 +52,17 @@ namespace NajlotLog
 					{
 						case 0:
 							{
-								Console.Error.WriteLine("Creating logger without appenders");
-								var consoleLogger = new ConsoleLoggerImplementation();
-								logger = new Logger(LogConfiguration.Instance.LogLevel, consoleLogger);
+								Console.WriteLine("NajlotLog: There are no appenders specified: Creating console appender.");
+								var consoleLogger = new ConsoleLoggerImplementation(_logConfiguration);
+								_logConfiguration.AttachObserver(consoleLogger);
+								logger = new Logger(consoleLogger, _logConfiguration);
 							}
 
 							break;
 
 						case 1:
-							logger = new Logger(LogConfiguration.Instance.LogLevel, _appenders[0]);
+							_logConfiguration.AttachObserver(_appenders[0] as IConfigurationChangedObserver);
+							logger = new Logger(_appenders[0], _logConfiguration);
 							break;
 
 						default:
@@ -51,13 +71,16 @@ namespace NajlotLog
 
 								foreach (var appender in _appenders)
 								{
-									loggerList.Add(appender
+									var clonedAppender = appender
 										.GetType()
 										.GetMethod("Clone", new Type[] { typeof(Type) })
-										.Invoke(appender, new object[] { sourceType }) as ILogger);
+										.Invoke(appender, new object[] { sourceType });
+
+									_logConfiguration.AttachObserver(clonedAppender as IConfigurationChangedObserver);
+									loggerList.Add(clonedAppender as ILogger);
 								}
 
-								logger = new Logger(LogConfiguration.Instance.LogLevel, loggerList);
+								logger = new Logger(loggerList, _logConfiguration);
 							}
 
 							break;

@@ -9,6 +9,7 @@ namespace NajlotLog.Implementation
 	{
 		private ILogExecutionMiddleware _middleware;
 		private ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();
+		private ILogConfiguration _logConfiguration;
 
 		protected Func<LogMessage, string> Format = (message) =>
 		{
@@ -16,10 +17,12 @@ namespace NajlotLog.Implementation
 			var sourceTypeName = message.SourceType == null ? "" : message.SourceType.Name;
 			return $"{timestamp} {message.LogLevel.ToString().ToUpper()} {sourceTypeName} {message.Message}";
 		};
-
-		public LoggerImplementationBase()
+		
+		public LoggerImplementationBase(ILogConfiguration logConfiguration)
 		{
-			_middleware = LogConfiguration.Instance.LogExecutionMiddleware;
+			_logConfiguration = logConfiguration;
+
+			_middleware = logConfiguration.LogExecutionMiddleware;
 
 			if(_middleware == null)
 			{
@@ -27,12 +30,12 @@ namespace NajlotLog.Implementation
 			}
 
 			Func<LogMessage, string> format;
-			if (LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out format))
+			if (logConfiguration.TryGetFormatFunctionForType(this.GetType(), out format))
 			{
 				Format = format;
 			}
 
-			LogConfiguration.Instance.AttachObserver(this);
+			logConfiguration.AttachObserver(this);
 		}
 
 		public void Flush()
@@ -168,7 +171,7 @@ namespace NajlotLog.Implementation
 
 		public void Dispose()
 		{
-			LogConfiguration.Instance.DetachObserver(this);
+			_logConfiguration.DetachObserver(this);
 		}
 	}
 }

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace NajlotLog.Tests
 {
-	public partial class LogTests
+	public class ExecutionMiddlewareTests
 	{
 		[Fact]
 		public void MiddlewareMockMustGetAndExecuteCorrectAction()
@@ -18,13 +18,19 @@ namespace NajlotLog.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				loggerGotAction = true;
-				logMessageActual = msg.Message.ToString();
-			});
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				{
+					loggerGotAction = true;
+					logMessageActual = msg.Message.ToString();
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new LogExecutionMiddlewareMock(action =>
+			var logger = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.LogExecutionMiddleware = new LogExecutionMiddlewareMock(action =>
 			{
 				middlewareGotAction = true;
 				action();
@@ -44,15 +50,21 @@ namespace NajlotLog.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				loggerGotAction = true;
-				logMessageActual = msg.Message.ToString();
-			});
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				{
+					loggerGotAction = true;
+					logMessageActual = msg.Message.ToString();
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			var log = loggerPool.GetLogger(this.GetType());
 
-			logger.Info(logMessageExpected);
+			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+
+			log.Info(logMessageExpected);
 			
 			Assert.True(loggerGotAction, "Logger did not got the action");
 			Assert.Equal(logMessageExpected, logMessageActual);
@@ -64,20 +76,26 @@ namespace NajlotLog.Tests
 			bool loggerGotAction = false;
 			var logMessageActual = "";
 
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				loggerGotAction = true;
-				logMessageActual = msg.Message.ToString();
-			});
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				{
+					loggerGotAction = true;
+					logMessageActual = msg.Message.ToString();
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
 
 			for (int i = 0; i < 10; i++)
 			{
 				var logMessageExpected = i.ToString();
 				loggerGotAction = false;
 				
-				logger.Info(logMessageExpected);
+				log.Info(logMessageExpected);
 
 				Assert.True(loggerGotAction, $"Logger did not got the action[{i}]");
 				Assert.Equal(logMessageExpected, logMessageActual);
@@ -89,18 +107,23 @@ namespace NajlotLog.Tests
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
-
 			List<string> messages = new List<string>();
-			
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				executionsActual++;
-				var logMessageActual = msg.Message.ToString();
-				bool couldRemove = messages.Remove(logMessageActual);
-				Assert.True(couldRemove, "Could not remove " + logMessageActual);
-			});
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				{
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
+					bool couldRemove = messages.Remove(logMessageActual);
+					Assert.True(couldRemove, "Could not remove " + logMessageActual);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -109,10 +132,10 @@ namespace NajlotLog.Tests
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
-				logger.Info(i.ToString());
+				log.Info(i.ToString());
 			}
 			
-			logger.Flush();
+			log.Flush();
 
 			Assert.Equal(executionsExpected, executionsActual);
 		}
@@ -122,25 +145,29 @@ namespace NajlotLog.Tests
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
-
 			List<string> messages = new List<string>();
-
 			var manualResetEventSlim = new ManualResetEventSlim(false);
 
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				executionsActual++;
-				var logMessageActual = msg.Message.ToString();
-				bool couldRemove = messages.Remove(logMessageActual);
-				Assert.True(couldRemove, "Could not remove " + logMessageActual);
-
-				if(executionsActual == executionsExpected)
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
 				{
-					manualResetEventSlim.Set();
-				}
-			});
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
+					bool couldRemove = messages.Remove(logMessageActual);
+					Assert.True(couldRemove, "Could not remove " + logMessageActual);
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+					if (executionsActual == executionsExpected)
+					{
+						manualResetEventSlim.Set();
+					}
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -149,7 +176,7 @@ namespace NajlotLog.Tests
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
-				logger.Info(i.ToString());
+				log.Info(i.ToString());
 			}
 
 			manualResetEventSlim.Wait(5000);
@@ -162,22 +189,27 @@ namespace NajlotLog.Tests
 		{
 			int executionsExpected = 10000;
 			int executionsActual = 0;
-
 			List<string> messages = new List<string>();
 
-			var logger = new LoggerImplementationMock(msg =>
-			{
-				executionsActual++;
-				var logMessageActual = msg.Message.ToString();
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				{
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
 
-				bool couldRemove = false;
+					bool couldRemove = false;
 
-				lock(messages) couldRemove = messages.Remove(logMessageActual);
+					lock (messages) couldRemove = messages.Remove(logMessageActual);
 
-				Assert.True(couldRemove, "Could not remove " + logMessageActual);
-			});
+					Assert.True(couldRemove, "Could not remove " + logMessageActual);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
 			
 			for (int i = 0; i < executionsExpected * 2; i++)
 			{
@@ -186,14 +218,14 @@ namespace NajlotLog.Tests
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
-				logger.Info(i.ToString());
+				log.Info(i.ToString());
 			}
 
-			LogConfiguration.Instance.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
 			
 			for (int i = executionsExpected; i < executionsExpected * 2; i++)
 			{
-				logger.Info(i.ToString());
+				log.Info(i.ToString());
 			}
 
 			Assert.Equal(executionsExpected * 2, executionsActual);

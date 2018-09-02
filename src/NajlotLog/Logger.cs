@@ -7,65 +7,23 @@ namespace NajlotLog
 	{
 		private InternalLogger internalLogger;
 
-		/// <summary>
-		/// This class speeds up the execution when not logging.
-		/// Implementing the ILogger interface there makes execution slower... Does not matter - it is internal
-		/// </summary>
-		private class InternalLogger
-		{
-			private ILogger Log;
-
-			public InternalLogger(ILogger log)
-			{
-				Log = log;
-			}
-
-			public void Debug<T>(T o)
-			{
-				Log.Debug(o);
-			}
-
-			public void Info<T>(T o)
-			{
-				Log.Info(o);
-			}
-
-			public void Warn<T>(T o)
-			{
-				Log.Warn(o);
-			}
-
-			public void Error<T>(T o)
-			{
-				Log.Error(o);
-			}
-
-			public void Fatal<T>(T o)
-			{
-				Log.Fatal(o);
-			}
-
-			public void Flush()
-			{
-				Log.Flush();
-			}
-		}
-
 		private bool LogDebug = false;
 		private bool LogInfo = false;
 		private bool LogWarn = false;
 		private bool LogError = false;
 		private bool LogFatal = false;
-		
-		internal Logger(LogLevel logLevel, ILogger log)
+
+		internal Logger(ILogger log, ILogConfiguration logConfiguration)
 		{
-			LogConfiguration.Instance.AttachObserver(this);
+			_logConfiguration = logConfiguration;
+			_logConfiguration.AttachObserver(this);
 
 			internalLogger = new InternalLogger(log ?? throw new ArgumentNullException(nameof(log)));
-			SetupLogLevel(logLevel);
+			SetupLogLevel(logConfiguration.LogLevel);
 		}
 
 		private LogLevel _logLevel;
+		private ILogConfiguration _logConfiguration;
 
 		private void SetupLogLevel(LogLevel logLevel)
 		{
@@ -75,52 +33,42 @@ namespace NajlotLog
 			LogInfo = false;
 			LogWarn = false;
 			LogError = false;
-			LogFatal = false;
 
-			// TODO
-			/*if(logLevel >= LogLevel.Fatal)
+			LogFatal = true;
+			if (logLevel == LogLevel.Fatal)
 			{
-
-			}*/
-
-			switch (logLevel)
-			{
-				case LogLevel.Debug:
-					LogDebug = true;
-					LogInfo = true;
-					LogWarn = true;
-					LogError = true;
-					LogFatal = true;
-					break;
-				case LogLevel.Info:
-					LogInfo = true;
-					LogWarn = true;
-					LogError = true;
-					LogFatal = true;
-					break;
-				case LogLevel.Warn:
-					LogWarn = true;
-					LogError = true;
-					LogFatal = true;
-					break;
-				case LogLevel.Error:
-					LogError = true;
-					LogFatal = true;
-					break;
-				case LogLevel.Fatal:
-					LogFatal = true;
-					break;
+				return;
 			}
+
+			LogError = true;
+			if (logLevel == LogLevel.Error)
+			{
+				return;
+			}
+
+			LogWarn = true;
+			if (logLevel == LogLevel.Warn)
+			{
+				return;
+			}
+
+			LogInfo = true;
+			if (logLevel == LogLevel.Info)
+			{
+				return;
+			}
+
+			LogDebug = true;
 		}
-		
+
 		public void Debug<T>(T o)
 		{
-			if(LogDebug)
+			if (LogDebug)
 			{
 				internalLogger.Debug(o);
 			}
 		}
-		
+
 		public void Info<T>(T o)
 		{
 			if (LogInfo)
@@ -152,15 +100,15 @@ namespace NajlotLog
 				internalLogger.Fatal(o);
 			}
 		}
-		
+
 		public void Flush()
 		{
 			internalLogger.Flush();
 		}
-		
+
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
-			if(_logLevel != configuration.LogLevel)
+			if (_logLevel != configuration.LogLevel)
 			{
 				_logLevel = configuration.LogLevel;
 				SetupLogLevel(_logLevel);
@@ -169,7 +117,7 @@ namespace NajlotLog
 
 		public void Dispose()
 		{
-			LogConfiguration.Instance.DetachObserver(this);
+			_logConfiguration.DetachObserver(this);
 		}
 	}
 }

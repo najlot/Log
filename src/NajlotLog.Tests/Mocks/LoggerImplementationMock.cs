@@ -1,3 +1,4 @@
+using NajlotLog.Configuration;
 using NajlotLog.Implementation;
 using System;
 
@@ -7,7 +8,7 @@ namespace NajlotLog.Tests.Mocks
 	{
 		Action<LogMessage> _logAction;
 
-		public LoggerImplementationMock(Action<LogMessage> logAction) : base()
+		public LoggerImplementationMock(ILogConfiguration configuration,Action<LogMessage> logAction) : base(configuration)
 		{
 			_logAction = logAction;
 		}

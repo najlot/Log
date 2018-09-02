@@ -1,3 +1,4 @@
+using NajlotLog.Configuration;
 using NajlotLog.Middleware;
 using NajlotLog.Tests.Mocks;
 using System;
@@ -5,23 +6,27 @@ using Xunit;
 
 namespace NajlotLog.Tests
 {
-	public partial class LogTests
+	public class LoggerTests
 	{
 		[Fact]
 		public void LoggerMustLogWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
 
-			LogConfigurator.Instance
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Fatal)
 				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
-				.AddCustomAppender(new LoggerImplementationMock(msg =>
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
 				{
 					gotLogMessage = true;
-				}));
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
 
-			var log = LoggerPool.Instance.GetLogger(typeof(LogTests));
+			var log = loggerPool.GetLogger(this.GetType());
 
-			LogConfigurator.Instance.SetLogLevel(LogLevel.Debug);
+			logConfiguration.LogLevel = LogLevel.Debug;
 
 			log.Debug("");
 			Assert.True(gotLogMessage, "LogLevel.Debug, but did not got Debug message");
@@ -43,7 +48,7 @@ namespace NajlotLog.Tests
 			Assert.True(gotLogMessage, "LogLevel.Debug, but did not got Fatal message");
 			gotLogMessage = false;
 
-			LogConfigurator.Instance.SetLogLevel(LogLevel.Info);
+			logConfiguration.LogLevel = LogLevel.Info;
 
 			log.Debug("");
 			Assert.False(gotLogMessage, "LogLevel.Info, but got Debug message");
@@ -65,7 +70,7 @@ namespace NajlotLog.Tests
 			Assert.True(gotLogMessage, "LogLevel.Info, but did not got Fatal message");
 			gotLogMessage = false;
 
-			LogConfigurator.Instance.SetLogLevel(LogLevel.Warn);
+			logConfiguration.LogLevel = LogLevel.Warn;
 
 			log.Debug("");
 			Assert.False(gotLogMessage, "LogLevel.Warn, but got Debug message");
@@ -87,7 +92,7 @@ namespace NajlotLog.Tests
 			Assert.True(gotLogMessage, "LogLevel.Warn, but did not got Fatal message");
 			gotLogMessage = false;
 
-			LogConfigurator.Instance.SetLogLevel(LogLevel.Error);
+			logConfiguration.LogLevel = LogLevel.Error;
 
 			log.Debug("");
 			Assert.False(gotLogMessage, "LogLevel.Error, but got Debug message");
@@ -109,7 +114,7 @@ namespace NajlotLog.Tests
 			Assert.True(gotLogMessage, "LogLevel.Error, but did not got Fatal message");
 			gotLogMessage = false;
 
-			LogConfigurator.Instance.SetLogLevel(LogLevel.Fatal);
+			logConfiguration.LogLevel = LogLevel.Fatal;
 
 			log.Debug("");
 			Assert.False(gotLogMessage, "LogLevel.Fatal, but got Debug message");

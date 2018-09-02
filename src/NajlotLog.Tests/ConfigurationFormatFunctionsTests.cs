@@ -5,20 +5,20 @@ using Xunit;
 
 namespace NajlotLog.Tests
 {
-	public partial class LogTests
+	public class ConfigurationFormatFunctionsTests
 	{
-		public LogTests()
-		{
-			LogConfiguration.Instance.ClearAllFormatFunctions();
-		}
-
 		[Fact]
 		public void NotSetFormattingFunctionMustReturnFalseOnGet()
 		{
-			Func<LogMessage, string> formatFunc;
-			bool canGetFunction = LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+			
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(
+				this.GetType(), 
+				out Func<LogMessage, string> formatFunc);
 
-			Assert.False(canGetFunction, "Could get not set function");
+			Assert.False(canGetFunction, "Could get function, that was not set");
 		}
 
 		[Fact]
@@ -26,18 +26,21 @@ namespace NajlotLog.Tests
 		{
 			var returnString = "some sample string";
 
-			bool canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
 			{
 				return returnString;
 			});
 
 			Assert.True(canSetFunction, "Could not set function");
 
-			LogConfiguration.Instance.ClearAllFormatFunctions();
-
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			logConfiguration.ClearAllFormatFunctions();
+			
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), 
+				out Func<LogMessage, string> formatFunc);
 
 			Assert.False(canGetFunction, "Could get not set function");
 		}
@@ -47,16 +50,18 @@ namespace NajlotLog.Tests
         {
 			var returnString = "some sample string";
 
-			bool canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
 			{
 				return returnString;
 			});
 
 			Assert.True(canSetFunction, "Could not set function");
 
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
@@ -70,21 +75,25 @@ namespace NajlotLog.Tests
 		{
 			var returnString = "correct string";
 
-			bool canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
 			{
 				return "wrong 1";
 			});
 
 			Assert.True(canSetFunction, "Could not set function 1");
 
-			canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
 			{
 				return "wrong 2";
 			});
 
 			Assert.True(canSetFunction, "Could not set function 2");
 
-			canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
 			{
 				return returnString;
 			});
@@ -93,7 +102,7 @@ namespace NajlotLog.Tests
 
 			Func<LogMessage, string> formatFunc;
 
-			bool canGetFunction = LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
@@ -107,12 +116,15 @@ namespace NajlotLog.Tests
 		{
 			var thisType = this.GetType();
 			var returnString = thisType.Name;
-
 			var types = new List<Type>() { typeof(LogMessage), thisType, typeof(Logger) };
 
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+			
 			foreach(var type in types)
 			{
-				bool canSetFunction = LogConfiguration.Instance.TrySetFormatFunctionForType(type, (msg) =>
+				bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(type, (msg) =>
 				{
 					return type.Name;
 				});
@@ -122,7 +134,7 @@ namespace NajlotLog.Tests
 			
 			Func<LogMessage, string> formatFunc;
 
-			bool canGetFunction = LogConfiguration.Instance.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 

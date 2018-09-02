@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 namespace NajlotLog.Configuration
 {
-	public class LogConfiguration : ILogConfiguration
+	internal class LogConfiguration : ILogConfiguration
 	{
 		public static ILogConfiguration Instance { get; } = new LogConfiguration();
 
-		private LogConfiguration()
+		internal LogConfiguration()
 		{
 
 		}
-
+		
 		LogLevel logLevel = LogLevel.Debug;
 		public LogLevel LogLevel
 		{
