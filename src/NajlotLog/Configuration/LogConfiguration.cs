@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace NajlotLog.Configuration
 {
+	/// <summary>
+	/// Internal implementation of the ILogConfiguration interface
+	/// </summary>
 	internal class LogConfiguration : ILogConfiguration
 	{
 		public static ILogConfiguration Instance { get; } = new LogConfiguration();
@@ -30,21 +33,21 @@ namespace NajlotLog.Configuration
 			}
 		}
 
-		ILogExecutionMiddleware logExecutionMiddleware = new SyncLogExecutionMiddleware();
-		public ILogExecutionMiddleware LogExecutionMiddleware
+		IExecutionMiddleware executionMiddleware = new SyncExecutionMiddleware();
+		public IExecutionMiddleware ExecutionMiddleware
 		{
 			get
 			{
-				return logExecutionMiddleware;
+				return executionMiddleware;
 			}
 			set
 			{
-				if(logExecutionMiddleware != value)
+				if(executionMiddleware != value)
 				{
 					// Observers get new middleware and we dispose the old one
-					using (var oldMiddleware = logExecutionMiddleware)
+					using (var oldMiddleware = executionMiddleware)
 					{
-						logExecutionMiddleware = value;
+						executionMiddleware = value;
 						NotifyObservers();
 					}
 				}

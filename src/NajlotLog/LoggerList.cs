@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace NajlotLog
 {
+	/// <summary>
+	/// Internal class for multiple log destinations.
+	/// </summary>
 	internal class LoggerList : List<ILogger>, ILogger
 	{
 		public void Debug<T>(T o)

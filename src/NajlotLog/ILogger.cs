@@ -9,7 +9,7 @@ namespace NajlotLog
 		void Fatal<T>(T o);
 		void Info<T>(T o);
 		void Warn<T>(T o);
-
+		
 		void Flush();
 	}
 }

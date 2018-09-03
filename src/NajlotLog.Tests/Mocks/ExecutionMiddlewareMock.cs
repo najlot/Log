@@ -3,11 +3,11 @@ using System;
 
 namespace NajlotLog.Tests.Mocks
 {
-	public class LogExecutionMiddlewareMock : ILogExecutionMiddleware
+	public class ExecutionMiddlewareMock : IExecutionMiddleware
 	{
 		private Action<Action> _action;
 
-		public LogExecutionMiddlewareMock(Action<Action> action)
+		public ExecutionMiddlewareMock(Action<Action> action)
 		{
 			_action = action;
 		}

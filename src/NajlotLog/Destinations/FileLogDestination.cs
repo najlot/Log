@@ -3,20 +3,23 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 
-namespace NajlotLog.Implementation
+namespace NajlotLog.Destinations
 {
-	internal class FileLoggerImplementation : LoggerImplementationBase
+	/// <summary>
+	/// Writes all messages to a file.
+	/// </summary>
+	internal class FileLogDestination : LogDestinationBase
 	{
 		public object FileLock { get; protected set; }
 		public string FilePath { get; protected set; }
 
 		private static ConcurrentDictionary<string, object> FileNameLockDictionary = new ConcurrentDictionary<string, object>();
 
-		public FileLoggerImplementation(ILogConfiguration configuration, string path) : base(configuration)
+		public FileLogDestination(ILogConfiguration configuration, string path) : base(configuration)
 		{
 			path = Path.GetFullPath(path);
 			
-			FileLock = FileNameLockDictionary.GetOrAdd(path, new object());
+			FileLock = FileNameLockDictionary.GetOrAdd(path.ToLower(), new object());
 
 			var dir = Path.GetDirectoryName(path);
 

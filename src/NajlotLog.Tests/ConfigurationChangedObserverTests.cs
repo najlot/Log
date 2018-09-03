@@ -15,7 +15,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
 				}))
@@ -36,14 +36,14 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 
 			var log = loggerPool.GetLogger(this.GetType());
-			logConfiguration.LogExecutionMiddleware = new LogExecutionMiddlewareMock(null);
+			logConfiguration.ExecutionMiddleware = new ExecutionMiddlewareMock(null);
 
 			Assert.True(observerNotified, "Observer was not notified on middleware changed");
 		}
@@ -57,7 +57,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
 
@@ -87,7 +87,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
 				}))
@@ -113,11 +113,11 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					wrongObserverNotified = true;
 				}))
-				.AddCustomAppender(new SecondConfigurationChangedObserverMock(logConfiguration, (config) =>
+				.AddCustomDestination(new SecondConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					rightObserverNotified = true;
 				}))

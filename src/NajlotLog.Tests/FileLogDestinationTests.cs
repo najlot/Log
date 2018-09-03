@@ -6,10 +6,10 @@ using Xunit;
 
 namespace NajlotLog.Tests
 {
-	public class FileLoggerTest
+	public class FileLogDestinationTests
 	{
 		[Fact]
-		public void FileLoggerMustWriteFile()
+		public void FileLoggerPrototypesMustWriteToSameFile()
 		{
 			var fileName = "TestFile.log";
 
@@ -21,8 +21,8 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
-				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
-				.AddFileAppender(fileName)
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.AddFileLogDestination(fileName)
 				.GetLoggerPool(out LoggerPool loggerPool);
 
 			var logForThis = loggerPool.GetLogger(this.GetType());

@@ -16,9 +16,9 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					gotLogMessage = true;
 				}))

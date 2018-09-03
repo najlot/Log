@@ -21,7 +21,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
@@ -30,7 +30,7 @@ namespace NajlotLog.Tests
 
 			var logger = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new LogExecutionMiddlewareMock(action =>
+			logConfiguration.ExecutionMiddleware = new ExecutionMiddlewareMock(action =>
 			{
 				middlewareGotAction = true;
 				action();
@@ -44,7 +44,7 @@ namespace NajlotLog.Tests
 		}
 
 		[Fact]
-		public void SyncLogExecutionMiddlewareOneTime()
+		public void SyncExecutionMiddlewareOneTime()
 		{
 			bool loggerGotAction = false;
 			var logMessageExpected = "test log message";
@@ -53,7 +53,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
@@ -62,7 +62,7 @@ namespace NajlotLog.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 
 			log.Info(logMessageExpected);
 			
@@ -71,7 +71,7 @@ namespace NajlotLog.Tests
 		}
 
 		[Fact]
-		public void SyncLogExecutionMiddlewareMustMultipleTimes()
+		public void SyncExecutionMiddlewareMustMultipleTimes()
 		{
 			bool loggerGotAction = false;
 			var logMessageActual = "";
@@ -79,7 +79,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
@@ -88,7 +88,7 @@ namespace NajlotLog.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -103,7 +103,7 @@ namespace NajlotLog.Tests
 		}
 
 		[Fact]
-		public void DequeueTaskLogExecutionMiddlewareMultipleTimes()
+		public void DequeueTaskExecutionMiddlewareMultipleTimes()
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
@@ -112,7 +112,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					executionsActual++;
 					var logMessageActual = msg.Message.ToString();
@@ -123,7 +123,7 @@ namespace NajlotLog.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -141,7 +141,7 @@ namespace NajlotLog.Tests
 		}
 
 		[Fact]
-		public void DequeueTaskLogExecutionMiddlewareWithoutFlush()
+		public void DequeueTaskExecutionMiddlewareWithoutFlush()
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
@@ -151,7 +151,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					executionsActual++;
 					var logMessageActual = msg.Message.ToString();
@@ -167,7 +167,7 @@ namespace NajlotLog.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -194,7 +194,7 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					executionsActual++;
 					var logMessageActual = msg.Message.ToString();
@@ -209,7 +209,7 @@ namespace NajlotLog.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.LogExecutionMiddleware = new DequeueTaskLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
 			
 			for (int i = 0; i < executionsExpected * 2; i++)
 			{
@@ -221,7 +221,7 @@ namespace NajlotLog.Tests
 				log.Info(i.ToString());
 			}
 
-			logConfiguration.LogExecutionMiddleware = new SyncLogExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 			
 			for (int i = executionsExpected; i < executionsExpected * 2; i++)
 			{

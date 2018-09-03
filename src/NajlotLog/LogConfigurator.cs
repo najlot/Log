@@ -1,14 +1,23 @@
 ﻿using NajlotLog.Configuration;
-using NajlotLog.Implementation;
+using NajlotLog.Destinations;
 using System;
 
 namespace NajlotLog
 {
+	/// <summary>
+	/// Class to help the user to cunfigure his log destinations, execution middleware, log level etc.
+	/// </summary>
 	public class LogConfigurator
 	{
 		private ILogConfiguration _logConfiguration;
 		private LoggerPool _loggerPool;
 		public static LogConfigurator Instance { get; } = new LogConfigurator(LogConfiguration.Instance, LoggerPool.Instance);
+
+		internal LogConfigurator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
+		{
+			_logConfiguration = logConfiguration;
+			_loggerPool = loggerPool;
+		}
 
 		public static LogConfigurator CreateNew()
 		{
@@ -29,54 +38,49 @@ namespace NajlotLog
 			loggerPool = _loggerPool;
 			return this;
 		}
-
-		internal LogConfigurator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
-		{
-			_logConfiguration = logConfiguration;
-			_loggerPool = loggerPool;
-		}
-
+		
 		public LogConfigurator SetLogLevel(LogLevel logLevel)
 		{
 			_logConfiguration.LogLevel = logLevel;
 			return this;
 		}
 
-		public LogConfigurator SetLogExecutionMiddleware(Middleware.ILogExecutionMiddleware middleware)
+		public LogConfigurator SetExecutionMiddleware(Middleware.IExecutionMiddleware middleware)
 		{
-			_logConfiguration.LogExecutionMiddleware = middleware;
+			_logConfiguration.ExecutionMiddleware = middleware;
 			return this;
 		}
 
-		public LogConfigurator AddCustomAppender(LoggerImplementationBase appender, Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddCustomDestination(LogDestinationBase logDestination, Func<LogMessage, string> formatFunction = null)
 		{
-			if (appender == null)
+			if (logDestination == null)
 			{
-				throw new ArgumentNullException(nameof(appender));
+				throw new ArgumentNullException(nameof(logDestination));
 			}
 			
 			if(formatFunction != null)
 			{
-				if(!_logConfiguration.TrySetFormatFunctionForType(appender.GetType(), formatFunction))
+				var logDestinationType = logDestination.GetType();
+				if (!_logConfiguration.TrySetFormatFunctionForType(logDestinationType, formatFunction))
 				{
-					Console.WriteLine("NajlotLog: Could not set format function for " + appender.GetType());
+					Console.WriteLine("NajlotLog: Could not set format function for " + logDestinationType.Name);
 				}
 			}
 
-			_loggerPool.AddAppender(appender);
+			_loggerPool.AddLogDestination(logDestination);
 			return this;
 		}
 
-		public LogConfigurator AddConsoleAppender(Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null)
 		{
-			var appender = new ConsoleLoggerImplementation(_logConfiguration);
-			return AddCustomAppender(appender, formatFunction);
+			var logDestination = new ConsoleLogDestination(_logConfiguration);
+			return AddCustomDestination(logDestination, formatFunction);
 		}
 
-		public LogConfigurator AddFileAppender(string fileName, Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
 		{
-			var appender = new FileLoggerImplementation(_logConfiguration, fileName);
-			return AddCustomAppender(appender, formatFunction);
+			var logDestination = new FileLogDestination(_logConfiguration, fileName);
+			return AddCustomDestination(logDestination, formatFunction);
 		}
 	}
 }

@@ -13,9 +13,9 @@ namespace LogTestApp
 		static Program()
 		{
 			LogConfigurator.Instance
-				.AddConsoleAppender()
-				.AddFileAppender("Test.log")
-				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
+				.AddConsoleLogDestination()
+				.AddFileLogDestination("Test.log")
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
 				.SetLogLevel(LogLevel.Fatal);
 
 			log = LoggerPool.Instance.GetLogger(typeof(Program));

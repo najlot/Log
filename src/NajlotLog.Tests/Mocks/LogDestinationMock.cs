@@ -1,14 +1,14 @@
 using NajlotLog.Configuration;
-using NajlotLog.Implementation;
+using NajlotLog.Destinations;
 using System;
 
 namespace NajlotLog.Tests.Mocks
 {
-	public class LoggerImplementationMock : LoggerImplementationBase
+	public class LogDestinationMock : LogDestinationBase
 	{
 		Action<LogMessage> _logAction;
 
-		public LoggerImplementationMock(ILogConfiguration configuration,Action<LogMessage> logAction) : base(configuration)
+		public LogDestinationMock(ILogConfiguration configuration,Action<LogMessage> logAction) : base(configuration)
 		{
 			_logAction = logAction;
 		}

@@ -1,10 +1,13 @@
 ﻿using NajlotLog.Configuration;
-using NajlotLog.Implementation;
+using NajlotLog.Destinations;
 using System;
 using System.Collections.Generic;
 
 namespace NajlotLog
 {
+	/// <summary>
+	/// Class for managing instances of loggers and log destinations.
+	/// </summary>
 	public class LoggerPool
 	{
 		/// <summary>
@@ -22,7 +25,7 @@ namespace NajlotLog
 		}
 
 		private ILogConfiguration _logConfiguration;
-		private List<ILogger> _appenders = new List<ILogger>();
+		private List<ILogger> _logDestinations = new List<ILogger>();
 		private Dictionary<Type, Logger> _loggerCache = new Dictionary<Type, Logger>();
 
 		public LoggerPool(ILogConfiguration logConfiguration)
@@ -30,9 +33,9 @@ namespace NajlotLog
 			_logConfiguration = logConfiguration;
 		}
 
-		internal void AddAppender<T>(T appender) where T : LoggerPrototype<T>, ILogger
+		internal void AddLogDestination<T>(T logDestination) where T : LogDestinationPrototype<T>, ILogger
 		{
-			lock (_appenders) _appenders.Add(appender);
+			lock (_logDestinations) _logDestinations.Add(logDestination);
 		}
 
 		public Logger GetLogger(Type sourceType)
@@ -46,14 +49,14 @@ namespace NajlotLog
 					return logger;
 				}
 
-				lock (_appenders)
+				lock (_logDestinations)
 				{
-					switch (_appenders.Count)
+					switch (_logDestinations.Count)
 					{
 						case 0:
 							{
-								Console.WriteLine("NajlotLog: There are no appenders specified: Creating console appender.");
-								var consoleLogger = new ConsoleLoggerImplementation(_logConfiguration);
+								Console.WriteLine("NajlotLog: There are no log destinations specified: Creating console log destination.");
+								var consoleLogger = new ConsoleLogDestination(_logConfiguration);
 								_logConfiguration.AttachObserver(consoleLogger);
 								logger = new Logger(consoleLogger, _logConfiguration);
 							}
@@ -62,8 +65,8 @@ namespace NajlotLog
 
 						case 1:
 							{
-								var clonedAppender = CloneAppender(sourceType, _appenders[0]);
-								logger = new Logger(clonedAppender, _logConfiguration);
+								var clonedLogDestination = CloneLogDestination(sourceType, _logDestinations[0]);
+								logger = new Logger(clonedLogDestination, _logConfiguration);
 							}
 
 							break;
@@ -72,10 +75,10 @@ namespace NajlotLog
 							{
 								var loggerList = new LoggerList();
 
-								foreach (var appender in _appenders)
+								foreach (var logDestination in _logDestinations)
 								{
-									var clonedAppender = CloneAppender(sourceType, appender);
-									loggerList.Add(clonedAppender);
+									var clonedLogDestination = CloneLogDestination(sourceType, logDestination);
+									loggerList.Add(clonedLogDestination);
 								}
 
 								logger = new Logger(loggerList, _logConfiguration);
@@ -91,14 +94,14 @@ namespace NajlotLog
 			return logger;
 		}
 
-		private ILogger CloneAppender(Type sourceType, ILogger appender)
+		private ILogger CloneLogDestination(Type sourceType, ILogger LogDestination)
 		{
-			var appenderType = appender.GetType();
-			var cloneMethod = appenderType.GetMethod("Clone", new Type[] { typeof(Type) });
-			var clonedAppender = cloneMethod.Invoke(appender, new object[] { sourceType });
+			var logDestinationType = LogDestination.GetType();
+			var cloneMethod = logDestinationType.GetMethod("Clone", new Type[] { typeof(Type) });
+			var clonedlogDestination = cloneMethod.Invoke(LogDestination, new object[] { sourceType });
 
-			_logConfiguration.AttachObserver(clonedAppender as IConfigurationChangedObserver);
-			return clonedAppender as ILogger;
+			_logConfiguration.AttachObserver(clonedlogDestination as IConfigurationChangedObserver);
+			return clonedlogDestination as ILogger;
 		}
 	}
 }

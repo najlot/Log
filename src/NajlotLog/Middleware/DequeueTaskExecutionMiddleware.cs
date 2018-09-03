@@ -5,7 +5,13 @@ using System.Threading.Tasks;
 
 namespace NajlotLog.Middleware
 {
-    public class DequeueTaskLogExecutionMiddleware : ILogExecutionMiddleware
+	/// <summary>
+	/// Enqueues actions to a queue and executes them in a task.
+	/// Has the advantage, that logging does not slow down the execution 
+	/// and the task runs out when there are no messages to log.
+	/// Do not forget to flush, to get all of your logged messages!
+	/// </summary>
+    public class DequeueTaskExecutionMiddleware : IExecutionMiddleware
 	{
 		private ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
 		

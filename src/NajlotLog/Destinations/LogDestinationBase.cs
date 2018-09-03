@@ -3,11 +3,14 @@ using System.Threading;
 using NajlotLog.Configuration;
 using NajlotLog.Middleware;
 
-namespace NajlotLog.Implementation
+namespace NajlotLog.Destinations
 {
-	public abstract class LoggerImplementationBase : LoggerPrototype<LoggerImplementationBase>, ILogger, IConfigurationChangedObserver, IDisposable
+	/// <summary>
+	/// Base implementation for a log destination.
+	/// </summary>
+	public abstract class LogDestinationBase : LogDestinationPrototype<LogDestinationBase>, ILogger, IConfigurationChangedObserver, IDisposable
 	{
-		private ILogExecutionMiddleware _middleware;
+		private IExecutionMiddleware _middleware;
 		private ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();
 		private ILogConfiguration _logConfiguration;
 
@@ -18,11 +21,11 @@ namespace NajlotLog.Implementation
 			return $"{timestamp} {message.LogLevel.ToString().ToUpper()} {sourceTypeName} {message.Message}";
 		};
 		
-		public LoggerImplementationBase(ILogConfiguration logConfiguration)
+		public LogDestinationBase(ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
 
-			_middleware = logConfiguration.LogExecutionMiddleware;
+			_middleware = logConfiguration.ExecutionMiddleware;
 			
 			Func<LogMessage, string> format;
 			if (logConfiguration.TryGetFormatFunctionForType(this.GetType(), out format))
@@ -144,9 +147,9 @@ namespace NajlotLog.Implementation
 			{
 				_configurationChangeLock.EnterWriteLock();
 
-				if (_middleware != configuration.LogExecutionMiddleware)
+				if (_middleware != configuration.ExecutionMiddleware)
 				{
-					_middleware = configuration.LogExecutionMiddleware;
+					_middleware = configuration.ExecutionMiddleware;
 				}
 
 				Func<LogMessage, string> format;
@@ -154,7 +157,7 @@ namespace NajlotLog.Implementation
 				{
 					if (Format != format)
 					{
-						_middleware = configuration.LogExecutionMiddleware;
+						_middleware = configuration.ExecutionMiddleware;
 					}
 				}
 			}

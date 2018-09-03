@@ -14,8 +14,8 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddConsoleAppender()
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddConsoleLogDestination()
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 
 				}))
@@ -43,9 +43,9 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
-				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					sourceType = msg.SourceType;
 					gotLogMessage = true;
@@ -91,10 +91,10 @@ namespace NajlotLog.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
-				.SetLogExecutionMiddleware(new SyncLogExecutionMiddleware())
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddConsoleAppender()
-				.AddCustomAppender(new LoggerImplementationMock(logConfiguration, msg =>
+				.AddConsoleLogDestination()
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
 					sourceType = msg.SourceType;
 					gotLogMessage = true;

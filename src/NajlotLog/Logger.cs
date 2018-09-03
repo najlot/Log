@@ -3,6 +3,10 @@ using System;
 
 namespace NajlotLog
 {
+	/// <summary>
+	/// Class to be used for logging.
+	/// Can bundle multiple log destinations and decides whether the message should be logged
+	/// </summary>
 	public class Logger : ILogger, IConfigurationChangedObserver, IDisposable
 	{
 		private InternalLogger internalLogger;

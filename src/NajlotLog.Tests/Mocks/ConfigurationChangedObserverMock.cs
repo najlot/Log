@@ -1,10 +1,10 @@
 using NajlotLog.Configuration;
-using NajlotLog.Implementation;
+using NajlotLog.Destinations;
 using System;
 
 namespace NajlotLog.Tests.Mocks
 {
-	public class ConfigurationChangedObserverMock : LoggerImplementationBase, IConfigurationChangedObserver
+	public class ConfigurationChangedObserverMock : LogDestinationBase, IConfigurationChangedObserver
 	{
 		private Action<ILogConfiguration> _configurationChangedAction;
 
