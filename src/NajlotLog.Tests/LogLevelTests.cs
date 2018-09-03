@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NajlotLog.Tests
 {
-	public class LoggerTests
+	public class LogLevelTests
 	{
 		[Fact]
 		public void LoggerMustLogWithCorrectLogLevel()

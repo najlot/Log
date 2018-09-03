@@ -61,8 +61,11 @@ namespace NajlotLog
 							break;
 
 						case 1:
-							_logConfiguration.AttachObserver(_appenders[0] as IConfigurationChangedObserver);
-							logger = new Logger(_appenders[0], _logConfiguration);
+							{
+								var clonedAppender = CloneAppender(sourceType, _appenders[0]);
+								logger = new Logger(clonedAppender, _logConfiguration);
+							}
+
 							break;
 
 						default:
@@ -71,13 +74,8 @@ namespace NajlotLog
 
 								foreach (var appender in _appenders)
 								{
-									var clonedAppender = appender
-										.GetType()
-										.GetMethod("Clone", new Type[] { typeof(Type) })
-										.Invoke(appender, new object[] { sourceType });
-
-									_logConfiguration.AttachObserver(clonedAppender as IConfigurationChangedObserver);
-									loggerList.Add(clonedAppender as ILogger);
+									var clonedAppender = CloneAppender(sourceType, appender);
+									loggerList.Add(clonedAppender);
 								}
 
 								logger = new Logger(loggerList, _logConfiguration);
@@ -91,6 +89,16 @@ namespace NajlotLog
 			}
 
 			return logger;
+		}
+
+		private ILogger CloneAppender(Type sourceType, ILogger appender)
+		{
+			var appenderType = appender.GetType();
+			var cloneMethod = appenderType.GetMethod("Clone", new Type[] { typeof(Type) });
+			var clonedAppender = cloneMethod.Invoke(appender, new object[] { sourceType });
+
+			_logConfiguration.AttachObserver(clonedAppender as IConfigurationChangedObserver);
+			return clonedAppender as ILogger;
 		}
 	}
 }

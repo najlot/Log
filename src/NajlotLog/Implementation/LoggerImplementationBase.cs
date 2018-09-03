@@ -23,12 +23,7 @@ namespace NajlotLog.Implementation
 			_logConfiguration = logConfiguration;
 
 			_middleware = logConfiguration.LogExecutionMiddleware;
-
-			if(_middleware == null)
-			{
-				System.Diagnostics.Debugger.Break();
-			}
-
+			
 			Func<LogMessage, string> format;
 			if (logConfiguration.TryGetFormatFunctionForType(this.GetType(), out format))
 			{
