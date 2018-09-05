@@ -18,20 +18,26 @@ namespace NajlotLog
 		public LogLevel LogLevel { get; private set; }
 
 		/// <summary>
-		/// Type of the class logging was requested for
+		/// Category the logger was requested for
 		/// </summary>
-		public Type SourceType { get; private set; }
+		public string Category { get; private set; }
 
 		/// <summary>
 		/// The instance that was given to the request
 		/// </summary>
 		public object Message { get; private set; }
 
-		public LogMessage(DateTime dateTime, LogLevel logLevel, Type sourceType, object message)
+		/// <summary>
+		/// State set with BeginScope
+		/// </summary>
+		public object State { get; private set; }
+
+		public LogMessage(DateTime dateTime, LogLevel logLevel, string category, object state, object message)
 		{
 			DateTime = dateTime;
 			LogLevel = logLevel;
-			SourceType = sourceType;
+			Category = category;
+			State = state;
 			Message = message;
 		}
 	}

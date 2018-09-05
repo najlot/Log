@@ -9,6 +9,23 @@ namespace NajlotLog.Tests
 	public class LogLevelTests
 	{
 		[Fact]
+		public void CheckIsLogLevelEnabled()
+		{
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Warn)
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var logger = loggerPool.GetLogger(this.GetType());
+
+			Assert.True(logger.IsEnabled(LogLevel.Warn));
+			Assert.True(logger.IsEnabled(LogLevel.Error));
+			Assert.False(logger.IsEnabled(LogLevel.Info));
+		}
+
+		[Fact]
 		public void LoggerMustLogWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using NajlotLog.Configuration;
 using NajlotLog.Middleware;
+using NajlotLog.Util;
 
 namespace NajlotLog.Destinations
 {
@@ -13,12 +15,20 @@ namespace NajlotLog.Destinations
 		private IExecutionMiddleware _middleware;
 		private ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();
 		private ILogConfiguration _logConfiguration;
+		private object _currentState;
+		private Stack<object> _states = new Stack<object>();
 
 		protected Func<LogMessage, string> Format = (message) =>
 		{
 			string timestamp = message.DateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-			var sourceTypeName = message.SourceType == null ? "" : message.SourceType.Name;
-			return $"{timestamp} {message.LogLevel.ToString().ToUpper()} {sourceTypeName} {message.Message}";
+			var category = message.Category == null ? "" : message.Category;
+			string delimiter = "";
+
+			return string.Concat(timestamp, 
+				delimiter, message.LogLevel.ToString().ToUpper(), 
+				delimiter, category, 
+				delimiter, message.State, 
+				delimiter, message.Message);
 		};
 		
 		public LogDestinationBase(ILogConfiguration logConfiguration)
@@ -36,20 +46,43 @@ namespace NajlotLog.Destinations
 			logConfiguration.AttachObserver(this);
 		}
 
-		public void Flush()
+		public IDisposable BeginScope<T>(T state)
 		{
+			_states.Push(_currentState);
+			_currentState = state;
+			
+			return new OnDisposeExcecutor(() =>
+			{
+				if(_states.Count > 0)
+				{
+					_currentState = _states.Pop();
+				}
+				else
+				{
+					_currentState = null;
+				}
+			});
+		}
+		
+		protected abstract void Log(LogMessage message);
+
+		public void Trace<T>(T o)
+		{
+			var time = DateTime.Now;
+			
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
-				_middleware.Flush();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Trace, Category, _currentState, o));
+				});
 			}
 			finally
 			{
 				_configurationChangeLock.ExitReadLock();
 			}
 		}
-
-		protected abstract void Log(LogMessage message);
 
 		public void Debug<T>(T o)
 		{
@@ -60,7 +93,7 @@ namespace NajlotLog.Destinations
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Debug, SourceType, o));
+					Log(new LogMessage(time, LogLevel.Debug, Category, _currentState, o));
 				});
 			}
 			finally
@@ -78,7 +111,7 @@ namespace NajlotLog.Destinations
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Info, SourceType, o));
+					Log(new LogMessage(time, LogLevel.Info, Category, _currentState, o));
 				});
 			}
 			finally
@@ -96,7 +129,7 @@ namespace NajlotLog.Destinations
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Warn, SourceType, o));
+					Log(new LogMessage(time, LogLevel.Warn, Category, _currentState, o));
 				});
 			}
 			finally
@@ -114,7 +147,7 @@ namespace NajlotLog.Destinations
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Error, SourceType, o));
+					Log(new LogMessage(time, LogLevel.Error, Category, _currentState, o));
 				});
 			}
 			finally
@@ -132,7 +165,7 @@ namespace NajlotLog.Destinations
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Fatal, SourceType, o));
+					Log(new LogMessage(time, LogLevel.Fatal, Category, _currentState, o));
 				});
 			}
 			finally
@@ -164,6 +197,19 @@ namespace NajlotLog.Destinations
 			finally
 			{
 				_configurationChangeLock.ExitWriteLock();
+			}
+		}
+
+		public void Flush()
+		{
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Flush();
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
 			}
 		}
 

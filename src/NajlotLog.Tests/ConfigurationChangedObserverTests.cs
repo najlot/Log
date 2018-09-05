@@ -65,7 +65,7 @@ namespace NajlotLog.Tests
 					Assert.True(config.TryGetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), out format),
 						"Observer notified, but could not get function");
 
-					Assert.Equal(testString, format(new LogMessage(DateTime.Now, LogLevel.Info, null, null)));
+					Assert.Equal(testString, format(new LogMessage(DateTime.Now, LogLevel.Info, null, null, null)));
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 			

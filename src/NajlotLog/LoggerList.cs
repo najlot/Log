@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NajlotLog.Util;
+using System;
 using System.Collections.Generic;
 
 namespace NajlotLog
@@ -8,6 +9,14 @@ namespace NajlotLog
 	/// </summary>
 	internal class LoggerList : List<ILogger>, ILogger
 	{
+		public void Trace<T>(T o)
+		{
+			foreach (var item in this)
+			{
+				item.Trace(o);
+			}
+		}
+
 		public void Debug<T>(T o)
 		{
 			foreach (var item in this)
@@ -54,6 +63,18 @@ namespace NajlotLog
 			{
 				item.Flush();
 			}
+		}
+		
+		public IDisposable BeginScope<T>(T state)
+		{
+			var disposableListOfDisposables = new DisposableListOfDisposables();
+			
+			foreach (var item in this)
+			{
+				disposableListOfDisposables.Add(item.BeginScope(state));
+			}
+
+			return disposableListOfDisposables;
 		}
 	}
 }

@@ -11,6 +11,7 @@ namespace NajlotLog
 	{
 		private InternalLogger internalLogger;
 
+		private bool LogTrace = false;
 		private bool LogDebug = false;
 		private bool LogInfo = false;
 		private bool LogWarn = false;
@@ -26,6 +27,11 @@ namespace NajlotLog
 			SetupLogLevel(logConfiguration.LogLevel);
 		}
 
+		public bool IsEnabled(LogLevel logLevel)
+		{
+			return logLevel >= _logLevel;
+		}
+
 		private LogLevel _logLevel;
 		private ILogConfiguration _logConfiguration;
 
@@ -33,10 +39,16 @@ namespace NajlotLog
 		{
 			_logLevel = logLevel;
 
+			LogFatal = false;
 			LogDebug = false;
 			LogInfo = false;
 			LogWarn = false;
 			LogError = false;
+
+			if (logLevel == LogLevel.None)
+			{
+				return;
+			}
 
 			LogFatal = true;
 			if (logLevel == LogLevel.Fatal)
@@ -63,6 +75,25 @@ namespace NajlotLog
 			}
 
 			LogDebug = true;
+
+			if (logLevel == LogLevel.Debug)
+			{
+				return;
+			}
+
+			if (logLevel == LogLevel.Trace)
+			{
+				// Must be carefull with this one...
+				LogTrace = true;
+			}
+		}
+
+		public void Trace<T>(T o)
+		{
+			if (LogTrace)
+			{
+				internalLogger.Trace(o);
+			}
 		}
 
 		public void Debug<T>(T o)
@@ -122,6 +153,11 @@ namespace NajlotLog
 		public void Dispose()
 		{
 			_logConfiguration.DetachObserver(this);
+		}
+
+		public IDisposable BeginScope<T>(T state)
+		{
+			return internalLogger.BeginScope(state);
 		}
 	}
 }

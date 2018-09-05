@@ -26,7 +26,7 @@ namespace NajlotLog
 
 		private ILogConfiguration _logConfiguration;
 		private List<ILogger> _logDestinations = new List<ILogger>();
-		private Dictionary<Type, Logger> _loggerCache = new Dictionary<Type, Logger>();
+		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 
 		public LoggerPool(ILogConfiguration logConfiguration)
 		{
@@ -40,11 +40,16 @@ namespace NajlotLog
 
 		public Logger GetLogger(Type sourceType)
 		{
+			return GetLogger(sourceType.FullName);
+		}
+
+		public Logger GetLogger(string category)
+		{
 			Logger logger;
 
 			lock (_loggerCache)
 			{
-				if (_loggerCache.TryGetValue(sourceType, out logger))
+				if (_loggerCache.TryGetValue(category, out logger))
 				{
 					return logger;
 				}
@@ -65,7 +70,7 @@ namespace NajlotLog
 
 						case 1:
 							{
-								var clonedLogDestination = CloneLogDestination(sourceType, _logDestinations[0]);
+								var clonedLogDestination = CloneLogDestination(category, _logDestinations[0]);
 								logger = new Logger(clonedLogDestination, _logConfiguration);
 							}
 
@@ -77,7 +82,7 @@ namespace NajlotLog
 
 								foreach (var logDestination in _logDestinations)
 								{
-									var clonedLogDestination = CloneLogDestination(sourceType, logDestination);
+									var clonedLogDestination = CloneLogDestination(category, logDestination);
 									loggerList.Add(clonedLogDestination);
 								}
 
@@ -88,17 +93,17 @@ namespace NajlotLog
 					}
 				}
 
-				_loggerCache.Add(sourceType, logger);
+				_loggerCache.Add(category, logger);
 			}
 
 			return logger;
 		}
 
-		private ILogger CloneLogDestination(Type sourceType, ILogger LogDestination)
+		private ILogger CloneLogDestination(string category, ILogger LogDestination)
 		{
 			var logDestinationType = LogDestination.GetType();
-			var cloneMethod = logDestinationType.GetMethod("Clone", new Type[] { typeof(Type) });
-			var clonedlogDestination = cloneMethod.Invoke(LogDestination, new object[] { sourceType });
+			var cloneMethod = logDestinationType.GetMethod("Clone", new Type[] { typeof(string) });
+			var clonedlogDestination = cloneMethod.Invoke(LogDestination, new object[] { category });
 
 			_logConfiguration.AttachObserver(clonedlogDestination as IConfigurationChangedObserver);
 			return clonedlogDestination as ILogger;

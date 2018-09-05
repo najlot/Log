@@ -35,10 +35,10 @@ namespace NajlotLog.Tests
 		}
 
 		[Fact]
-		public void PrototypesMustBeCopiedWithNewSourceType()
+		public void PrototypesMustBeCopiedWithNewCategory()
 		{
 			bool gotLogMessage = false;
-			Type sourceType = null;
+			string category = null;
 
 			LogConfigurator
 				.CreateNew()
@@ -47,7 +47,7 @@ namespace NajlotLog.Tests
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
-					sourceType = msg.SourceType;
+					category = msg.Category;
 					gotLogMessage = true;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -61,32 +61,32 @@ namespace NajlotLog.Tests
 			logForThis.Info("log this");
 
 			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType, sourceType);
+			Assert.Equal(thisType.FullName, category);
 
 			gotLogMessage = false;
-			sourceType = null;
+			category = null;
 
 			logForPool.Info("log pool");
 
 			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
-			Assert.Equal(loggerPoolType, sourceType);
+			Assert.Equal(loggerPoolType.FullName, category);
 
 			logForThis = loggerPool.GetLogger(thisType);
 
 			gotLogMessage = false;
-			sourceType = null;
+			category = null;
 
 			logForThis.Info("log this 2");
 
 			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType, sourceType);
+			Assert.Equal(thisType.FullName, category);
 		}
 
 		[Fact]
-		public void MultiplePrototypesMustBeCopiedWithNewSourceType()
+		public void MultiplePrototypesMustBeCopiedWithNewCategory()
 		{
 			bool gotLogMessage = false;
-			Type sourceType = null;
+			string category = null;
 
 			LogConfigurator
 				.CreateNew()
@@ -96,7 +96,7 @@ namespace NajlotLog.Tests
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
-					sourceType = msg.SourceType;
+					category = msg.Category;
 					gotLogMessage = true;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -110,25 +110,25 @@ namespace NajlotLog.Tests
 			logForThis.Info("log this");
 
 			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType, sourceType);
+			Assert.Equal(thisType.FullName, category);
 
 			gotLogMessage = false;
-			sourceType = null;
+			category = null;
 
 			logForPool.Info("log pool");
 
 			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
-			Assert.Equal(loggerPoolType, sourceType);
+			Assert.Equal(loggerPoolType.FullName, category);
 
 			logForThis = loggerPool.GetLogger(thisType);
 
 			gotLogMessage = false;
-			sourceType = null;
+			category = null;
 
 			logForThis.Info("log this 2");
 
 			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType, sourceType);
+			Assert.Equal(thisType.FullName, category);
 		}
 	}
 }

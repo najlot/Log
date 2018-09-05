@@ -1,4 +1,6 @@
-﻿namespace NajlotLog
+﻿using System;
+
+namespace NajlotLog
 {
 	/// <summary>
 	/// This class speeds up the execution when not logging.
@@ -6,41 +8,51 @@
 	/// </summary>
 	internal class InternalLogger
 	{
-		private ILogger Log;
+		private ILogger _log;
 
 		public InternalLogger(ILogger log)
 		{
-			Log = log;
+			_log = log;
+		}
+
+		internal void Trace<T>(T o)
+		{
+			_log.Trace(o);
 		}
 
 		public void Debug<T>(T o)
 		{
-			Log.Debug(o);
+			_log.Debug(o);
 		}
 
 		public void Info<T>(T o)
 		{
-			Log.Info(o);
+			_log.Info(o);
 		}
 
 		public void Warn<T>(T o)
 		{
-			Log.Warn(o);
+			_log.Warn(o);
 		}
 
 		public void Error<T>(T o)
 		{
-			Log.Error(o);
+			_log.Error(o);
 		}
 
 		public void Fatal<T>(T o)
 		{
-			Log.Fatal(o);
+			_log.Fatal(o);
 		}
 
 		public void Flush()
 		{
-			Log.Flush();
+			_log.Flush();
+		}
+
+		internal IDisposable BeginScope<T>(T state)
+		{
+			return _log.BeginScope(state);
 		}
 	}
 }
