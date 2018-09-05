@@ -21,14 +21,16 @@ namespace NajlotLog.Destinations
 		protected Func<LogMessage, string> Format = (message) =>
 		{
 			string timestamp = message.DateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-			var category = message.Category == null ? "" : message.Category;
-			string delimiter = "";
+			var category = message.Category ?? "";
+			string delimiter = "|";
 
-			return string.Concat(timestamp, 
-				delimiter, message.LogLevel.ToString().ToUpper(), 
-				delimiter, category, 
-				delimiter, message.State, 
+			var formatted = string.Concat(timestamp,
+				delimiter, message.LogLevel.ToString().ToUpper(),
+				delimiter, category,
+				delimiter, message.State,
 				delimiter, message.Message);
+
+			return message.ExceptionIsValid ? formatted + message.Exception.ToString() : formatted;
 		};
 		
 		public LogDestinationBase(ILogConfiguration logConfiguration)
@@ -166,6 +168,114 @@ namespace NajlotLog.Destinations
 				_middleware.Execute(() =>
 				{
 					Log(new LogMessage(time, LogLevel.Fatal, Category, _currentState, o));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Trace<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Trace, Category, _currentState, o, ex));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Debug<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Debug, Category, _currentState, o, ex));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Error<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Error, Category, _currentState, o, ex));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Fatal<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Fatal, Category, _currentState, o, ex));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Info<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Info, Category, _currentState, o, ex));
+				});
+			}
+			finally
+			{
+				_configurationChangeLock.ExitReadLock();
+			}
+		}
+
+		public void Warn<T>(T o, Exception ex)
+		{
+			var time = DateTime.Now;
+
+			try
+			{
+				_configurationChangeLock.EnterReadLock();
+				_middleware.Execute(() =>
+				{
+					Log(new LogMessage(time, LogLevel.Warn, Category, _currentState, o, ex));
 				});
 			}
 			finally

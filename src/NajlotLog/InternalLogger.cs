@@ -54,5 +54,35 @@ namespace NajlotLog
 		{
 			return _log.BeginScope(state);
 		}
+
+		internal void Trace<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal void Debug<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal void Error<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal void Fatal<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal void Info<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal void Warn<T>(T o, Exception ex)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

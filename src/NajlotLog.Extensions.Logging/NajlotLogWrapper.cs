@@ -27,34 +27,34 @@ namespace NajlotLog.Extensions.Logging
 			switch (logLevel)
 			{
 				case Microsoft.Extensions.Logging.LogLevel.Trace:
-					_logger.Trace(formatter(state, exception)); // TODO: Hey! I have my own formatting specified!
+					_logger.Trace(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.Debug:
-					_logger.Debug(formatter(state, exception));
+					_logger.Debug(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.Information:
-					_logger.Info(formatter(state, exception));
+					_logger.Info(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.Warning:
-					_logger.Warn(formatter(state, exception));
+					_logger.Warn(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.Error:
-					_logger.Error(formatter(state, exception));
+					_logger.Error(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.Critical:
-					_logger.Fatal(formatter(state, exception));
+					_logger.Fatal(state, exception);
 					break;
 
 				case Microsoft.Extensions.Logging.LogLevel.None:
 					break;
 
 				default: // Should never occur. Better write debug than have a hidden bug.
-					_logger.Debug(formatter(state, exception));
+					_logger.Debug(state, exception);
 					break;
 			}
 		}

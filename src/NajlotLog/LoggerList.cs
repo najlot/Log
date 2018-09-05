@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace NajlotLog
 {
 	/// <summary>
-	/// Internal class for multiple log destinations.
+	/// Internal class for multiple log destinations
 	/// </summary>
 	internal class LoggerList : List<ILogger>, ILogger
 	{
@@ -75,6 +75,54 @@ namespace NajlotLog
 			}
 
 			return disposableListOfDisposables;
+		}
+
+		public void Trace<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Trace(o, ex);
+			}
+		}
+
+		public void Debug<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Debug(o, ex);
+			}
+		}
+
+		public void Error<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Error(o, ex);
+			}
+		}
+
+		public void Fatal<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Fatal(o, ex);
+			}
+		}
+
+		public void Info<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Info(o, ex);
+			}
+		}
+
+		public void Warn<T>(T o, Exception ex)
+		{
+			foreach (var item in this)
+			{
+				item.Warn(o, ex);
+			}
 		}
 	}
 }
