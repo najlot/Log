@@ -1,22 +1,26 @@
 ﻿using Najlot.Log;
+using Najlot.Log.Configuration;
+using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 
 namespace LogTestApp
 {
     class Program
     {
+		static ILogConfiguration logConfiguration;
 		static Logger log;
 
 		static Program()
 		{
 			LogConfigurator.Instance
-				.AddConsoleLogDestination()
-				.AddFileLogDestination("Test.log")
+				.GetLogConfiguration(out logConfiguration)
+				.AddCustomDestination(new ColorfulConsoleDestination(logConfiguration))
 				.SetExecutionMiddleware(new SyncExecutionMiddleware())
-				.SetLogLevel(LogLevel.Fatal);
+				.SetLogLevel(LogLevel.Debug);
 
 			log = LoggerPool.Instance.GetLogger(typeof(Program));
 		}
@@ -28,7 +32,7 @@ namespace LogTestApp
 
 			for (int i = 0; i < 100000000; i++)
 			{
-				log.Info(i);
+				log.Trace(i);
 			}
 
 			sw.Stop();
@@ -40,12 +44,14 @@ namespace LogTestApp
 		{
 			var msMittelwert = new List<int>();
 			
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				var ms = TestLogOnce();
-				msMittelwert.Add((int)ms);
-				log.Warn(ms);
-				Console.WriteLine(ms);
+				using (log.BeginScope(i))
+				{
+					var ms = TestLogOnce();
+					msMittelwert.Add((int)ms);
+					log.Debug(ms);
+				}
 			}
 			
 			long sum = 0;
@@ -55,22 +61,33 @@ namespace LogTestApp
 				sum += val;
 			}
 
-			Console.WriteLine("".PadLeft(16, '-'));
-			Console.WriteLine(sum / msMittelwert.Count);
-			Console.WriteLine("".PadLeft(16, '-'));
-
-			Console.WriteLine("----FLUSHING----");
+			using (log.BeginScope("Result"))
+			{
+				log.Info("".PadLeft(16, '-'));
+				log.Info(sum / msMittelwert.Count);
+				log.Info("".PadLeft(16, '-'));
+			}
+			
+			log.Warn("----FLUSHING----");
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
 			log.Flush();
-			Console.WriteLine(sw.ElapsedMilliseconds);
+			log.Info(sw.ElapsedMilliseconds);
 			sw.Stop();
 		}
 		
 		static void Main(string[] args)
 		{
+			logConfiguration.LogLevel = LogLevel.Trace;
+			log.Trace("Just a message to see trace color");
+			logConfiguration.LogLevel = LogLevel.Debug;
+
 			TestLogTime();
+
+			log.Error("Done");
+			log.Fatal("Press any key");
+			Console.ReadKey();
 		}
 	}
 }

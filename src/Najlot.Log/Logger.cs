@@ -39,6 +39,7 @@ namespace Najlot.Log
 		{
 			_logLevel = logLevel;
 
+			LogTrace = false;
 			LogFatal = false;
 			LogDebug = false;
 			LogInfo = false;
