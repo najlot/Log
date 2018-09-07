@@ -1,7 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Najlot</Authors>
+    <Company>-</Company>
+    <PackageProjectUrl>https://github.com/najlot/Log</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/najlot/Log/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
+    <Product>Najlot.Log</Product>
+    <Copyright>Najlot</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
