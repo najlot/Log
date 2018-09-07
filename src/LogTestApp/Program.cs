@@ -1,5 +1,5 @@
-﻿using NajlotLog;
-using NajlotLog.Middleware;
+﻿using Najlot.Log;
+using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
