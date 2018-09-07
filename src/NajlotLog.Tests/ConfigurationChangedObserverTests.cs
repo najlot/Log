@@ -8,6 +8,26 @@ namespace NajlotLog.Tests
 	public class ConfigurationChangedObserverTests
 	{
 		[Fact]
+		public void ConfigurationMustNotifyPrototypes()
+		{
+			var observerNotified = false;
+
+			var configurator = LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Debug)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				{
+					observerNotified = true;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			logConfiguration.LogLevel = LogLevel.Info;
+
+			Assert.True(observerNotified, "Observer was not notified");
+		}
+
+		[Fact]
 		public void ConfigurationMustNotifyOnLogLevelChanged()
 		{
 			bool observerNotified = false;

@@ -8,42 +8,62 @@ namespace NajlotLog.Destinations
 	/// <summary>
 	/// Writes all messages to a file.
 	/// </summary>
-	internal class FileLogDestination : LogDestinationBase
+	public class FileLogDestination : LogDestinationBase
 	{
 		public object FileLock { get; protected set; }
 		public string FilePath { get; protected set; }
+		public Func<string> GetPath { get; protected set; }
 
 		private static ConcurrentDictionary<string, object> FileNameLockDictionary = new ConcurrentDictionary<string, object>();
 
-		public FileLogDestination(ILogConfiguration configuration, string path) : base(configuration)
+		public FileLogDestination(ILogConfiguration configuration, Func<string> getPath) : base(configuration)
 		{
-			path = Path.GetFullPath(path);
+			GetPath = getPath;
+
+			var path = GetPath();
 			
-			FileLock = FileNameLockDictionary.GetOrAdd(path.ToLower(), new object());
+			FileLock = FileNameLockDictionary.GetOrAdd(path, new object());
 
 			var dir = Path.GetDirectoryName(path);
 
-			if (!Directory.Exists(dir))
+			if(!string.IsNullOrWhiteSpace(dir))
 			{
-				Directory.CreateDirectory(dir);
-			}
-
-			if (!File.Exists(path))
-			{
-				lock (FileLock)
+				if (!Directory.Exists(dir))
 				{
-					File.WriteAllText(path, "");
+					Directory.CreateDirectory(dir);
 				}
 			}
+
+			EnsureFileExists(path);
 
 			FilePath = path;
 		}
 
 		protected override void Log(LogMessage message)
 		{
+			var path = GetPath();
+
+			if (FilePath != path)
+			{
+				FileLock = FileNameLockDictionary.GetOrAdd(path, new object());
+				FilePath = path;
+				EnsureFileExists(path);
+			}
+
 			lock (FileLock)
 			{
 				File.AppendAllText(FilePath, Format(message) + Environment.NewLine);
+			}
+		}
+
+		private void EnsureFileExists(string path)
+		{
+			if (!File.Exists(path))
+			{
+				lock (FileLock)
+				{
+					File.WriteAllText(path, "");
+				}
 			}
 		}
 	}

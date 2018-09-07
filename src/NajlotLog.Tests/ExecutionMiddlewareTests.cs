@@ -4,12 +4,71 @@ using NajlotLog.Tests.Mocks;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NajlotLog.Tests
 {
 	public class ExecutionMiddlewareTests
 	{
+		[Fact]
+		public void DoNotLoseMessagesAsynchronous()
+		{
+			long executionsDone = 0;
+			long executionsLogged = 0;
+
+			LogConfigurator
+				.CreateNew()
+				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+					Interlocked.Increment(ref executionsLogged);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			Parallel.For(0, 1000000, nr =>
+			{
+				Interlocked.Increment(ref executionsDone);
+				log.Info(nr);
+			});
+
+			log.Flush();
+
+			Assert.Equal(executionsDone, executionsLogged);
+		}
+
+		[Fact]
+		public void DoNotLoseMessagesAsynchronousWhenDequeue()
+		{
+			long executionsDone = 0;
+			long executionsLogged = 0;
+
+			LogConfigurator
+				.CreateNew()
+				.SetExecutionMiddleware(new DequeueTaskExecutionMiddleware())
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+					Interlocked.Increment(ref executionsLogged);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			Parallel.For(0, 1000000, nr =>
+			{
+				Interlocked.Increment(ref executionsDone);
+				log.Info(nr);
+			});
+
+			log.Flush();
+
+			Assert.Equal(executionsDone, executionsLogged);
+		}
+
 		[Fact]
 		public void MiddlewareMockMustGetAndExecuteCorrectAction()
 		{

@@ -77,10 +77,27 @@ namespace NajlotLog
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 
+		/// <summary>
+		/// Adds a FileLogDestination that calculates the path
+		/// </summary>
+		/// <param name="getFileName">Function to calculate the path</param>
+		/// <param name="formatFunction">Function to customize the output</param>
+		/// <returns></returns>
+		public LogConfigurator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null)
+		{
+			var logDestination = new FileLogDestination(_logConfiguration, getFileName);
+			return AddCustomDestination(logDestination, formatFunction);
+		}
+
+		/// <summary>
+		/// Adds a FileLogDestination that uses a constant path
+		/// </summary>
+		/// <param name="fileName">Path to the file</param>
+		/// <param name="formatFunction">Function to customize the output</param>
+		/// <returns></returns>
 		public LogConfigurator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
 		{
-			var logDestination = new FileLogDestination(_logConfiguration, fileName);
-			return AddCustomDestination(logDestination, formatFunction);
+			return AddFileLogDestination(() => fileName, formatFunction);
 		}
 	}
 }

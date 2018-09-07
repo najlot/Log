@@ -6,7 +6,7 @@ namespace NajlotLog.Destinations
 	/// <summary>
 	/// Writes all messages to console.
 	/// </summary>
-	internal class ConsoleLogDestination : LogDestinationBase
+	public class ConsoleLogDestination : LogDestinationBase
 	{
 		public ConsoleLogDestination(ILogConfiguration configuration) : base(configuration)
 		{

@@ -22,7 +22,7 @@ namespace NajlotLog.Destinations
 		{
 			string timestamp = message.DateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
 			var category = message.Category ?? "";
-			string delimiter = "|";
+			string delimiter = " - ";
 
 			var formatted = string.Concat(timestamp,
 				delimiter, message.LogLevel.ToString().ToUpper(),
@@ -50,18 +50,24 @@ namespace NajlotLog.Destinations
 
 		public IDisposable BeginScope<T>(T state)
 		{
-			_states.Push(_currentState);
-			_currentState = state;
+			lock(_states)
+			{
+				_states.Push(_currentState);
+				_currentState = state;
+			}
 			
 			return new OnDisposeExcecutor(() =>
 			{
-				if(_states.Count > 0)
+				lock (_states)
 				{
-					_currentState = _states.Pop();
-				}
-				else
-				{
-					_currentState = null;
+					if (_states.Count > 0)
+					{
+						_currentState = _states.Pop();
+					}
+					else
+					{
+						_currentState = null;
+					}
 				}
 			});
 		}
