@@ -4,7 +4,7 @@ using NajlotLog.Configuration;
 namespace NajlotLog.Extensions.Logging
 {
 	[ProviderAlias("NajlotLog")]
-	internal class NajlotLogProvider : ILoggerProvider
+	public class NajlotLogProvider : ILoggerProvider
 	{
 		private LoggerPool _loggerPool;
 		private ILogConfiguration _logConfiguration;

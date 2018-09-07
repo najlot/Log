@@ -57,32 +57,32 @@ namespace NajlotLog
 
 		internal void Trace<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Trace(o, ex);
 		}
 
 		internal void Debug<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Debug(o, ex);
 		}
 
 		internal void Error<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Error(o, ex);
 		}
 
 		internal void Fatal<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Fatal(o, ex);
 		}
 
 		internal void Info<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Info(o, ex);
 		}
 
 		internal void Warn<T>(T o, Exception ex)
 		{
-			throw new NotImplementedException();
+			_log.Warn(o, ex);
 		}
 	}
 }
