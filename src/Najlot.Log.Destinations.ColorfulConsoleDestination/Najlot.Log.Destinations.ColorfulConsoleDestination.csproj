@@ -13,7 +13,7 @@
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png</PackageIconUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description />
+    <Description>Colorful console destination for Najlot.Log</Description>
   </PropertyGroup>
 
   <ItemGroup>

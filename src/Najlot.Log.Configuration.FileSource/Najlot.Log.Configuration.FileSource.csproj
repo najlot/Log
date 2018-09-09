@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Company>-</Company>
+    <Authors>Najlot</Authors>
+    <Copyright>Najlot</Copyright>
+    <PackageLicenseUrl>https://github.com/najlot/Log/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/najlot/Log</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
+    <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
+    <Description>Extension methods for Najlot.Log to handle log configuration with XML files.</Description>
   </PropertyGroup>
 
   <ItemGroup>
