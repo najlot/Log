@@ -5,7 +5,7 @@ using System;
 namespace Najlot.Log
 {
 	/// <summary>
-	/// Class to help the user to cunfigure his log destinations, execution middleware, log level etc.
+	/// Class to help the user to configure log destinations, execution middleware, log level etc.
 	/// </summary>
 	public class LogConfigurator
 	{
@@ -45,9 +45,9 @@ namespace Najlot.Log
 			return this;
 		}
 
-		public LogConfigurator SetExecutionMiddleware(Middleware.IExecutionMiddleware middleware)
+		public LogConfigurator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware: Middleware.IExecutionMiddleware, new()
 		{
-			_logConfiguration.ExecutionMiddleware = middleware;
+			_logConfiguration.ExecutionMiddleware = new TExecutionMiddleware();
 			return this;
 		}
 

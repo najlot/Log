@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddFileLogDestination(() =>
 				{
 					var fileInfo = new FileInfo(fileName1);
@@ -76,7 +76,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddFileLogDestination(fileName)
 				.GetLoggerPool(out LoggerPool loggerPool);
 

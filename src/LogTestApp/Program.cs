@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Najlot.Log.Configuration.FileSource;
 
 namespace LogTestApp
 {
@@ -16,11 +17,14 @@ namespace LogTestApp
 
 		static Program()
 		{
+			var configPath = "Najlot.Log.config";
+
 			LogConfigurator.Instance
 				.GetLogConfiguration(out logConfiguration)
 				.AddCustomDestination(new ColorfulConsoleDestination(logConfiguration))
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
-				.SetLogLevel(LogLevel.Debug);
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.WriteXmlConfigurationFile(configPath)
+				.AssignConfigurationFromXmlFile(configPath);
 
 			log = LoggerPool.Instance.GetLogger(typeof(Program));
 		}
@@ -96,7 +100,19 @@ namespace LogTestApp
 
 			log.Fatal("Press any key");
 
-			Console.ReadKey();
+			//Console.ReadKey();
+
+			while(true)
+			{
+				Thread.Sleep(250);
+
+				log.Info("Info");
+
+				Thread.Sleep(250);
+
+				log.Warn("Warn");
+			}
+
 		}
 	}
 }

@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log.Extensions.Loggi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log.Destinations.ColorfulConsoleDestination", "Najlot.Log.Destinations.ColorfulConsoleDestination\Najlot.Log.Destinations.ColorfulConsoleDestination.csproj", "{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Najlot.Log.Configuration.FileSource", "Najlot.Log.Configuration.FileSource\Najlot.Log.Configuration.FileSource.csproj", "{D3FCDB44-C8CE-4BB2-9319-BE0293FCEF29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3FCDB44-C8CE-4BB2-9319-BE0293FCEF29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3FCDB44-C8CE-4BB2-9319-BE0293FCEF29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3FCDB44-C8CE-4BB2-9319-BE0293FCEF29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3FCDB44-C8CE-4BB2-9319-BE0293FCEF29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

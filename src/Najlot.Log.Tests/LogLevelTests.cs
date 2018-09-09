@@ -14,7 +14,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Warn)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.GetLoggerPool(out LoggerPool loggerPool);
 
@@ -33,7 +33,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -78,7 +78,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -123,7 +123,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -168,7 +168,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -213,7 +213,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -258,7 +258,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{

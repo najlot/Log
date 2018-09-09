@@ -42,7 +42,12 @@ namespace Najlot.Log.Configuration
 			}
 			set
 			{
-				if(executionMiddleware != value)
+				if(value == null)
+				{
+					return;
+				}
+
+				if(executionMiddleware.GetType().FullName != value.GetType().FullName)
 				{
 					// Observers get new middleware and we dispose the old one
 					using (var oldMiddleware = executionMiddleware)

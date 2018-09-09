@@ -19,7 +19,7 @@ namespace Najlot.Log.Tests
 
 			LogConfigurator
 				.CreateNew()
-				.SetExecutionMiddleware(new SyncExecutionMiddleware())
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -48,7 +48,7 @@ namespace Najlot.Log.Tests
 
 			LogConfigurator
 				.CreateNew()
-				.SetExecutionMiddleware(new DequeueTaskExecutionMiddleware())
+				.SetExecutionMiddleware<DequeueTaskExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
