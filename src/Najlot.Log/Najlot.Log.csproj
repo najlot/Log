@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -12,6 +12,8 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png</PackageIconUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Simple and yet powerful logging library with performance and extensibility in mind.</Description>
   </PropertyGroup>
 
 </Project>

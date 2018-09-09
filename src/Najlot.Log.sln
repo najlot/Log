@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log.Tests", "Najlot.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log.Extensions.Logging", "Najlot.Log.Extensions.Logging\Najlot.Log.Extensions.Logging.csproj", "{03A2C857-D8EF-4FF2-B834-5422C60EB615}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Najlot.Log.ColorfulConsoleDestination", "Najlot.Log.ColorfulConsoleDestination\Najlot.Log.ColorfulConsoleDestination.csproj", "{767A183A-5021-4539-839E-E13C1FE068E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log.Destinations.ColorfulConsoleDestination", "Najlot.Log.Destinations.ColorfulConsoleDestination\Najlot.Log.Destinations.ColorfulConsoleDestination.csproj", "{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{03A2C857-D8EF-4FF2-B834-5422C60EB615}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03A2C857-D8EF-4FF2-B834-5422C60EB615}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03A2C857-D8EF-4FF2-B834-5422C60EB615}.Release|Any CPU.Build.0 = Release|Any CPU
-		{767A183A-5021-4539-839E-E13C1FE068E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{767A183A-5021-4539-839E-E13C1FE068E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{767A183A-5021-4539-839E-E13C1FE068E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{767A183A-5021-4539-839E-E13C1FE068E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABEE546A-F5BF-4138-BCD1-3A90CD85874F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

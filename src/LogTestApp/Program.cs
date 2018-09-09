@@ -84,9 +84,18 @@ namespace LogTestApp
 			logConfiguration.LogLevel = LogLevel.Debug;
 
 			TestLogTime();
+			
+			try
+			{
+				throw new OperationCanceledException("Test exception");
+			}
+			catch (Exception ex)
+			{
+				log.Error("Done: ", ex);
+			}
 
-			log.Error("Done");
 			log.Fatal("Press any key");
+
 			Console.ReadKey();
 		}
 	}

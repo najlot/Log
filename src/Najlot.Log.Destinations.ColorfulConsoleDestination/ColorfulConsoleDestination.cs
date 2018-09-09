@@ -30,10 +30,10 @@ namespace Najlot.Log.Destinations
 					Console.WriteLine(msgString, Color.Yellow);
 					break;
 				case LogLevel.Error:
-					Console.WriteLine(msgString, Color.DarkRed);
+					Console.WriteLine(msgString, Color.Red);
 					break;
 				case LogLevel.Fatal:
-					Console.WriteLine(msgString, Color.Red);
+					Console.WriteLine(msgString, Color.DarkRed);
 					break;
 				default:
 					Console.WriteLine(msgString, Color.White);

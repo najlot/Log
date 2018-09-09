@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Najlot.Log.ColorfulConsoleDestination\Najlot.Log.ColorfulConsoleDestination.csproj" />
+    <ProjectReference Include="..\Najlot.Log.Destinations.ColorfulConsoleDestination\Najlot.Log.Destinations.ColorfulConsoleDestination.csproj" />
     <ProjectReference Include="..\Najlot.Log\Najlot.Log.csproj" />
   </ItemGroup>
 
