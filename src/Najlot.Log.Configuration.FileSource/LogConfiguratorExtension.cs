@@ -90,7 +90,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 						try
 						{
-							Console.WriteLine("config changed");
+							Console.WriteLine("Najlot.Log: configuration changed.");
 
 							ReadConfiguration(path, logConfiguration);
 						}
@@ -145,7 +145,7 @@ namespace Najlot.Log.Configuration.FileSource
 				return;
 			}
 
-			var executionMiddlewareType = Type.GetType(currentExecutionMiddlewareFullTypeName, true);
+			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, true);
 
 			if (executionMiddlewareType == null)
 			{
