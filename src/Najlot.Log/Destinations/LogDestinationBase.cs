@@ -306,7 +306,7 @@ namespace Najlot.Log.Destinations
 				{
 					if (Format != format)
 					{
-						_middleware = configuration.ExecutionMiddleware;
+						Format = format;
 					}
 				}
 			}
