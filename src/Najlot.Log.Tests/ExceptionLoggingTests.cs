@@ -12,6 +12,7 @@ namespace Najlot.Log.Tests
 		public void CheckExceptionIsLogged()
 		{
 			var logged = false;
+			bool fail = false;
 
 			LogConfigurator
 				.CreateNew()
@@ -21,8 +22,14 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
 				{
 					logged = true;
-					Assert.NotNull(msg.Exception);
-					Assert.True(msg.ExceptionIsValid, "msg.ExceptionIsValid != true");
+
+					if (fail) return;
+
+					fail = msg.Exception == null;
+
+					if (fail) return;
+
+					fail = !msg.ExceptionIsValid;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 
@@ -58,6 +65,8 @@ namespace Najlot.Log.Tests
 				Assert.True(logged);
 				logged = false;
 			}
+
+			Assert.False(fail, "failed");
 		}
 	}
 }

@@ -202,6 +202,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void DequeueTaskExecutionMiddlewareWithoutFlush()
 		{
+			bool removingError = false;
 			int executionsExpected = 10;
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
@@ -215,7 +216,9 @@ namespace Najlot.Log.Tests
 					executionsActual++;
 					var logMessageActual = msg.Message.ToString();
 					bool couldRemove = messages.Remove(logMessageActual);
-					Assert.True(couldRemove, "Could not remove " + logMessageActual);
+
+					if (removingError) return;
+					removingError = !couldRemove;
 
 					if (executionsActual == executionsExpected)
 					{
@@ -241,11 +244,13 @@ namespace Najlot.Log.Tests
 			manualResetEventSlim.Wait(5000);
 
 			Assert.Equal(executionsExpected, executionsActual);
+			Assert.False(removingError, "got removing errors");
 		}
 
 		[Fact]
 		public void ChangeMiddlewareWhileExecuting()
 		{
+			bool removingError = false;
 			int executionsExpected = 10000;
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
@@ -262,7 +267,8 @@ namespace Najlot.Log.Tests
 
 					lock (messages) couldRemove = messages.Remove(logMessageActual);
 
-					Assert.True(couldRemove, "Could not remove " + logMessageActual);
+					if (removingError) return;
+					removingError = !couldRemove;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 
@@ -288,6 +294,7 @@ namespace Najlot.Log.Tests
 			}
 
 			Assert.Equal(executionsExpected * 2, executionsActual);
+			Assert.False(removingError, "got removing errors");
 		}
 	}
 }

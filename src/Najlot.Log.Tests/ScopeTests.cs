@@ -82,14 +82,17 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NestedScopesMustBeLoggedAsync()
 		{
+			bool scopesAreNotCorrect = false;
+
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.SetExecutionMiddleware<DequeueTaskExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
 				{
-					Assert.Equal((string)msg.Message, (string)msg.State);
+					if (scopesAreNotCorrect) return;
+					scopesAreNotCorrect = (string)msg.Message != (string)msg.State;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 			
@@ -108,12 +111,17 @@ namespace Najlot.Log.Tests
 					{
 						log.Info("scope 3");
 					}
+
+					log.Info("scope 2");
+
 				}
 
 				log.Info("scope 1");
 			}
 			
 			log.Flush();
+
+			Assert.False(scopesAreNotCorrect, "scopes are not correct");
 		}
 	}
 }
