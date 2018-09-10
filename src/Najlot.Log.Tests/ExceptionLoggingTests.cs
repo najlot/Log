@@ -26,7 +26,7 @@ namespace Najlot.Log.Tests
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
 
-			var log = loggerPool.GetLogger("Excetion tests");
+			var log = loggerPool.GetLogger("Exception tests");
 
 			try
 			{
