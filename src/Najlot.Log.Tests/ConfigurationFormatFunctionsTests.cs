@@ -1,4 +1,5 @@
 using Najlot.Log.Configuration;
+using Najlot.Log.Tests.Mocks;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -7,6 +8,79 @@ namespace Najlot.Log.Tests
 {
 	public class ConfigurationFormatFunctionsTests
 	{
+		[Fact]
+		public void FormattingFuctionMustBechangedAfterCreation()
+		{
+			var strExpected = "AA Bb cc";
+			var strActual = "";
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
+				{
+					strActual = str;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+			
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
+
+			log.Fatal("this message should not be used");
+
+			Assert.Equal(strExpected, strActual);
+		}
+
+		[Fact]
+		public void FormattingFuctionMustBeChangedAfterRegistration()
+		{
+			var strExpected = "AA Bb cc";
+			var strActual = "";
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
+				{
+					strActual = str;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
+
+			var log = loggerPool.GetLogger(this.GetType());
+			
+			log.Fatal("this message should not be used");
+
+			Assert.Equal(strExpected, strActual);
+		}
+
+		[Fact]
+		public void FormattingFuctionMustBeSetOnRegistration()
+		{
+			var strExpected = "AA Bb cc";
+			var strActual = "";
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
+				{
+					strActual = str;
+				}), 
+				msg =>
+				{
+					return strExpected;
+				})
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+			log.Fatal("this message should not be used");
+
+			Assert.Equal(strExpected, strActual);
+		}
+
 		[Fact]
 		public void NotSetFormattingFunctionMustReturnFalseOnGet()
 		{
