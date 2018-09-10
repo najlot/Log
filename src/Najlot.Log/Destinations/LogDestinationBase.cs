@@ -77,13 +77,14 @@ namespace Najlot.Log.Destinations
 		public void Trace<T>(T o)
 		{
 			var time = DateTime.Now;
-			
+			var state = _currentState;
+
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Trace, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Trace, Category, state, o));
 				});
 			}
 			finally
@@ -95,13 +96,14 @@ namespace Najlot.Log.Destinations
 		public void Debug<T>(T o)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Debug, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Debug, Category, state, o));
 				});
 			}
 			finally
@@ -113,13 +115,14 @@ namespace Najlot.Log.Destinations
 		public void Info<T>(T o)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Info, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Info, Category, state, o));
 				});
 			}
 			finally
@@ -131,13 +134,14 @@ namespace Najlot.Log.Destinations
 		public void Warn<T>(T o)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Warn, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Warn, Category, state, o));
 				});
 			}
 			finally
@@ -149,13 +153,14 @@ namespace Najlot.Log.Destinations
 		public void Error<T>(T o)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Error, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Error, Category, state, o));
 				});
 			}
 			finally
@@ -167,13 +172,14 @@ namespace Najlot.Log.Destinations
 		public void Fatal<T>(T o)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Fatal, Category, _currentState, o));
+					Log(new LogMessage(time, LogLevel.Fatal, Category, state, o));
 				});
 			}
 			finally
@@ -185,13 +191,14 @@ namespace Najlot.Log.Destinations
 		public void Trace<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Trace, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Trace, Category, state, o, ex));
 				});
 			}
 			finally
@@ -203,13 +210,14 @@ namespace Najlot.Log.Destinations
 		public void Debug<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Debug, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Debug, Category, state, o, ex));
 				});
 			}
 			finally
@@ -221,13 +229,14 @@ namespace Najlot.Log.Destinations
 		public void Error<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Error, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Error, Category, state, o, ex));
 				});
 			}
 			finally
@@ -239,13 +248,14 @@ namespace Najlot.Log.Destinations
 		public void Fatal<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Fatal, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Fatal, Category, state, o, ex));
 				});
 			}
 			finally
@@ -257,13 +267,14 @@ namespace Najlot.Log.Destinations
 		public void Info<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Info, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Info, Category, state, o, ex));
 				});
 			}
 			finally
@@ -275,13 +286,14 @@ namespace Najlot.Log.Destinations
 		public void Warn<T>(T o, Exception ex)
 		{
 			var time = DateTime.Now;
+			var state = _currentState;
 
 			try
 			{
 				_configurationChangeLock.EnterReadLock();
 				_middleware.Execute(() =>
 				{
-					Log(new LogMessage(time, LogLevel.Warn, Category, _currentState, o, ex));
+					Log(new LogMessage(time, LogLevel.Warn, Category, state, o, ex));
 				});
 			}
 			finally
