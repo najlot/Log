@@ -71,6 +71,9 @@ namespace Najlot.Log.Tests
 			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
 			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 
+			// Sometimes too fast, that the FileSystemListener is not ready
+			Thread.Sleep(100);
+
 			// Write new configuration, wait until it changes and fail if it does not
 			File.WriteAllText(configPath, newContent);
 			var stopwatch = Stopwatch.StartNew();

@@ -13,10 +13,10 @@ namespace Najlot.Log.Destinations
 	public abstract class LogDestinationBase : LogDestinationPrototype<LogDestinationBase>, ILogger, IConfigurationChangedObserver, IDisposable
 	{
 		private IExecutionMiddleware _middleware;
-		private ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();
-		private ILogConfiguration _logConfiguration;
+		private readonly ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();
+		private readonly ILogConfiguration _logConfiguration;
 		private object _currentState;
-		private Stack<object> _states = new Stack<object>();
+		private readonly Stack<object> _states = new Stack<object>();
 
 		protected Func<LogMessage, string> Format = (message) =>
 		{
@@ -39,7 +39,7 @@ namespace Najlot.Log.Destinations
 			return message.ExceptionIsValid ? formatted + message.Exception.ToString() : formatted;
 		};
 		
-		public LogDestinationBase(ILogConfiguration logConfiguration)
+		protected LogDestinationBase(ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
 

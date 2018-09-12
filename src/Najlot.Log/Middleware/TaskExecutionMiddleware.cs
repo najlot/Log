@@ -13,11 +13,11 @@ namespace Najlot.Log.Middleware
 	/// </summary>
     public class TaskExecutionMiddleware : IExecutionMiddleware
 	{
-		private ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
+		private readonly ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
 		
 		private volatile bool _dequeueTaskRuns = false;
 
-		private object _taskLock = new object();
+		private readonly object _taskLock = new object();
 
 		private Task _dequeueTask;
 

@@ -5,7 +5,7 @@ namespace Najlot.Log.Extensions.Logging
 {
 	internal class NajlotLogWrapper : Microsoft.Extensions.Logging.ILogger
 	{
-		private Logger _logger;
+		private readonly Logger _logger;
 
 		public NajlotLogWrapper(Logger logger)
 		{

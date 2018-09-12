@@ -60,7 +60,7 @@ namespace Najlot.Log.Configuration
 		}
 
 		#region ConfigurationChanged observers
-		private List<IConfigurationChangedObserver> _observerList = new List<IConfigurationChangedObserver>();
+		private readonly List<IConfigurationChangedObserver> _observerList = new List<IConfigurationChangedObserver>();
 
 		public void AttachObserver(IConfigurationChangedObserver observer)
 		{
@@ -72,9 +72,15 @@ namespace Najlot.Log.Configuration
 
 		public void DetachObserver(IConfigurationChangedObserver observer)
 		{
+			bool couldRemove;
+
 			lock (_observerList)
 			{
-				while(_observerList.Remove(observer));
+				do
+				{
+					couldRemove = _observerList.Remove(observer);
+				}
+				while (couldRemove);
 			}
 		}
 		
@@ -99,7 +105,7 @@ namespace Najlot.Log.Configuration
 		#endregion
 
 		#region Format functions
-		private Dictionary<Type, Func<LogMessage, string>> _formatFunctions = new Dictionary<Type, Func<LogMessage, string>>();
+		private readonly Dictionary<Type, Func<LogMessage, string>> _formatFunctions = new Dictionary<Type, Func<LogMessage, string>>();
 
 		public bool TryGetFormatFunctionForType(Type type, out Func<LogMessage, string> function)
 		{

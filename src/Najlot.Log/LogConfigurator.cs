@@ -9,8 +9,8 @@ namespace Najlot.Log
 	/// </summary>
 	public class LogConfigurator
 	{
-		private ILogConfiguration _logConfiguration;
-		private LoggerPool _loggerPool;
+		private readonly ILogConfiguration _logConfiguration;
+		private readonly LoggerPool _loggerPool;
 		public static LogConfigurator Instance { get; } = new LogConfigurator(LogConfiguration.Instance, LoggerPool.Instance);
 
 		internal LogConfigurator(ILogConfiguration logConfiguration, LoggerPool loggerPool)

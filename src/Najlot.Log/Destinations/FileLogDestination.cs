@@ -26,12 +26,9 @@ namespace Najlot.Log.Destinations
 
 			var dir = Path.GetDirectoryName(path);
 
-			if(!string.IsNullOrWhiteSpace(dir))
+			if(!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
 			{
-				if (!Directory.Exists(dir))
-				{
-					Directory.CreateDirectory(dir);
-				}
+				Directory.CreateDirectory(dir);
 			}
 
 			EnsureFileExists(path);

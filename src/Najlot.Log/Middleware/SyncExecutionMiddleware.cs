@@ -15,12 +15,12 @@ namespace Najlot.Log.Middleware
 
         public void Dispose()
         {
-            
-        }
+			Flush();
+		}
 
         public void Flush()
         {
-            
+            // As the actions are executed directly, there is nothing to flush.
         }
     }
 }

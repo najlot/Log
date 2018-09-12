@@ -8,7 +8,7 @@ namespace Najlot.Log
 	/// </summary>
 	internal class InternalLogger
 	{
-		private ILogger _log;
+		private readonly ILogger _log;
 
 		public InternalLogger(ILogger log)
 		{

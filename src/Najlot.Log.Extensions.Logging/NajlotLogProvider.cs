@@ -6,8 +6,8 @@ namespace Najlot.Log.Extensions.Logging
 	[ProviderAlias("Najlot.Log")]
 	public class NajlotLogProvider : ILoggerProvider
 	{
-		private LoggerPool _loggerPool;
-		private ILogConfiguration _logConfiguration;
+		private readonly LoggerPool _loggerPool;
+		private readonly ILogConfiguration _logConfiguration;
 
 		public NajlotLogProvider(LoggerPool loggerPool, ILogConfiguration logConfiguration)
 		{
