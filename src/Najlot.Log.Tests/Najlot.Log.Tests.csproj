@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Najlot.Log.Configuration.FileSource\Najlot.Log.Configuration.FileSource.csproj" />
     <ProjectReference Include="..\Najlot.Log\Najlot.Log.csproj" />
   </ItemGroup>
 

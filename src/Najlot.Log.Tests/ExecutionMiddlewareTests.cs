@@ -48,7 +48,7 @@ namespace Najlot.Log.Tests
 
 			LogConfigurator
 				.CreateNew()
-				.SetExecutionMiddleware<DequeueTaskExecutionMiddleware>()
+				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
@@ -182,7 +182,7 @@ namespace Najlot.Log.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -229,7 +229,7 @@ namespace Najlot.Log.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -274,7 +274,7 @@ namespace Najlot.Log.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new DequeueTaskExecutionMiddleware();
+			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
 			
 			for (int i = 0; i < executionsExpected * 2; i++)
 			{

@@ -23,8 +23,7 @@ namespace LogTestApp
 				.GetLogConfiguration(out logConfiguration)
 				.AddCustomDestination(new ColorfulConsoleDestination(logConfiguration))
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.WriteXmlConfigurationFile(configPath)
-				.AssignConfigurationFromXmlFile(configPath);
+				.ReadConfigurationFromXmlFile(configPath, writeExampleIfSourceDoesNotExists: true);
 
 			log = LoggerPool.Instance.GetLogger(typeof(Program));
 		}

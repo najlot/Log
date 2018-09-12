@@ -11,7 +11,7 @@ namespace Najlot.Log.Middleware
 	/// and the task runs out when there are no messages to log.
 	/// Do not forget to flush, to get all of your logged messages!
 	/// </summary>
-    public class DequeueTaskExecutionMiddleware : IExecutionMiddleware
+    public class TaskExecutionMiddleware : IExecutionMiddleware
 	{
 		private ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
 		

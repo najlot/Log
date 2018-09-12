@@ -87,7 +87,7 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<DequeueTaskExecutionMiddleware>()
+				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
 				{

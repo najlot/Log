@@ -16,13 +16,8 @@ namespace Najlot.Log.Configuration.FileSource
 
     public static class LogConfiguratorExtension
 	{
-		public static LogConfigurator WriteXmlConfigurationFile(this LogConfigurator logConfigurator, string path, bool replace = false)
+		private static void WriteXmlConfigurationFile(LogConfigurator logConfigurator, string path)
 		{
-			if (File.Exists(path) && !replace)
-			{
-				return logConfigurator;
-			}
-
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
 			
 			try
@@ -32,7 +27,7 @@ namespace Najlot.Log.Configuration.FileSource
 				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
 				if (currentExecutionMiddlewareType.Assembly != null)
 				{
-					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.FullName;
+					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.GetName().Name;
 				}
 
 				XmlSerializer xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
@@ -55,11 +50,9 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				Console.WriteLine("Najlot.Log: " + ex);
 			}
-
-			return logConfigurator;
 		}
 
-		public static LogConfigurator AssignConfigurationFromXmlFile(this LogConfigurator logConfigurator, string path, bool listenForChanges = true)
+		public static LogConfigurator ReadConfigurationFromXmlFile(this LogConfigurator logConfigurator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
 		{
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -67,7 +60,11 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				if (!File.Exists(path))
 				{
-					Console.WriteLine($"Najlot.Log: {path} not found!");
+					if(writeExampleIfSourceDoesNotExists)
+					{
+						WriteXmlConfigurationFile(logConfigurator, path);
+					}
+					
 					return logConfigurator;
 				}
 
@@ -86,12 +83,11 @@ namespace Najlot.Log.Configuration.FileSource
 
 					fileSystemWatcher.Changed += (object sender, FileSystemEventArgs e) =>
 					{
-						Thread.Sleep(100); // Ensure the file is not accessed any more
+						// Ensure the file is not accessed any more
+						Thread.Sleep(100); 
 
 						try
 						{
-							Console.WriteLine("Najlot.Log: configuration changed.");
-
 							ReadConfiguration(path, logConfiguration);
 						}
 						catch (Exception ex)
@@ -127,29 +123,23 @@ namespace Najlot.Log.Configuration.FileSource
 				logConfiguration.LogLevel = fileConfiguration.LogLevel;
 			}
 
-			AssignExecutionMiddleware(logConfiguration, fileConfiguration);
+			AssignExecutionMiddlewareIfChanged(logConfiguration, fileConfiguration);
 		}
 
-		private static void AssignExecutionMiddleware(ILogConfiguration logConfiguration, FileConfiguration fileConfiguration)
+		private static void AssignExecutionMiddlewareIfChanged(ILogConfiguration logConfiguration, FileConfiguration fileConfiguration)
 		{
 			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
-
-			var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
-			if(currentExecutionMiddlewareType.Assembly != null)
-			{
-				currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.FullName;
-			}
-
-			if (currentExecutionMiddlewareFullTypeName == fileConfiguration.ExecutionMiddleware)
-			{
-				return;
-			}
 
 			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, true);
 
 			if (executionMiddlewareType == null)
 			{
 				Console.WriteLine($"Najlot.Log: new execution middleware type {fileConfiguration.ExecutionMiddleware} not found!");
+				return;
+			}
+			
+			if(executionMiddlewareType == currentExecutionMiddlewareType)
+			{
 				return;
 			}
 

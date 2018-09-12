@@ -23,9 +23,15 @@ namespace Najlot.Log.Destinations
 			string timestamp = message.DateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
 			var category = message.Category ?? "";
 			string delimiter = " - ";
-
+			string logLevel = message.LogLevel.ToString().ToUpper();
+			
+			if(logLevel.Length == 4)
+			{
+				logLevel += ' ';
+			}
+			
 			var formatted = string.Concat(timestamp,
-				delimiter, message.LogLevel.ToString().ToUpper(),
+				delimiter, logLevel,
 				delimiter, category,
 				delimiter, message.State,
 				delimiter, message.Message);
