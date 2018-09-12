@@ -1,4 +1,5 @@
-# Najlot.Log ![Build status](https://dev.azure.com/Najlot/Log/_apis/build/status/Log%20build?branchName=master) ![NuGet Version](https://img.shields.io/nuget/v/Najlot.Log.svg)
+# Najlot.Log 
+![Build status](https://dev.azure.com/Najlot/Log/_apis/build/status/Log%20build?branchName=master) ![NuGet Version](https://img.shields.io/nuget/v/Najlot.Log.svg) ![alert_status](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=alert_status) ![sqale_rating](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=sqale_rating) ![reliability_rating](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=reliability_rating) ![security_rating](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=security_rating) ![sqale_index](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=sqale_index) ![code_smells](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=code_smells) ![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=duplicated_lines_density) ![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=najlot_Log&metric=vulnerabilities)
 
 Simple and yet powerful logging library with performance and extensibility in mind.
 
