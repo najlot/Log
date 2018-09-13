@@ -14,7 +14,7 @@
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Colorful console destination for Najlot.Log</Description>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
