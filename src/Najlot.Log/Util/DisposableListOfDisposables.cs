@@ -4,13 +4,20 @@ using System.Text;
 
 namespace Najlot.Log.Util
 {
-	internal class DisposableListOfDisposables : List<IDisposable>, IDisposable
+	internal sealed class DisposableListOfDisposables : List<IDisposable>, IDisposable
 	{
+		bool _disposed = false;
+
 		public void Dispose()
 		{
-			foreach (var item in this)
+			if(!_disposed)
 			{
-				item.Dispose();
+				_disposed = true;
+
+				foreach (var item in this)
+				{
+					item.Dispose();
+				}
 			}
 		}
 	}

@@ -4,10 +4,11 @@ using Najlot.Log.Configuration;
 namespace Najlot.Log.Extensions.Logging
 {
 	[ProviderAlias("Najlot.Log")]
-	public class NajlotLogProvider : ILoggerProvider
+	public sealed class NajlotLogProvider : ILoggerProvider
 	{
 		private readonly LoggerPool _loggerPool;
 		private readonly ILogConfiguration _logConfiguration;
+		private bool _disposed = false;
 
 		public NajlotLogProvider(LoggerPool loggerPool, ILogConfiguration logConfiguration)
 		{
@@ -22,7 +23,11 @@ namespace Najlot.Log.Extensions.Logging
 		
 		public void Dispose()
 		{
-			_logConfiguration.ExecutionMiddleware.Flush();
+			if(!_disposed)
+			{
+				_disposed = true;
+				_logConfiguration.ExecutionMiddleware.Flush();
+			}
 		}
 	}
 }

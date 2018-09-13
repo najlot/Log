@@ -2,9 +2,9 @@
 
 namespace Najlot.Log.Util
 {
-	internal class OnDisposeExcecutor : IDisposable
+	internal sealed class OnDisposeExcecutor : IDisposable
 	{
-		private readonly Action _action;
+		private Action _action;
 
 		public OnDisposeExcecutor(Action action)
 		{
@@ -13,7 +13,11 @@ namespace Najlot.Log.Util
 
 		public void Dispose()
 		{
-			_action();
+			if(_action != null)
+			{
+				_action();
+				_action = null;
+			}
 		}
 	}
 }

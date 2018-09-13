@@ -11,10 +11,10 @@ namespace Najlot.Log.Middleware
 	/// and the task runs out when there are no messages to log.
 	/// Do not forget to flush, to get all of your logged messages!
 	/// </summary>
-    public class TaskExecutionMiddleware : IExecutionMiddleware
+	public sealed class TaskExecutionMiddleware : IExecutionMiddleware
 	{
 		private readonly ConcurrentQueue<Action> ActionsToExecute = new ConcurrentQueue<Action>();
-		
+
 		private volatile bool _dequeueTaskRuns = false;
 
 		private readonly object _taskLock = new object();
@@ -25,7 +25,7 @@ namespace Najlot.Log.Middleware
 		{
 			if (!_dequeueTaskRuns)
 			{
-				if(Monitor.TryEnter(_taskLock))
+				if (Monitor.TryEnter(_taskLock))
 				{
 					try
 					{
@@ -46,49 +46,49 @@ namespace Najlot.Log.Middleware
 					}
 				}
 			}
-			else if(wait)
+			else if (wait)
 			{
 				_dequeueTask.Wait();
 			}
 		}
 
-        private void DequeueTaskMethod()
-        {
-            while (ActionsToExecute.TryDequeue(out Action action))
-            {
-                try
-                {
-                    action();
-                }
-                catch(Exception ex)
-                {
+		private void DequeueTaskMethod()
+		{
+			while (ActionsToExecute.TryDequeue(out Action action))
+			{
+				try
+				{
+					action();
+				}
+				catch (Exception ex)
+				{
 					Console.Write("Najlot.Log: ");
 
-					while(ex != null)
+					while (ex != null)
 					{
 						Console.WriteLine(ex.ToString());
 						ex = ex.InnerException;
 					}
-                }
-            }
+				}
+			}
 
-            _dequeueTaskRuns = false;
-        }
-		
+			_dequeueTaskRuns = false;
+		}
+
 		public void Execute(Action execute)
-        {
-            ActionsToExecute.Enqueue(execute);
+		{
+			ActionsToExecute.Enqueue(execute);
 			StartDequeueTaskIfNotRuns(false);
-        }
+		}
 
 		public void Dispose()
-        {
-            this.Flush();
-        }
+		{
+			this.Flush();
+		}
 
 		public void Flush()
 		{
 			StartDequeueTaskIfNotRuns(true);
 		}
-    }
+	}
 }
