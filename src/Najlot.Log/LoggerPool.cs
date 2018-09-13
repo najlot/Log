@@ -24,9 +24,9 @@ namespace Najlot.Log
 			return new LoggerPool(new LogConfiguration());
 		}
 
-		private ILogConfiguration _logConfiguration;
-		private List<ILogger> _logDestinations = new List<ILogger>();
-		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
+		private readonly ILogConfiguration _logConfiguration;
+		private readonly List<ILogger> _logDestinations = new List<ILogger>();
+		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 
 		public LoggerPool(ILogConfiguration logConfiguration)
 		{

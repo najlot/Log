@@ -62,15 +62,13 @@ namespace Najlot.Log.Middleware
                 }
                 catch(Exception ex)
                 {
-					var errorMessage = ex.ToString();
+					Console.Write("Najlot.Log: ");
 
 					while(ex != null)
 					{
-						errorMessage += Environment.NewLine + ex.ToString();
+						Console.WriteLine(ex.ToString());
 						ex = ex.InnerException;
 					}
-
-					Console.WriteLine("Najlot.Log: " + errorMessage);
                 }
             }
 

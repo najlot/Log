@@ -90,12 +90,9 @@ namespace Najlot.Log.Configuration
 			{
 				foreach (var observer in _observerList)
 				{
-					if(type != null)
+					if(type != null && type != observer.GetType())
 					{
-						if (type != observer.GetType())
-						{
-							continue;
-						}
+						continue;
 					}
 					
 					observer.NotifyConfigurationChanged(this);

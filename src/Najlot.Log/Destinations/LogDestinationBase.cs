@@ -314,18 +314,11 @@ namespace Najlot.Log.Destinations
 			{
 				_configurationChangeLock.EnterWriteLock();
 
-				if (_middleware != configuration.ExecutionMiddleware)
-				{
-					_middleware = configuration.ExecutionMiddleware;
-				}
+				_middleware = configuration.ExecutionMiddleware;
 
-				Func<LogMessage, string> format;
-				if (configuration.TryGetFormatFunctionForType(this.GetType(), out format))
+				if (configuration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> format))
 				{
-					if (Format != format)
-					{
-						Format = format;
-					}
+					Format = format;
 				}
 			}
 			finally

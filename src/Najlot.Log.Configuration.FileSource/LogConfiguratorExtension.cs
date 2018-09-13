@@ -118,10 +118,7 @@ namespace Najlot.Log.Configuration.FileSource
 				fileConfiguration = xmlSerializer.Deserialize(streamReader) as FileConfiguration;
 			}
 
-			if (logConfiguration.LogLevel != fileConfiguration.LogLevel)
-			{
-				logConfiguration.LogLevel = fileConfiguration.LogLevel;
-			}
+			logConfiguration.LogLevel = fileConfiguration.LogLevel;
 
 			AssignExecutionMiddlewareIfChanged(logConfiguration, fileConfiguration);
 		}

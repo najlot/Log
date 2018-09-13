@@ -9,7 +9,7 @@ namespace Najlot.Log
 	/// </summary>
 	public class Logger : ILogger, IConfigurationChangedObserver, IDisposable
 	{
-		private InternalLogger internalLogger;
+		private readonly InternalLogger internalLogger;
 
 		private bool LogTrace = false;
 		private bool LogDebug = false;
@@ -33,7 +33,7 @@ namespace Najlot.Log
 		}
 
 		private LogLevel _logLevel;
-		private ILogConfiguration _logConfiguration;
+		private readonly ILogConfiguration _logConfiguration;
 
 		private void SetupLogLevel(LogLevel logLevel)
 		{
