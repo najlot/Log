@@ -341,7 +341,7 @@ namespace Najlot.Log.Destinations
 		}
 
 		#region IDisposable Support
-		private bool disposedValue = false; // To detect redundant calls
+		private bool disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
 		{
@@ -356,12 +356,12 @@ namespace Najlot.Log.Destinations
 			}
 		}
 		
-		// This code added to correctly implement the disposable pattern.
 		public void Dispose()
 		{
 			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
-		#endregion
 
+		#endregion
 	}
 }
