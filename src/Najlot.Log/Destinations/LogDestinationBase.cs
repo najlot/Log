@@ -340,9 +340,28 @@ namespace Najlot.Log.Destinations
 			}
 		}
 
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					_logConfiguration.DetachObserver(this);
+				}
+				
+				disposedValue = true;
+			}
+		}
+		
+		// This code added to correctly implement the disposable pattern.
 		public void Dispose()
 		{
-			_logConfiguration.DetachObserver(this);
+			Dispose(true);
 		}
+		#endregion
+
 	}
 }

@@ -191,8 +191,8 @@ namespace Najlot.Log
 		{
 			if(!_disposed)
 			{
-				_logConfiguration.DetachObserver(this);
 				_disposed = true;
+				_logConfiguration.DetachObserver(this);
 			}
 		}
 	}
