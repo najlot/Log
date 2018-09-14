@@ -45,9 +45,6 @@ namespace Najlot.Log.Destinations
 				case LogLevel.Fatal:
 					Console.WriteLine(msgString, Color.DarkRed);
 					break;
-				default:
-					Console.WriteLine(msgString, Color.White);
-					break;
 			}
 		}
 	}
