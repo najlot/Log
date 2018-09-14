@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 		public void LoggerFactoryExtensionShouldLogToFile()
 		{
 			var logFile = "LoggerFactoryExtension.log";
-
+			
 			var loggerFactory = new LoggerFactory();
 			loggerFactory.AddNajlotLog((configurator) =>
 			{

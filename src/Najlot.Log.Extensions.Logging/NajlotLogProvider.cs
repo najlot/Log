@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
-using Najlot.Log.Configuration;
 
 namespace Najlot.Log.Extensions.Logging
 {
 	[ProviderAlias("Najlot.Log")]
 	public sealed class NajlotLogProvider : ILoggerProvider
 	{
-		private readonly LoggerPool _loggerPool;
-		private readonly ILogConfiguration _logConfiguration;
+		private LogConfigurator _logConfigurator;
+		private LoggerPool _loggerPool;
 		private bool _disposed = false;
 
-		public NajlotLogProvider(LoggerPool loggerPool, ILogConfiguration logConfiguration)
+		public NajlotLogProvider(LogConfigurator logConfigurator)
 		{
-			_loggerPool = loggerPool;
-			_logConfiguration = logConfiguration;
+			_logConfigurator = logConfigurator;
+			_logConfigurator.GetLoggerPool(out _loggerPool);
 		}
 
 		public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
@@ -26,7 +25,10 @@ namespace Najlot.Log.Extensions.Logging
 			if(!_disposed)
 			{
 				_disposed = true;
-				_logConfiguration.ExecutionMiddleware.Flush();
+				_loggerPool = null;
+
+				_logConfigurator.Dispose();
+				_logConfigurator = null;
 			}
 		}
 	}

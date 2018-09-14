@@ -16,12 +16,12 @@ namespace Najlot.Log.Extensions.Logging
 
 			configure(configurator);
 			
-			return builder.AddNajlotLog(loggerPool, logConfiguration);
+			return builder.AddNajlotLog(configurator);
 		}
 
-		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LoggerPool loggerPool, ILogConfiguration logConfiguration)
+		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogConfigurator logConfigurator)
 		{
-			builder.AddProvider(new NajlotLogProvider(loggerPool, logConfiguration));
+			builder.AddProvider(new NajlotLogProvider(logConfigurator));
 			return builder;
 		}
 	}
@@ -37,12 +37,12 @@ namespace Najlot.Log.Extensions.Logging
 
 			configure(configurator);
 
-			return builder.AddNajlotLog(loggerPool, logConfiguration);
+			return builder.AddNajlotLog(configurator);
 		}
 
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LoggerPool loggerPool, ILogConfiguration logConfiguration)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogConfigurator logConfigurator)
 		{
-			loggerFactory.AddProvider(new NajlotLogProvider(loggerPool, logConfiguration));
+			loggerFactory.AddProvider(new NajlotLogProvider(logConfigurator));
 			return loggerFactory;
 		}
     }
