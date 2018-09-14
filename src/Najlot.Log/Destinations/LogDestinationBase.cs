@@ -64,17 +64,7 @@ namespace Najlot.Log.Destinations
 			
 			return new OnDisposeExcecutor(() =>
 			{
-				lock (_states)
-				{
-					if (_states.Count > 0)
-					{
-						_currentState = _states.Pop();
-					}
-					else
-					{
-						_currentState = null;
-					}
-				}
+				lock (_states) _currentState = _states.Pop();
 			});
 		}
 		
