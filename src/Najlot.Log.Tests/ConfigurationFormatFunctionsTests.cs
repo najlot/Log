@@ -9,7 +9,7 @@ namespace Najlot.Log.Tests
 	public class ConfigurationFormatFunctionsTests
 	{
 		[Fact]
-		public void FormattingFuctionMustBechangedAfterCreation()
+		public void FormatFuctionCanBeChangedAfterCreation()
 		{
 			var strExpected = "AA Bb cc";
 			var strActual = "";
@@ -33,7 +33,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void FormattingFuctionMustBeChangedAfterRegistration()
+		public void FormatFuctionCanBeChangedAfterRegistration()
 		{
 			var strExpected = "AA Bb cc";
 			var strActual = "";
@@ -57,7 +57,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void FormattingFuctionMustBeSetOnRegistration()
+		public void FormatFuctionCanBeSetOnRegistration()
 		{
 			var strExpected = "AA Bb cc";
 			var strActual = "";
@@ -125,7 +125,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-        public void CanSetAndGetFormattingFunction()
+        public void SetFormatFunctionCanBeRetrieved()
         {
 			var returnString = "some sample string";
 
@@ -157,7 +157,7 @@ namespace Najlot.Log.Tests
 		}
 		
 		[Fact]
-		public void CanSetAndGetFormattingFunctionAfterMultipleSet()
+		public void LastFormatFunctionCanBeRetrievedAfterMultipleSet()
 		{
 			var returnString = "correct string";
 
@@ -198,7 +198,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void CanSetAndGetFormattingFunctionWithMultipleTypes()
+		public void FormatFunctionCanBeSetAndGetForMultipleTypes()
 		{
 			var thisType = this.GetType();
 			var returnString = thisType.Name;
