@@ -159,5 +159,24 @@ namespace Najlot.Log.Tests
 
 			Assert.True(File.Exists(configPath));
 		}
+
+		[Fact]
+		public void ApplicationMustNotDieOnBadConfigurationPath()
+		{
+			// Very bad path :)
+			const string configPath = "::::";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
+			
+		}
 	}
 }

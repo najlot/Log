@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Najlot.Log.Configuration.FileSource\Najlot.Log.Configuration.FileSource.csproj" />
     <ProjectReference Include="..\Najlot.Log.Destinations.ColorfulConsoleDestination\Najlot.Log.Destinations.ColorfulConsoleDestination.csproj" />
+    <ProjectReference Include="..\Najlot.Log.Extensions.Logging\Najlot.Log.Extensions.Logging.csproj" />
     <ProjectReference Include="..\Najlot.Log\Najlot.Log.csproj" />
   </ItemGroup>
 
