@@ -8,39 +8,39 @@ namespace Najlot.Log
     public class LogMessage
 	{
 		/// <summary>
-		/// Timespamp the logging was requested
+		/// Timestamp the logging was requested
 		/// </summary>
-		public DateTime DateTime { get; private set; }
+		public DateTime DateTime { get; }
 
 		/// <summary>
 		/// Logging level it was requested to log with
 		/// </summary>
-		public LogLevel LogLevel { get; private set; }
+		public LogLevel LogLevel { get; }
 
 		/// <summary>
 		/// Category the logger was requested for
 		/// </summary>
-		public string Category { get; private set; }
+		public string Category { get; }
 
 		/// <summary>
 		/// State set with BeginScope
 		/// </summary>
-		public object State { get; private set; }
+		public object State { get; }
 
 		/// <summary>
 		/// The instance that was given to the request
 		/// </summary>
-		public object Message { get; private set; }
+		public object Message { get; }
 		
 		/// <summary>
-		/// Exception, if got any, owherwise null. Check ExceptionIsValid
+		/// Exception, if got any, otherwise null. Check ExceptionIsValid
 		/// </summary>
-		public Exception Exception { get; private set; }
+		public Exception Exception { get; }
 
 		/// <summary>
 		/// Specifying whether the exception is null or not
 		/// </summary>
-		public bool ExceptionIsValid { get; set; }
+		public bool ExceptionIsValid { get; }
 
 		public LogMessage(DateTime dateTime, LogLevel logLevel, string category, object state, object message)
 		{
