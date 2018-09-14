@@ -10,7 +10,7 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Base implementation for a log destination.
 	/// </summary>
-	public abstract class LogDestinationBase : LogDestinationPrototype<LogDestinationBase>, ILogger, IConfigurationChangedObserver, IDisposable
+	public abstract class LogDestinationBase : LogDestinationPrototype<LogDestinationBase>, ILogger, IConfigurationChangedObserver
 	{
 		private IExecutionMiddleware _middleware;
 		private readonly ReaderWriterLockSlim _configurationChangeLock = new ReaderWriterLockSlim();

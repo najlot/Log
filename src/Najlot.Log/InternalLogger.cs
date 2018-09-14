@@ -6,7 +6,7 @@ namespace Najlot.Log
 	/// This class speeds up the execution when not logging.
 	/// Implementing the ILogger interface there makes execution slower... Does not matter - it is internal
 	/// </summary>
-	internal class InternalLogger
+	internal class InternalLogger : IDisposable
 	{
 		private ILogger _log;
 
