@@ -49,13 +49,6 @@ namespace Najlot.Log.Extensions.Logging
 				case Microsoft.Extensions.Logging.LogLevel.Critical:
 					_logger.Fatal(state, exception);
 					break;
-
-				case Microsoft.Extensions.Logging.LogLevel.None:
-					break;
-
-				default: // Should never occur. Better write debug than have a hidden bug.
-					_logger.Debug(state, exception);
-					break;
 			}
 		}
 	}
