@@ -124,24 +124,31 @@ namespace Najlot.Log.Tests
         {
 			var returnString = "some sample string";
 
-			LogConfigurator
+			var configurator = LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), (msg) =>
 			{
 				return returnString;
 			});
 
 			Assert.True(canSetFunction, "Could not set function");
 
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), out Func<LogMessage, string> formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
-			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+			var formatedString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
 
-			Assert.Equal(returnString, formatString);
+			Assert.Equal(returnString, formatedString);
+
+			configurator.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, formatted =>
+			{
+				formatedString = formatted;
+			}));
+
+			Assert.Equal(returnString, formatedString);
 		}
 		
 		[Fact]

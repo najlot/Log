@@ -44,9 +44,8 @@ namespace Najlot.Log.Destinations
 			_logConfiguration = logConfiguration;
 
 			_middleware = logConfiguration.ExecutionMiddleware;
-			
-			Func<LogMessage, string> format;
-			if (logConfiguration.TryGetFormatFunctionForType(this.GetType(), out format))
+
+			if (logConfiguration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> format))
 			{
 				Format = format;
 			}
