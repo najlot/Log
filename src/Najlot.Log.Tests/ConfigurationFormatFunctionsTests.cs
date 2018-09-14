@@ -9,6 +9,19 @@ namespace Najlot.Log.Tests
 	public class ConfigurationFormatFunctionsTests
 	{
 		[Fact]
+		public void ConfiguratorMustNotAcceptNullDestinations()
+		{
+			Assert.Throws<ArgumentNullException>(() =>
+			{
+				LogConfigurator
+					.CreateNew()
+					.GetLogConfiguration(out ILogConfiguration logConfiguration)
+					.AddCustomDestination(null)
+					.GetLoggerPool(out LoggerPool loggerPool);
+			});
+		}
+
+		[Fact]
 		public void FormatFuctionCanBeChangedAfterCreation()
 		{
 			var strExpected = "AA Bb cc";
