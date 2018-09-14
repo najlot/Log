@@ -40,7 +40,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void DoNotLoseMessagesAsynchronous()
+		public void AsynchronousMessagesShouldNotGetLost()
 		{
 			long executionsDone = 0;
 			long executionsLogged = 0;
@@ -69,7 +69,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void DoNotLoseMessagesAsynchronousWhenDequeue()
+		public void AsynchronousMessagesShouldNotGetLostWithTaskExecutionMiddleware()
 		{
 			long executionsDone = 0;
 			long executionsLogged = 0;
@@ -98,7 +98,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void DoNotLoseMessagesAsynchronousWhenDequeueWithMultipleDestinations()
+		public void AsynchronousMessagesShouldNotGetLostWhenDequeueWithMultipleDestinations()
 		{
 			long executionsDone = 0;
 			long executionsLogged = 0;
@@ -131,7 +131,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void MiddlewareMockMustGetAndExecuteCorrectAction()
+		public void MiddlewareMockMustGetAndExecuteDefinedAction()
 		{
 			bool loggerGotAction = false;
 			bool middlewareGotAction = false;
@@ -164,7 +164,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void SyncExecutionMiddlewareOneTime()
+		public void SyncExecutionMiddlewareMustNotLooseMessage()
 		{
 			bool loggerGotAction = false;
 			var logMessageExpected = "test log message";
@@ -191,7 +191,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void SyncExecutionMiddlewareMustMultipleTimes()
+		public void SyncExecutionMiddlewareMustNotLooseMessages()
 		{
 			bool loggerGotAction = false;
 			var logMessageActual = "";
@@ -223,7 +223,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void TaskExecutionMiddlewareMultipleTimes()
+		public void TaskExecutionMiddlewareMustNotLooseMessages()
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
@@ -302,7 +302,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void TaskExecutionMiddlewareWithoutFlush()
+		public void TaskExecutionMiddlewareMustFinishWithoutFlush()
 		{
 			bool removingError = false;
 			int executionsExpected = 10;
@@ -350,7 +350,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void ChangeMiddlewareWhileExecuting()
+		public void MiddlewareCanBeChangedWhileExecuting()
 		{
 			bool removingError = false;
 			int executionsExpected = 10000;
