@@ -87,7 +87,12 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-			
+
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(
+				this.GetType(), null);
+
+			Assert.False(canSetFunction, "Function was set to null");
+
 			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(
 				this.GetType(), 
 				out Func<LogMessage, string> formatFunc);
