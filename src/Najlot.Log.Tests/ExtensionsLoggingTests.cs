@@ -10,9 +10,9 @@ namespace Najlot.Log.Tests
 	public class ExtensionsLoggingTests
 	{
 		[Fact]
-		public void ExtensionsLoggingShould()
+		public void LoggerFactoryExtensionShouldLogToFile()
 		{
-			var logFile = "extensions.log";
+			var logFile = "LoggerFactoryExtension.log";
 
 			var loggerFactory = new LoggerFactory();
 			loggerFactory.AddNajlotLog((configurator) =>
