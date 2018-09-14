@@ -87,27 +87,58 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+			
+			File.WriteAllText(configPath, newContent
+				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
+				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Warn</LogLevel>"));
+			
+			stopwatch = Stopwatch.StartNew();
 
-			File.WriteAllText(configPath, newContent.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware"));
-			Thread.Sleep(100);
+			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Info)
+			{
+				Thread.Sleep(10);
+			}
 
-			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
+			stopwatch.Stop();
+
+			Assert.Equal(LogLevel.Warn, logConfiguration.LogLevel);
+			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+			
+			File.WriteAllText(configPath, newContent
+				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log", "System.Guid")
+				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Error</LogLevel>"));
+
+			stopwatch = Stopwatch.StartNew();
+
+			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Warn)
+			{
+				Thread.Sleep(10);
+			}
+
+			stopwatch.Stop();
+
+			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 
-			File.WriteAllText(configPath, newContent.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Logger"));
-			Thread.Sleep(100);
+			File.WriteAllText(configPath, newContent
+				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
+				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Trace</LogLevel>"));
 
-			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
+			stopwatch = Stopwatch.StartNew();
+
+			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Error)
+			{
+				Thread.Sleep(10);
+			}
+
+			stopwatch.Stop();
+
+			Assert.Equal(LogLevel.Trace, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
-
-			File.WriteAllText(configPath, newContent.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>BadLogLevel</LogLevel>"));
-			Thread.Sleep(100);
-
-			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
-			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
-
+			
 			File.Delete(configPath);
-			Thread.Sleep(100);
+
+			Thread.Sleep(300);
 		}
 
 		[Fact]

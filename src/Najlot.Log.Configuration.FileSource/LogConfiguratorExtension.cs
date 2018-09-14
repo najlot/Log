@@ -84,7 +84,7 @@ namespace Najlot.Log.Configuration.FileSource
 					fileSystemWatcher.Changed += (object sender, FileSystemEventArgs e) =>
 					{
 						// Ensure the file is not accessed any more
-						Thread.Sleep(100); 
+						Thread.Sleep(75); 
 
 						try
 						{
@@ -127,11 +127,11 @@ namespace Najlot.Log.Configuration.FileSource
 		{
 			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
 
-			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, true);
+			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, false);
 
 			if (executionMiddlewareType == null)
 			{
-				Console.WriteLine($"Najlot.Log: new execution middleware type {fileConfiguration.ExecutionMiddleware} not found!");
+				Console.WriteLine($"Najlot.Log: New execution middleware of type '{fileConfiguration.ExecutionMiddleware}' not found!");
 				return;
 			}
 			
