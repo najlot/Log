@@ -12,7 +12,32 @@ namespace Najlot.Log.Tests
 	public class FileConfigurationTests
 	{
 		[Fact]
-		public void ExtensionMustReadConfigurationFile()
+		public void ExtensionMustReadLogLevelFromConfigurationFile()
+		{
+			const string configPath = "LogConfigurationToRead.config";
+			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+					"<LogLevel>Error</LogLevel>" +
+					"<ExecutionMiddleware>Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+				"</NajlotLogConfiguration>";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			File.WriteAllText(configPath, content);
+
+			LogConfigurator
+				.CreateNew()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
+		}
+
+		[Fact]
+		public void ExtensionMustReadExecutionMiddlewareFromConfigurationFile()
 		{
 			const string configPath = "LogConfigurationToRead.config";
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -33,7 +58,6 @@ namespace Najlot.Log.Tests
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 			
-			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
 			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 		}
 
