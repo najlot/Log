@@ -40,6 +40,45 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void ScopeMustBeLoggedToMultiple()
+		{
+			object state = null;
+			object secondState = null;
+
+			var scope = "testing scopes";
+
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				{
+					state = msg.State;
+				}))
+				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, (msg) =>
+				{
+					secondState = msg.State;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			using (log.BeginScope(scope))
+			{
+				log.Warn("setting scope");
+			}
+
+			Assert.Equal(scope, (string)state);
+			Assert.Equal(scope, (string)secondState);
+
+			log.Warn("scope must be null now");
+
+			Assert.Null(state);
+			Assert.Null(secondState);
+		}
+
+		[Fact]
 		public void NestedScopesMustBeLogged()
 		{
 			object state = null;

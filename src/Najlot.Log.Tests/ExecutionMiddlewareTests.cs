@@ -58,7 +58,7 @@ namespace Najlot.Log.Tests
 
 			var log = loggerPool.GetLogger(this.GetType());
 
-			Parallel.For(0, 1000000, nr =>
+			Parallel.For(0, 100000, nr =>
 			{
 				Interlocked.Increment(ref executionsDone);
 				log.Info(nr);
@@ -67,6 +67,39 @@ namespace Najlot.Log.Tests
 			log.Flush();
 
 			Assert.Equal(executionsDone, executionsLogged);
+		}
+
+		[Fact]
+		public void DoNotLoseMessagesAsynchronousWhenDequeueWithMultipleDestinations()
+		{
+			long executionsDone = 0;
+			long executionsLogged = 0;
+
+			LogConfigurator
+				.CreateNew()
+				.SetExecutionMiddleware<TaskExecutionMiddleware>()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+					Interlocked.Increment(ref executionsLogged);
+				}))
+				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, msg =>
+				{
+					Interlocked.Increment(ref executionsLogged);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			Parallel.For(0, 100000, nr =>
+			{
+				Interlocked.Increment(ref executionsDone);
+				log.Info(nr);
+			});
+
+			log.Flush();
+
+			Assert.Equal(executionsDone * 2, executionsLogged);
 		}
 
 		[Fact]
