@@ -10,7 +10,20 @@ namespace Najlot.Log.Middleware
 	{
 		public void Execute(Action execute)
 		{
-			execute();
+			try
+			{
+				execute();
+			}
+			catch (Exception exception)
+			{
+				Console.Write("Najlot.Log.Middleware.SyncExecutionMiddleware: ");
+
+				while (exception != null)
+				{
+					Console.WriteLine($"{exception}");
+					exception = exception.InnerException;
+				}
+			}
 		}
 
 		public void Dispose()

@@ -12,6 +12,34 @@ namespace Najlot.Log.Tests
 	public class ExecutionMiddlewareTests
 	{
 		[Fact]
+		public void ApplicationMustNotDieFromErrorsInDestinations()
+		{
+			LogConfigurator
+				.CreateNew()
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.GetLogConfiguration(out var logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+					throw new NotImplementedException();
+				}))
+				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, msg =>
+				{
+					throw new Exception("Test!");
+				}))
+				.GetLoggerPool(out var loggerPool);
+
+			var log = loggerPool.GetLogger("default");
+
+			log.Fatal("We will get some exceptions now!");
+
+			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+
+			log.Fatal("We will get more exceptions now!");
+
+			log.Flush();
+		}
+
+		[Fact]
 		public void DoNotLoseMessagesAsynchronous()
 		{
 			long executionsDone = 0;

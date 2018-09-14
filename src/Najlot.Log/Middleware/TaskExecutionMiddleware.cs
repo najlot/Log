@@ -62,7 +62,7 @@ namespace Najlot.Log.Middleware
 				}
 				catch (Exception ex)
 				{
-					Console.Write("Najlot.Log: ");
+					Console.Write("Najlot.Log.Middleware.TaskExecutionMiddleware: ");
 
 					while (ex != null)
 					{
