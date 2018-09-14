@@ -8,13 +8,14 @@ namespace Najlot.Log.Tests
 {
 	public class LogLevelTests
 	{
-		LogLevel[] logLevels = {
+		private readonly LogLevel[] logLevels = {
 				LogLevel.Trace,
 				LogLevel.Debug,
 				LogLevel.Info,
 				LogLevel.Warn,
 				LogLevel.Error,
-				LogLevel.Fatal
+				LogLevel.Fatal,
+				LogLevel.None
 			};
 
 		[Fact]
@@ -33,7 +34,7 @@ namespace Najlot.Log.Tests
 			Assert.True(logger.IsEnabled(LogLevel.Error));
 			Assert.False(logger.IsEnabled(LogLevel.Info));
 		}
-
+		
 		[Fact]
 		public void LoggerMustLogWithCorrectLogLevel()
 		{
