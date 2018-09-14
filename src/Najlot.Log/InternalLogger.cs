@@ -8,7 +8,7 @@ namespace Najlot.Log
 	/// </summary>
 	internal class InternalLogger
 	{
-		private readonly ILogger _log;
+		private ILogger _log;
 
 		public InternalLogger(ILogger log)
 		{
@@ -84,5 +84,30 @@ namespace Najlot.Log
 		{
 			_log.Warn(o, ex);
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				disposedValue = true;
+
+				if (disposing)
+				{
+					_log.Dispose();
+				}
+
+				_log = null;
+			}
+		}
+		
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }

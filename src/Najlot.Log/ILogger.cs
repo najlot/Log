@@ -2,7 +2,7 @@
 
 namespace Najlot.Log
 {
-    public interface ILogger
+    public interface ILogger: IDisposable
 	{
 		IDisposable BeginScope<T>(T state);
 

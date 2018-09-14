@@ -7,10 +7,10 @@ namespace Najlot.Log
 	/// <summary>
 	/// Class to help the user to configure log destinations, execution middleware, log level etc.
 	/// </summary>
-	public class LogConfigurator
+	public class LogConfigurator : IDisposable
 	{
-		private readonly ILogConfiguration _logConfiguration;
-		private readonly LoggerPool _loggerPool;
+		private ILogConfiguration _logConfiguration;
+		private LoggerPool _loggerPool;
 		public static LogConfigurator Instance { get; } = new LogConfigurator(LogConfiguration.Instance, LoggerPool.Instance);
 
 		internal LogConfigurator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
@@ -99,5 +99,31 @@ namespace Najlot.Log
 		{
 			return AddFileLogDestination(() => fileName, formatFunction);
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				disposedValue = true;
+
+				if (disposing)
+				{
+					_loggerPool.Dispose();
+				}
+
+				_loggerPool = null;
+				_logConfiguration = null;
+			}
+		}
+		
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }

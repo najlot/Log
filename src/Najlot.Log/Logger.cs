@@ -7,9 +7,9 @@ namespace Najlot.Log
 	/// Class to be used for logging.
 	/// Can bundle multiple log destinations and decides whether the message should be logged
 	/// </summary>
-	public sealed class Logger : ILogger, IConfigurationChangedObserver, IDisposable
+	public sealed class Logger : ILogger, IConfigurationChangedObserver
 	{
-		private readonly InternalLogger internalLogger;
+		private InternalLogger internalLogger;
 
 		private bool LogTrace = false;
 		private bool LogDebug = false;
@@ -34,7 +34,6 @@ namespace Najlot.Log
 
 		private LogLevel _logLevel;
 		private readonly ILogConfiguration _logConfiguration;
-		private bool _disposed = false;
 
 		private void SetupLogLevel(LogLevel logLevel)
 		{
@@ -187,13 +186,32 @@ namespace Najlot.Log
 			internalLogger.Warn(o, ex);
 		}
 
-		public void Dispose()
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		void Dispose(bool disposing)
 		{
-			if(!_disposed)
+			if (!disposedValue)
 			{
-				_disposed = true;
-				_logConfiguration.DetachObserver(this);
+				disposedValue = true;
+
+				if (disposing)
+				{
+					_logConfiguration.DetachObserver(this);
+
+					internalLogger.Dispose();
+				}
+
+				internalLogger = null;
 			}
 		}
+		
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
+
 	}
 }

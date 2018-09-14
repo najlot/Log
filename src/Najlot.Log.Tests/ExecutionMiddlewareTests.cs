@@ -162,7 +162,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void DequeueTaskExecutionMiddlewareMultipleTimes()
+		public void TaskExecutionMiddlewareMultipleTimes()
 		{
 			int executionsExpected = 10;
 			int executionsActual = 0;
@@ -200,7 +200,48 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void DequeueTaskExecutionMiddlewareWithoutFlush()
+		public void TaskExecutionMiddlewareMustRestartTask()
+		{
+			int executionsExpected = 10;
+			int executionsActual = 0;
+			List<string> messages = new List<string>();
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
+					bool couldRemove = messages.Remove(logMessageActual);
+					Assert.True(couldRemove, "Could not remove " + logMessageActual);
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+
+			for (int i = 0; i < executionsExpected; i++)
+			{
+				messages.Add(i.ToString());
+			}
+
+			logConfiguration.ExecutionMiddleware.Flush();
+			Thread.Sleep(100);
+
+			for (int i = 0; i < executionsExpected; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logConfiguration.ExecutionMiddleware.Flush();
+
+			Assert.Equal(executionsExpected, executionsActual);
+		}
+
+		[Fact]
+		public void TaskExecutionMiddlewareWithoutFlush()
 		{
 			bool removingError = false;
 			int executionsExpected = 10;

@@ -8,7 +8,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Class for managing instances of loggers and log destinations.
 	/// </summary>
-	public class LoggerPool
+	public class LoggerPool : IDisposable
 	{
 		/// <summary>
 		/// Static LoggerPool instance
@@ -24,9 +24,9 @@ namespace Najlot.Log
 			return new LoggerPool(new LogConfiguration());
 		}
 
-		private readonly ILogConfiguration _logConfiguration;
-		private readonly List<ILogger> _logDestinations = new List<ILogger>();
-		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
+		private ILogConfiguration _logConfiguration;
+		private List<ILogger> _logDestinations = new List<ILogger>();
+		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 
 		public LoggerPool(ILogConfiguration logConfiguration)
 		{
@@ -108,5 +108,40 @@ namespace Najlot.Log
 			_logConfiguration.AttachObserver(clonedlogDestination as IConfigurationChangedObserver);
 			return clonedlogDestination as ILogger;
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				disposedValue = true;
+
+				if (disposing)
+				{
+					foreach(var destination in _logDestinations)
+					{
+						destination.Dispose();
+					}
+
+					foreach(var cachedDestinationEntry in _loggerCache)
+					{
+						cachedDestinationEntry.Value.Dispose();
+					}
+				}
+
+				_logConfiguration = null;
+				_logDestinations = null;
+				_loggerCache = null;
+			}
+		}
+		
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }

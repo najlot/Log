@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Najlot.Log.Tests
 {
-	public class ConfigurationChangedObserverTests
+	public class ConfigurationObserverTests
 	{
 		[Fact]
 		public void ConfigurationMustNotifyPrototypes()

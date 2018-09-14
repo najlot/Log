@@ -124,5 +124,31 @@ namespace Najlot.Log
 				item.Warn(o, ex);
 			}
 		}
+
+		#region IDisposable Support
+		private bool disposedValue = false;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				disposedValue = true;
+
+				if (disposing)
+				{
+					foreach (var item in this)
+					{
+						item.Dispose();
+					}
+				}
+			}
+		}
+		
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }
