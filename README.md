@@ -126,7 +126,26 @@ public class DebugDestination : LogDestinationBase
 }
 ```
 
+Najlot.Log has a provider for Microsoft.Extensions.Logging:
+```csharp
+using Microsoft.Extensions.Logging;
+using Najlot.Log.Extensions.Logging;
+
+...
+
+var loggerFactory = new LoggerFactory();
+
+loggerFactory.AddNajlotLog((configurator) =>
+{
+  configurator
+    .SetLogLevel(LogLevel.Info)
+    .AddConsoleLogDestination()
+    .AddFileLogDestination("log.txt");
+});
+
+var logger = loggerFactory.CreateLogger("default");
+logger.LogInformation("Hello, World!");
+```
 
 ###### TODO:
-- [ ] Add examples for Microsoft.Extensions.Logging.
 - [ ] Implement structured logging.
