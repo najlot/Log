@@ -14,16 +14,7 @@ namespace Najlot.Log
 		/// Static LoggerPool instance
 		/// </summary>
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
-
-		/// <summary>
-		/// Creates new LoggerPool with a new configuration.
-		/// </summary>
-		/// <returns></returns>
-		public static LoggerPool CreateNew()
-		{
-			return new LoggerPool(new LogConfiguration());
-		}
-
+		
 		private ILogConfiguration _logConfiguration;
 		private List<ILogger> _logDestinations = new List<ILogger>();
 		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
