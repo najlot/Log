@@ -23,14 +23,7 @@ namespace Najlot.Log.Destinations
 			var path = GetPath();
 			
 			FileLock = FileNameLockDictionary.GetOrAdd(path, new object());
-
-			var dir = Path.GetDirectoryName(path);
-
-			if(!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
-			{
-				Directory.CreateDirectory(dir);
-			}
-
+			
 			EnsureFileExists(path);
 
 			FilePath = path;
@@ -59,6 +52,13 @@ namespace Najlot.Log.Destinations
 			{
 				lock (FileLock)
 				{
+					var dir = Path.GetDirectoryName(path);
+
+					if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+					{
+						Directory.CreateDirectory(dir);
+					}
+
 					File.WriteAllText(path, "");
 				}
 			}
