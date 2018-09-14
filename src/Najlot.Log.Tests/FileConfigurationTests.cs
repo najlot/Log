@@ -176,7 +176,25 @@ namespace Najlot.Log.Tests
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
-			
+		}
+
+		[Fact]
+		public void ApplicationMustNotDieOnBadConfigurationFile()
+		{
+			const string configPath = "BadLogConfiguration.config";
+			var content = "<?xml version=\"1.0\" encod";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			File.WriteAllText(configPath, content);
+
+			LogConfigurator
+				.CreateNew()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 		}
 	}
 }
