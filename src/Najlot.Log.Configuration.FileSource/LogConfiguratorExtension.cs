@@ -139,10 +139,8 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				return;
 			}
-
-			var newExecutionMiddleware = Activator.CreateInstance(executionMiddlewareType) as IExecutionMiddleware;
-
-			if (newExecutionMiddleware == null)
+			
+			if (!(Activator.CreateInstance(executionMiddlewareType) is IExecutionMiddleware newExecutionMiddleware))
 			{
 				Console.WriteLine("Najlot.Log: New execution middleware is not " + nameof(IExecutionMiddleware));
 				return;

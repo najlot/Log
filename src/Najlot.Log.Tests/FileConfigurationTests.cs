@@ -12,7 +12,7 @@ namespace Najlot.Log.Tests
 	public class FileConfigurationTests
 	{
 		[Fact]
-		public void FileConfigurationMustBeRead()
+		public void ExtensionMustReadConfigurationFile()
 		{
 			const string configPath = "LogConfigurationToRead.config";
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -38,7 +38,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void FileConfigurationMustUpdateAtRuntime()
+		public void FileConfigurationMustUpdateAtRuntimeWithoutApplicationFailure()
 		{
 			const string configPath = "LogConfigurationToUpdate.config";
 
@@ -87,10 +87,31 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+
+			File.WriteAllText(configPath, newContent.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware"));
+			Thread.Sleep(100);
+
+			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
+			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+
+			File.WriteAllText(configPath, newContent.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Logger"));
+			Thread.Sleep(100);
+
+			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
+			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+
+			File.WriteAllText(configPath, newContent.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>BadLogLevel</LogLevel>"));
+			Thread.Sleep(100);
+
+			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
+			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
+
+			File.Delete(configPath);
+			Thread.Sleep(100);
 		}
 
 		[Fact]
-		public void ExampleMustBeWritten()
+		public void ExtensionMustWriteExampleFile()
 		{
 			const string configPath = "LogConfigurationExamle.config";
 
