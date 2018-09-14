@@ -7,14 +7,14 @@
     <PackageProjectUrl>https://github.com/najlot/Log</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/najlot/Log/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
-    <Product>Najlot.Log</Product>
+    <Product>Najlot.Log.Destinations.ColorfulConsoleDestination</Product>
     <Copyright>Najlot</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Colorful console destination for Najlot.Log</Description>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>
