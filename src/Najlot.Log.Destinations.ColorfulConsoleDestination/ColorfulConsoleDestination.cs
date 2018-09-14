@@ -5,6 +5,16 @@ using Console = Colorful.Console;
 
 namespace Najlot.Log.Destinations
 {
+	public static class LogConfiguratorExtension
+	{
+		public static LogConfigurator AddColorfulConsoleDestination(this LogConfigurator logConfigurator, Func<LogMessage, string> formatFunction = null)
+		{
+			return logConfigurator
+				.GetLogConfiguration(out var logConfiguration)
+				.AddCustomDestination(new ColorfulConsoleDestination(logConfiguration), formatFunction);
+		}
+	}
+
 	public class ColorfulConsoleDestination : LogDestinationBase
 	{
 		public ColorfulConsoleDestination(ILogConfiguration logConfiguration) : base(logConfiguration)
