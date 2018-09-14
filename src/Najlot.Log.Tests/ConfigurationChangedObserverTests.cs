@@ -154,5 +154,27 @@ namespace Najlot.Log.Tests
 			Assert.False(wrongObserverNotified, "Observer was notified on format function changed for other");
 			Assert.True(rightObserverNotified, "Observer was notified on format function changed for other");
 		}
+
+		[Fact]
+		public void ConfigurationMustNotChangeMiddlewareToNull()
+		{
+			bool observerNotified = false;
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out var logConfiguration)
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				{
+					observerNotified = true;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.ExecutionMiddleware = null;
+
+			Assert.NotNull(logConfiguration.ExecutionMiddleware);
+			Assert.False(observerNotified, "Observer was notified on format function changed for other");
+		}
 	}
 }
