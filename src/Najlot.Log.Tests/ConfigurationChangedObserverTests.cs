@@ -126,6 +126,31 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void ConfigurationMustNotNotifyOnFormatFunctionAlreadySetBeforeAddingDestination()
+		{
+			bool observerNotified = false;
+			string testFunc(LogMessage msg) => "123";
+			
+			var configurator = LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			
+			configurator
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				{
+					observerNotified = true;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+			
+			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
+		}
+
+		[Fact]
 		public void ConfigurationMustNotNotifyOnFormatFunctionChangedForOther()
 		{
 			bool observerNotified = false;

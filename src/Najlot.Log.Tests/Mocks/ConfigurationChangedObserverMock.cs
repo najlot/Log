@@ -22,6 +22,8 @@ namespace Najlot.Log.Tests.Mocks
 
 		protected override void Log(LogMessage message)
 		{
+			var msg = Format(message);
+
 			throw new NotImplementedException();
 		}
 	}
