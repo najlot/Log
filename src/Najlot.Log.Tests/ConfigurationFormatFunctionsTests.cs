@@ -112,7 +112,7 @@ namespace Najlot.Log.Tests
 
 			Assert.False(canGetFunction, "Could get function, that was not set");
 		}
-
+		
 		[Fact]
 		public void RemovedFormattingFunctionMustReturnFalseOnGet()
 		{

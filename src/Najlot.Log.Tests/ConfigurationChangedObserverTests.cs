@@ -100,6 +100,32 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwice()
+		{
+			bool observerNotified = false;
+			string testFunc(LogMessage msg) => "";
+
+			LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
+				{
+					observerNotified = true;
+				}))
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			Assert.True(observerNotified, "Observer was not notified on format function changed");
+
+			observerNotified = false;
+
+			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
+		}
+
+		[Fact]
 		public void ConfigurationMustNotNotifyOnFormatFunctionChangedForOther()
 		{
 			bool observerNotified = false;
