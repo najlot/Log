@@ -141,12 +141,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
-				}))
+				}), testFunc)
 				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var log = loggerPool.GetLogger(this.GetType());
 			
-			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
 			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
 		}
 
