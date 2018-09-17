@@ -4,11 +4,53 @@ using Najlot.Log.Extensions.Logging;
 using Xunit;
 using Najlot.Log.Middleware;
 using System.IO;
+using Najlot.Log.Configuration;
 
 namespace Najlot.Log.Tests
 {
 	public class ExtensionsLoggingTests
 	{
+		[Fact]
+		public void IsEnabledShouldReturnCorrectLogLevelEnabled()
+		{
+			using (var loggerFactory = new LoggerFactory())
+			{
+				ILogConfiguration logConfiguration = null;
+
+				loggerFactory.AddNajlotLog((configurator) =>
+				{
+					configurator
+						.SetLogLevel(LogLevel.Trace)
+						.AddConsoleLogDestination()
+						.GetLogConfiguration(out logConfiguration);
+				});
+
+				var logger = loggerFactory.CreateLogger("default");
+
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
+
+				logConfiguration.LogLevel = LogLevel.Debug;
+				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
+
+				logConfiguration.LogLevel = LogLevel.Info;
+				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
+
+				logConfiguration.LogLevel = LogLevel.Warn;
+				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
+
+				logConfiguration.LogLevel = LogLevel.Error;
+				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
+
+				logConfiguration.LogLevel = LogLevel.Fatal;
+				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
+				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical));
+			}
+		}
+
 		[Fact]
 		public void LoggerFactoryExtensionShouldLogToFile()
 		{

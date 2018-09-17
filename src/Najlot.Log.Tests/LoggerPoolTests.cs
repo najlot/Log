@@ -35,6 +35,28 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void LoggerPoolMustNotCacheNotInitializedEntries()
+		{
+			var configurator = LogConfigurator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var notInitializedLog = loggerPool.GetLogger(this.GetType());
+
+			configurator
+				.AddConsoleLogDestination()
+				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				{
+
+				}));
+
+			var initializedLog = loggerPool.GetLogger(this.GetType());
+
+			Assert.NotStrictEqual(notInitializedLog, initializedLog);
+		}
+
+		[Fact]
 		public void PrototypesMustBeCopiedWithNewCategory()
 		{
 			bool gotLogMessage = false;

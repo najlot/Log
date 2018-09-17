@@ -55,9 +55,8 @@ namespace Najlot.Log
 								var consoleLogger = new ConsoleLogDestination(_logConfiguration);
 								_logConfiguration.AttachObserver(consoleLogger);
 								logger = new Logger(consoleLogger, _logConfiguration);
+								return logger;
 							}
-
-							break;
 
 						case 1:
 							{
