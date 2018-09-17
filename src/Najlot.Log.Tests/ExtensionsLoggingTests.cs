@@ -5,13 +5,32 @@ using Xunit;
 using Najlot.Log.Middleware;
 using System.IO;
 using Najlot.Log.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Najlot.Log.Tests.Mocks;
+
+namespace Najlot.Log.Tests.Mocks
+{
+	public class DependencyInjectionLoggerService
+	{
+		private readonly ILogger<DependencyInjectionLoggerService> _logger;
+		public DependencyInjectionLoggerService(ILogger<DependencyInjectionLoggerService> logger)
+		{
+			_logger = logger;
+		}
+
+		public ILogger<DependencyInjectionLoggerService> GetLogger()
+		{
+			return _logger;
+		}
+	}
+}
 
 namespace Najlot.Log.Tests
 {
 	public class ExtensionsLoggingTests
 	{
 		[Fact]
-		public void IsEnabledShouldReturnCorrectLogLevelEnabled()
+		public void IsEnabledMustReturnCorrectLogLevelEnabled()
 		{
 			using (var loggerFactory = new LoggerFactory())
 			{
@@ -52,7 +71,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void LoggerFactoryExtensionShouldLogToFile()
+		public void LoggerFactoryExtensionMustLogToFile()
 		{
 			var logFile = "LoggerFactoryExtension.log";
 
@@ -105,5 +124,36 @@ namespace Najlot.Log.Tests
 				Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
 			}
 		}
+
+		[Fact]
+		public void LoggingBuilderExtensionMustLogCorrect()
+		{
+			var logFile = "LoggingBuilderExtension.log";
+			var services = new ServiceCollection();
+			
+			services.AddLogging(loggerBuilder =>
+			{
+				loggerBuilder.AddNajlotLog((configurator) =>
+				{
+					configurator
+						.SetLogLevel(LogLevel.Trace)
+						.SetExecutionMiddleware<SyncExecutionMiddleware>()
+						.AddFileLogDestination(logFile);
+				});
+			});
+			
+			services.AddTransient<DependencyInjectionLoggerService>();
+			
+			var serviceProvider = services.BuildServiceProvider();
+			
+			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
+			service.GetLogger().LogInformation("Logger created!");
+
+			var content = File.ReadAllText(logFile);
+
+			Assert.NotEqual(-1, content.IndexOf("Logger created!"));
+			Assert.NotEqual(-1, content.IndexOf(typeof(DependencyInjectionLoggerService).FullName));
+		}
+
 	}
 }
