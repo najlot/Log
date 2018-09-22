@@ -51,11 +51,10 @@ namespace Najlot.Log
 					{
 						case 0:
 							{
-								Console.WriteLine("Najlot.Log: There are no log destinations specified: Creating console log destination.");
+								// There are no log destinations specified: Creating console log destination
 								var consoleLogger = new ConsoleLogDestination(_logConfiguration);
 								_logConfiguration.AttachObserver(consoleLogger);
-								logger = new Logger(consoleLogger, _logConfiguration);
-								return logger;
+								return new Logger(consoleLogger, _logConfiguration);
 							}
 
 						case 1:
