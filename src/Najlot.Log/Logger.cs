@@ -158,32 +158,50 @@ namespace Najlot.Log
 
 		public void Trace<T>(T o, Exception ex)
 		{
-			internalLogger.Trace(o, ex);
+			if (LogTrace)
+			{
+				internalLogger.Trace(o, ex);
+			}
 		}
 
 		public void Debug<T>(T o, Exception ex)
 		{
-			internalLogger.Debug(o, ex);
+			if (LogDebug)
+			{
+				internalLogger.Debug(o, ex);
+			}
 		}
 
 		public void Error<T>(T o, Exception ex)
 		{
-			internalLogger.Error(o, ex);
+			if (LogError)
+			{
+				internalLogger.Error(o, ex);
+			}
 		}
 
 		public void Fatal<T>(T o, Exception ex)
 		{
-			internalLogger.Fatal(o, ex);
+			if (LogFatal)
+			{
+				internalLogger.Fatal(o, ex);
+			}
 		}
 
 		public void Info<T>(T o, Exception ex)
 		{
-			internalLogger.Info(o, ex);
+			if (LogInfo)
+			{
+				internalLogger.Info(o, ex);
+			}
 		}
 
 		public void Warn<T>(T o, Exception ex)
 		{
-			internalLogger.Warn(o, ex);
+			if (LogWarn)
+			{
+				internalLogger.Warn(o, ex);
+			}
 		}
 
 		#region IDisposable Support
