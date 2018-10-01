@@ -77,15 +77,16 @@ namespace Najlot.Log
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 
-		/// <summary>
 		/// Adds a FileLogDestination that calculates the path
 		/// </summary>
 		/// <param name="getFileName">Function to calculate the path</param>
 		/// <param name="formatFunction">Function to customize the output</param>
+		/// <param name="maxFiles">Max count of files.</param>
+		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
 		/// <returns></returns>
-		public LogConfigurator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null)
 		{
-			var logDestination = new FileLogDestination(_logConfiguration, getFileName);
+			var logDestination = new FileLogDestination(_logConfiguration, getFileName, maxFiles, logFilePaths);
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 

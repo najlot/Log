@@ -1,6 +1,7 @@
-using Najlot.Log.Configuration;
+
 using Najlot.Log.Middleware;
 using System;
+using System.Linq;
 using System.IO;
 using Xunit;
 
@@ -162,6 +163,42 @@ namespace Najlot.Log.Tests
 			logger.Info("This must recreate the directory.");
 
 			Assert.True(Directory.Exists(dir));
+		}
+
+		[Fact]
+		public void FileLoggerMustCleanUpFiles()
+		{
+			const int maxFiles = 5;
+			const string logFilePaths = ".FilesToCleanUp";
+			string logsDir = $"logs_for_{nameof(FileLoggerMustCleanUpFiles)}";
+			
+			if (File.Exists(logFilePaths)) File.Delete(logFilePaths);
+			if (Directory.Exists(logsDir)) Directory.Delete(logsDir, true);
+
+			int i = 0;
+
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(() => Path.Combine(logsDir, i.ToString()), maxFiles: maxFiles, logFilePaths: logFilePaths)
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var log = loggerPool.GetLogger(this.GetType());
+
+			for (; i < 100; i++)
+			{
+				log.Info(Guid.NewGuid());
+			}
+
+			var files = Directory.GetFiles(logsDir);
+
+			Assert.Equal(maxFiles, files.Length);
+
+			foreach(var file in files.Select(p => Path.GetFileNameWithoutExtension(p)))
+			{
+				Assert.True(int.Parse(file) > 99 - maxFiles);
+			}
 		}
 	}
 }
