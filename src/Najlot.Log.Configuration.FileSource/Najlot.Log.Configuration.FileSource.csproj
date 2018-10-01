@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <Description>Extension methods for Najlot.Log to handle log configuration with XML files.</Description>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
   </PropertyGroup>
 
   <ItemGroup>
