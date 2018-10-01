@@ -64,8 +64,7 @@ class Program
       // calculate the file path it should write to.
       .AddFileLogDestination(() =>
       {
-        var time = DateTime.Now;
-        return $"{time.Year}-{time.Month}-{time.Day}-log.txt";
+        return $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.log";
       })
 
       // Write to console using custom formatting
