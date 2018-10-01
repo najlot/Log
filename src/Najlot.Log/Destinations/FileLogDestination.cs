@@ -13,7 +13,7 @@ namespace Najlot.Log.Destinations
 	{
 		private readonly string NewLine = Environment.NewLine;
 
-		public readonly int MaxFiles = 30;
+		public readonly int MaxFiles;
 		public readonly string LogFilePaths = null;
 		public readonly bool AutoCleanUp;
 		
