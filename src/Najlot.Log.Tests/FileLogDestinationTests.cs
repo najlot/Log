@@ -11,17 +11,20 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void FileLoggerPrototypesMustWriteToDifferentFilesInDifferentDirectories()
 		{
-			var fileName1 = Path.Combine("logs_dir_1", "TestDifferentFile1.log");
-			var fileName2 = Path.Combine("logs_dir_2", "TestDifferentFile2.log");
+			var dir1 = "logs_dir_1";
+			var dir2 = "logs_dir_2";
 
-			if (File.Exists(fileName1))
+			var fileName1 = Path.Combine(dir1, "TestDifferentFile1.log");
+			var fileName2 = Path.Combine(dir2, "TestDifferentFile2.log");
+			
+			if (Directory.Exists(dir1))
 			{
-				File.Delete(fileName1);
+				Directory.Delete(dir1, true);
 			}
 
-			if (File.Exists(fileName2))
+			if (Directory.Exists(dir2))
 			{
-				File.Delete(fileName2);
+				Directory.Delete(dir2, true);
 			}
 
 			LogConfigurator
@@ -100,11 +103,12 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void FileLoggerMustCreateDirectory()
 		{
-			var fileName = Path.Combine($"logs_for_{nameof(FileLoggerMustCreateDirectory)}", "TestFile.log");
-
-			if (File.Exists(fileName))
+			var dir = $"logs_for_{nameof(FileLoggerMustCreateDirectory)}";
+			var fileName = Path.Combine(dir, "TestFile.log");
+			
+			if(Directory.Exists(dir))
 			{
-				File.Delete(fileName);
+				Directory.Delete(dir, true);
 			}
 
 			LogConfigurator
@@ -129,6 +133,35 @@ namespace Najlot.Log.Tests
 
 			Assert.NotEqual(-1, content.IndexOf(contentThis));
 			Assert.NotEqual(-1, content.IndexOf(contentPool));
+		}
+
+		[Fact]
+		public void FileLoggerMustRecreateDirectory()
+		{
+			var dir = $"logs_for_{nameof(FileLoggerMustRecreateDirectory)}";
+			var fileName = Path.Combine(dir, "TestFile.log");
+
+			if (Directory.Exists(dir))
+			{
+				Directory.Delete(dir, true);
+			}
+
+			LogConfigurator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(fileName)
+				.GetLoggerPool(out LoggerPool loggerPool);
+
+			var logger = loggerPool.GetLogger(nameof(FileLoggerMustRecreateDirectory));
+			
+			logger.Info("...");
+
+			Directory.Delete(dir, true);
+
+			logger.Info("This must recreate the directory.");
+
+			Assert.True(Directory.Exists(dir));
 		}
 	}
 }

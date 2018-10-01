@@ -18,35 +18,43 @@ namespace Najlot.Log.Destinations
 			GetPath = getPath;
 
 			var path = GetPath();
-			EnsureFileExists(path);
+			EnsureDirectoryExists(path);
 			FilePath = path;
 		}
 
 		protected override void Log(LogMessage message)
 		{
 			var path = GetPath();
-
+			
 			if (FilePath != path)
 			{
 				FilePath = path;
-				EnsureFileExists(path);
+				EnsureDirectoryExists(path);
 			}
-			
-			File.AppendAllText(FilePath, Format(message) + Environment.NewLine);
+
+			// Ensure directory is created when the path changes, 
+			// but try to create when DirectoryNotFoundException occurs
+			// The directory could be deleted by the user in the meantime...
+			try
+			{
+				File.AppendAllText(FilePath, Format(message) + Environment.NewLine);
+			}
+			catch (DirectoryNotFoundException)
+			{
+				EnsureDirectoryExists(path);
+			}
 		}
 
-		private void EnsureFileExists(string path)
+		private void EnsureDirectoryExists(string path)
 		{
 			if (!File.Exists(path))
 			{
 				var dir = Path.GetDirectoryName(path);
 
-				if (!string.IsNullOrWhiteSpace(dir) && !Directory.Exists(dir))
+				if (!string.IsNullOrWhiteSpace(dir))
 				{
 					Directory.CreateDirectory(dir);
 				}
-
-				File.WriteAllText(path, "");
 			}
 		}
 	}
