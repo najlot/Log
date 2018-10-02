@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.IO;
 using Xunit;
+using System.Reflection;
 
 namespace Najlot.Log.Tests
 {
@@ -194,6 +195,7 @@ namespace Najlot.Log.Tests
 					File.AppendAllText(logFilePaths, 
 						Environment.NewLine + " " + 
 						Environment.NewLine + "not-existing-file.log" +
+						Environment.NewLine + new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath +
 						Environment.NewLine);
 				}
 

@@ -64,26 +64,26 @@ namespace Najlot.Log.Destinations
 		{
 			try
 			{
-				List<string> LogFilePathsList = null;
+				List<string> logFilePathsList = null;
 
 				if (!File.Exists(LogFilePaths))
 				{
-					LogFilePathsList = new List<string>();
+					logFilePathsList = new List<string>();
 				}
 				else
 				{
-					LogFilePathsList = new List<string>(File.ReadAllLines(LogFilePaths));
+					logFilePathsList = new List<string>(File.ReadAllLines(LogFilePaths));
 				}
 
-				LogFilePathsList.Add(path);
+				logFilePathsList.Add(path);
 
-				if (LogFilePathsList.Count < MaxFiles)
+				if (logFilePathsList.Count < MaxFiles)
 				{
-					File.WriteAllLines(LogFilePaths, LogFilePathsList.Distinct());
+					File.WriteAllLines(LogFilePaths, logFilePathsList.Distinct());
 					return;
 				}
 				
-				LogFilePathsList = LogFilePathsList.Where(p =>
+				logFilePathsList = logFilePathsList.Where(p =>
 				{
 					if(string.IsNullOrWhiteSpace(p))
 					{
@@ -98,13 +98,15 @@ namespace Najlot.Log.Destinations
 					return true;
 				}).Distinct().ToList();
 
-				while(LogFilePathsList.Count > MaxFiles)
+				while(logFilePathsList.Count > MaxFiles)
 				{
-					File.Delete(LogFilePathsList[0]);
-					LogFilePathsList.RemoveAt(0);
+					var file = logFilePathsList[0];
+					logFilePathsList.Remove(file);
+					File.WriteAllLines(LogFilePaths, logFilePathsList);
+					File.Delete(file);
 				}
 
-				File.WriteAllLines(LogFilePaths, LogFilePathsList);
+				File.WriteAllLines(LogFilePaths, logFilePathsList);
 			}
 			catch(Exception ex)
 			{
