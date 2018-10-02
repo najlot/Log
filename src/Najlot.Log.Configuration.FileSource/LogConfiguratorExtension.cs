@@ -1,6 +1,8 @@
 ﻿using Najlot.Log.Middleware;
+using Najlot.Log.Util;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Xml;
 using System.Xml.Serialization;
@@ -18,6 +20,8 @@ namespace Najlot.Log.Configuration.FileSource
 	{
 		private static void WriteXmlConfigurationFile(LogConfigurator logConfigurator, string path)
 		{
+			var encoding = Encoding.UTF8;
+
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
 			
 			try
@@ -30,11 +34,11 @@ namespace Najlot.Log.Configuration.FileSource
 					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.GetName().Name;
 				}
 
-				XmlSerializer xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
+				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
 
-				using (var stringWriter = new StringWriter())
+				using (var stringWriter = new CustomStringWriter(encoding))
 				{
-					using (XmlWriter xmlWriter = XmlWriter.Create(stringWriter))
+					using (var xmlWriter = XmlWriter.Create(stringWriter))
 					{
 						xmlSerializer.Serialize(xmlWriter, new FileConfiguration()
 						{
@@ -42,7 +46,7 @@ namespace Najlot.Log.Configuration.FileSource
 							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName
 						});
 
-						File.WriteAllText(path, stringWriter.ToString());
+						File.WriteAllText(path, stringWriter.ToString(), encoding);
 					}
 				}
 			}
@@ -52,6 +56,14 @@ namespace Najlot.Log.Configuration.FileSource
 			}
 		}
 
+		/// <summary>
+		/// Reads logconfiguration from an XML file
+		/// </summary>
+		/// <param name="logConfigurator">LogConfigurator instance</param>
+		/// <param name="path">Path to the XML file</param>
+		/// <param name="listenForChanges">Should the canges happened at runtime be reflected to the logger</param>
+		/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>
+		/// <returns></returns>
 		public static LogConfigurator ReadConfigurationFromXmlFile(this LogConfigurator logConfigurator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
 		{
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
