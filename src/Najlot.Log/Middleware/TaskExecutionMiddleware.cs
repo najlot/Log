@@ -21,7 +21,7 @@ namespace Najlot.Log.Middleware
 
 		private Task _dequeueTask;
 
-		private async void StartDequeueTaskIfNotRuns(bool wait)
+		private void StartDequeueTaskIfNotRuns(bool wait)
 		{
 			if (!_dequeueTaskRuns)
 			{
@@ -36,7 +36,7 @@ namespace Najlot.Log.Middleware
 
 							if (wait)
 							{
-								await _dequeueTask;
+								_dequeueTask.Wait();
 							}
 						}
 					}
@@ -48,7 +48,7 @@ namespace Najlot.Log.Middleware
 			}
 			else if (wait)
 			{
-				await _dequeueTask;
+				_dequeueTask.Wait();
 			}
 		}
 
