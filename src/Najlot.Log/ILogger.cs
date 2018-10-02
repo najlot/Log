@@ -20,6 +20,10 @@ namespace Najlot.Log
 		void Info<T>(T o, Exception ex);
 		void Warn<T>(T o, Exception ex);
 
+		/// <summary>
+		/// Tells the logger to write all messages to destinations, immediately.
+		/// Will not return until done.
+		/// </summary>
 		void Flush();
 	}
 }

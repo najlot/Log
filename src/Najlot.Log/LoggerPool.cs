@@ -19,7 +19,7 @@ namespace Najlot.Log
 		private List<ILogger> _logDestinations = new List<ILogger>();
 		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 
-		public LoggerPool(ILogConfiguration logConfiguration)
+		internal LoggerPool(ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
 		}
@@ -29,11 +29,21 @@ namespace Najlot.Log
 			lock (_logDestinations) _logDestinations.Add(logDestination);
 		}
 
+		/// <summary>
+		/// Creates a logger for a type or retrieves it from the cache.
+		/// </summary>
+		/// <param name="sourceType">Type to create a logger for</param>
+		/// <returns></returns>
 		public Logger GetLogger(Type sourceType)
 		{
 			return GetLogger(sourceType.FullName);
 		}
 
+		/// <summary>
+		/// Creates a logger for a category or retrieves it from the cache.
+		/// </summary>
+		/// <param name="category">Category to create a logger for</param>
+		/// <returns></returns>
 		public Logger GetLogger(string category)
 		{
 			Logger logger;
