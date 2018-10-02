@@ -71,9 +71,9 @@ namespace Najlot.Log
 			return this;
 		}
 
-		public LogConfigurator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null, bool useColors = false)
 		{
-			var logDestination = new ConsoleLogDestination(_logConfiguration);
+			var logDestination = new ConsoleLogDestination(_logConfiguration, useColors);
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 

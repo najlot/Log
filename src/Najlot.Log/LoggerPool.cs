@@ -52,7 +52,7 @@ namespace Najlot.Log
 						case 0:
 							{
 								// There are no log destinations specified: Creating console log destination
-								var consoleLogger = new ConsoleLogDestination(_logConfiguration);
+								var consoleLogger = new ConsoleLogDestination(_logConfiguration, false);
 								_logConfiguration.AttachObserver(consoleLogger);
 								return new Logger(consoleLogger, _logConfiguration);
 							}

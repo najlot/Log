@@ -79,7 +79,7 @@ namespace Najlot.Log.Destinations
 
 				if (LogFilePathsList.Count < MaxFiles)
 				{
-					File.WriteAllLines(LogFilePaths, LogFilePathsList);
+					File.WriteAllLines(LogFilePaths, LogFilePathsList.Distinct());
 					return;
 				}
 				
