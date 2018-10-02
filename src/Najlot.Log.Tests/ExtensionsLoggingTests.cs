@@ -40,7 +40,7 @@ namespace Najlot.Log.Tests
 				{
 					configurator
 						.SetLogLevel(LogLevel.Trace)
-						.AddConsoleLogDestination()
+						.AddConsoleLogDestination(useColors: true)
 						.GetLogConfiguration(out logConfiguration);
 				});
 

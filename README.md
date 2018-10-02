@@ -67,10 +67,8 @@ class Program
         return $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.log";
       })
 
-      // Write to console using custom formatting
-      // or write to a custom destination (console with colors there) using the same formatting
-      //.AddConsoleLogDestination(FormatForConsole)
-      .AddCustomDestination(new ColorfulConsoleDestination(logConfiguration), FormatForConsole)
+      // Write to console using custom formatting and applying colors for different loglevels
+	  .AddConsoleLogDestination(FormatForConsole, useColors: true)
 
       // Add a destination implemented below.
       .AddCustomDestination(new DebugDestination(logConfiguration))
