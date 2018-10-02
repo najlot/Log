@@ -13,11 +13,7 @@ namespace Najlot.Log.Tests
 		{
 			Assert.Throws<ArgumentNullException>(() =>
 			{
-				LogConfigurator
-					.CreateNew()
-					.GetLogConfiguration(out ILogConfiguration logConfiguration)
-					.AddCustomDestination(null)
-					.GetLoggerPool(out LoggerPool loggerPool);
+				LogConfigurator.CreateNew().AddCustomDestination(null);
 			});
 		}
 
