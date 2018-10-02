@@ -110,6 +110,7 @@ namespace Najlot.Log.Tests
 				{
 					gotSecondLogMessage = true;
 				}))
+				.AddConsoleLogDestination(useColors: true)
 				.GetLoggerPool(out var loggerPool);
 
 			var log = loggerPool.GetLogger(this.GetType());
