@@ -188,6 +188,15 @@ namespace Najlot.Log.Tests
 
 			for (; i < 100; i++)
 			{
+				// Add some bad data
+				if(i == 50)
+				{
+					File.AppendAllText(logFilePaths, 
+						Environment.NewLine + " " + 
+						Environment.NewLine + "not-existing-file.log" +
+						Environment.NewLine);
+				}
+
 				log.Info(Guid.NewGuid());
 			}
 
