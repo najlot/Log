@@ -31,7 +31,7 @@ namespace Najlot.Log.Destinations
 			var path = GetPath();
 			EnsureDirectoryExists(path);
 			FilePath = path;
-			CleanUpOldFiles(path);
+			if(AutoCleanUp) CleanUpOldFiles(path);
 		}
 		
 		protected override void Log(LogMessage message)
