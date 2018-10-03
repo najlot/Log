@@ -57,42 +57,30 @@ namespace Najlot.Log
 
 				lock (_logDestinations)
 				{
-					switch (_logDestinations.Count)
+					var loggerList = new LoggerList();
+
+					if (_logDestinations.Count == 0)
 					{
-						case 0:
-							{
-								// There are no log destinations specified: Creating console log destination
-								var consoleLogger = new ConsoleLogDestination(_logConfiguration, false);
-								_logConfiguration.AttachObserver(consoleLogger);
-								return new Logger(consoleLogger, _logConfiguration);
-							}
+						// There are no log destinations specified: Creating console log destination
+						var consoleDestination = new ConsoleLogDestination(_logConfiguration, false);
+						_logConfiguration.AttachObserver(consoleDestination);
+						loggerList.Add(consoleDestination);
 
-						case 1:
-							{
-								var clonedLogDestination = CloneLogDestination(category, _logDestinations[0]);
-								logger = new Logger(clonedLogDestination, _logConfiguration);
-							}
+						logger = new Logger(loggerList, _logConfiguration);
+					}
+					else
+					{
+						foreach (var logDestination in _logDestinations)
+						{
+							var clonedLogDestination = CloneLogDestination(category, logDestination);
+							loggerList.Add(clonedLogDestination);
+						}
 
-							break;
+						logger = new Logger(loggerList, _logConfiguration);
 
-						default:
-							{
-								var loggerList = new LoggerList();
-
-								foreach (var logDestination in _logDestinations)
-								{
-									var clonedLogDestination = CloneLogDestination(category, logDestination);
-									loggerList.Add(clonedLogDestination);
-								}
-
-								logger = new Logger(loggerList, _logConfiguration);
-							}
-
-							break;
+						_loggerCache.Add(category, logger);
 					}
 				}
-
-				_loggerCache.Add(category, logger);
 			}
 
 			return logger;
