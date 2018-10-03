@@ -68,7 +68,7 @@ class Program
       })
 
       // Write to console using custom formatting and applying colors for different loglevels
-	  .AddConsoleLogDestination(FormatForConsole, useColors: true)
+      .AddConsoleLogDestination(FormatForConsole, useColors: true)
 
       // Add a destination implemented below.
       .AddCustomDestination(new DebugDestination(logConfiguration))
