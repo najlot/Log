@@ -14,7 +14,7 @@ namespace Najlot.Log
 		/// Static LoggerPool instance
 		/// </summary>
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
-		
+
 		private ILogConfiguration _logConfiguration;
 		private List<ILogger> _logDestinations = new List<ILogger>();
 		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
@@ -97,6 +97,7 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
@@ -107,12 +108,12 @@ namespace Najlot.Log
 
 				if (disposing)
 				{
-					foreach(var destination in _logDestinations)
+					foreach (var destination in _logDestinations)
 					{
 						destination.Dispose();
 					}
 
-					foreach(var cachedDestinationEntry in _loggerCache)
+					foreach (var cachedDestinationEntry in _loggerCache)
 					{
 						cachedDestinationEntry.Value.Dispose();
 					}
@@ -123,12 +124,13 @@ namespace Najlot.Log
 				_loggerCache = null;
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

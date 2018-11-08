@@ -13,7 +13,7 @@ namespace Najlot.Log.Util
 
 		public void Dispose()
 		{
-			if(_action != null)
+			if (_action != null)
 			{
 				_action();
 				_action = null;

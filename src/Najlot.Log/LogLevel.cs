@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Najlot.Log
+﻿namespace Najlot.Log
 {
 	public enum LogLevel
 	{

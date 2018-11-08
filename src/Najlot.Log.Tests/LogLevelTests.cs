@@ -1,7 +1,6 @@
 using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
-using System;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -34,7 +33,7 @@ namespace Najlot.Log.Tests
 			Assert.True(logger.IsEnabled(LogLevel.Error));
 			Assert.False(logger.IsEnabled(LogLevel.Info));
 		}
-		
+
 		[Fact]
 		public void LoggerMustLogWithCorrectLogLevel()
 		{

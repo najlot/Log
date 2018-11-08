@@ -150,7 +150,7 @@ namespace Najlot.Log
 				SetupLogLevel(_logLevel);
 			}
 		}
-		
+
 		public IDisposable BeginScope<T>(T state)
 		{
 			return internalLogger.BeginScope(state);
@@ -205,9 +205,10 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false;
 
-		void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
 			if (!disposedValue)
 			{
@@ -223,13 +224,13 @@ namespace Najlot.Log
 				internalLogger = null;
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
 
+		#endregion IDisposable Support
 	}
 }

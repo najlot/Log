@@ -1,11 +1,10 @@
-﻿
-using Xunit;
-using Najlot.Log.Middleware;
+﻿using Najlot.Log.Configuration;
 using Najlot.Log.Configuration.FileSource;
-using System.IO;
-using Najlot.Log.Configuration;
+using Najlot.Log.Middleware;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
+using Xunit;
 
 namespace Najlot.Log.Tests
 {
@@ -46,7 +45,7 @@ namespace Najlot.Log.Tests
 					"<ExecutionMiddleware>Najlot.Log.Middleware.TaskExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
 				"</NajlotLogConfiguration>";
 
-			if(File.Exists(configPath))
+			if (File.Exists(configPath))
 			{
 				File.Delete(configPath);
 			}
@@ -57,7 +56,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-			
+
 			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 		}
 
@@ -102,7 +101,7 @@ namespace Najlot.Log.Tests
 			File.WriteAllText(configPath, newContent);
 			var stopwatch = Stopwatch.StartNew();
 
-			while(stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Error)
+			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Error)
 			{
 				Thread.Sleep(10);
 			}
@@ -111,11 +110,11 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
-			
+
 			File.WriteAllText(configPath, newContent
 				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
 				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Warn</LogLevel>"));
-			
+
 			stopwatch = Stopwatch.StartNew();
 
 			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Info)
@@ -127,7 +126,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Warn, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
-			
+
 			File.WriteAllText(configPath, newContent
 				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log", "System.Guid")
 				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Error</LogLevel>"));
@@ -159,7 +158,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Trace, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
-			
+
 			File.Delete(configPath);
 
 			Thread.Sleep(300);
@@ -170,7 +169,7 @@ namespace Najlot.Log.Tests
 		{
 			const string configPath = "LogConfigurationExamle.config";
 
-			if(File.Exists(configPath))
+			if (File.Exists(configPath))
 			{
 				File.Delete(configPath);
 			}

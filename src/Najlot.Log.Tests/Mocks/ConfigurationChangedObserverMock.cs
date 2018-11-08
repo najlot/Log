@@ -9,7 +9,7 @@ namespace Najlot.Log.Tests.Mocks
 		private Action<ILogConfiguration> _configurationChangedAction;
 
 		public ConfigurationChangedObserverMock(
-			ILogConfiguration configuration, 
+			ILogConfiguration configuration,
 			Action<ILogConfiguration> configurationChangedAction) : base(configuration)
 		{
 			_configurationChangedAction = configurationChangedAction;

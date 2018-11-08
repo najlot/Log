@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Najlot.Log.Configuration
+﻿namespace Najlot.Log.Configuration
 {
 	public interface IConfigurationChangedObserver
 	{

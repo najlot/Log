@@ -19,10 +19,10 @@ namespace Najlot.Log.Extensions.Logging
 		{
 			return new NajlotLogWrapper(_loggerPool.GetLogger(categoryName));
 		}
-		
+
 		public void Dispose()
 		{
-			if(!_disposed)
+			if (!_disposed)
 			{
 				_disposed = true;
 				_loggerPool = null;

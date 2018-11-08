@@ -11,7 +11,7 @@ namespace Najlot.Log.Extensions.Logging
 		{
 			this._logger = logger;
 		}
-		
+
 		public IDisposable BeginScope<TState>(TState state)
 		{
 			return _logger.BeginScope(state);
@@ -21,7 +21,7 @@ namespace Najlot.Log.Extensions.Logging
 		{
 			return _logger.IsEnabled((LogLevel)logLevel);
 		}
-		
+
 		public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
 			switch (logLevel)

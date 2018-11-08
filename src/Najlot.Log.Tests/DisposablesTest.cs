@@ -1,9 +1,6 @@
 ﻿using Najlot.Log.Configuration;
 using Najlot.Log.Tests.Mocks;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -24,8 +21,8 @@ namespace Najlot.Log.Tests
 						.AddCustomDestination(new LogDestinationMock(logConfiguration, msg => { }))
 						.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, msg => { })));
 			}
-			
-			foreach(var logConfigurator in logConfigurators)
+
+			foreach (var logConfigurator in logConfigurators)
 			{
 				logConfigurator.GetLoggerPool(out var loggerPool);
 				var logger = loggerPool.GetLogger("1");

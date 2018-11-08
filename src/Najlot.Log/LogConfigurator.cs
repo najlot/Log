@@ -13,7 +13,7 @@ namespace Najlot.Log
 		private LoggerPool _loggerPool;
 
 		/// <summary>
-		/// Returns an static registered instance of a LogConfigurator 
+		/// Returns an static registered instance of a LogConfigurator
 		/// that has static resistered configuration and pool.
 		/// </summary>
 		/// <returns></returns>
@@ -26,7 +26,7 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
-		/// Creates a new LogConfigurator that is not static registered and 
+		/// Creates a new LogConfigurator that is not static registered and
 		/// has own configuration and pool.
 		/// </summary>
 		/// <returns></returns>
@@ -76,7 +76,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <typeparam name="TExecutionMiddleware"></typeparam>
 		/// <returns></returns>
-		public LogConfigurator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware: Middleware.IExecutionMiddleware, new()
+		public LogConfigurator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
 			_logConfiguration.ExecutionMiddleware = new TExecutionMiddleware();
 			return this;
@@ -95,8 +95,8 @@ namespace Najlot.Log
 			{
 				throw new ArgumentNullException(nameof(logDestination));
 			}
-			
-			if(formatFunction != null)
+
+			if (formatFunction != null)
 			{
 				var logDestinationType = logDestination.GetType();
 				if (!_logConfiguration.TrySetFormatFunctionForType(logDestinationType, formatFunction))
@@ -147,6 +147,7 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false; // To detect redundant calls
 
 		protected virtual void Dispose(bool disposing)
@@ -164,12 +165,13 @@ namespace Najlot.Log
 				_logConfiguration = null;
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

@@ -6,7 +6,7 @@ namespace Najlot.Log.Tests.Mocks
 {
 	public class LogDestinationFormatFunctionMock : LogDestinationBase
 	{
-		Action<string> _logAction;
+		private Action<string> _logAction;
 
 		public LogDestinationFormatFunctionMock(ILogConfiguration configuration, Action<string> formattedLogAction) : base(configuration)
 		{

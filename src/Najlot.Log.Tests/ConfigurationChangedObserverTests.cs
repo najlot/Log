@@ -47,7 +47,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(observerNotified, "Observer was not notified on log level changed");
 		}
-		
+
 		[Fact]
 		public void ConfigurationMustNotifyOnExecutionMiddlewareChanged()
 		{
@@ -73,7 +73,7 @@ namespace Najlot.Log.Tests
 		{
 			var testString = "new foo";
 			bool observerNotified = false;
-			
+
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
@@ -88,7 +88,7 @@ namespace Najlot.Log.Tests
 					Assert.Equal(testString, format(new LogMessage(DateTime.Now, LogLevel.Info, null, null, null)));
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
-			
+
 			var log = loggerPool.GetLogger(this.GetType());
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), msg =>
@@ -130,20 +130,20 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 			string testFunc(LogMessage msg) => "123";
-			
+
 			var configurator = LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
-			
+
 			configurator
 				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
 				{
 					observerNotified = true;
 				}), testFunc)
 				.GetLoggerPool(out LoggerPool loggerPool);
-			
+
 			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
 		}
 
@@ -192,7 +192,7 @@ namespace Najlot.Log.Tests
 				.GetLoggerPool(out LoggerPool loggerPool);
 
 			var log = loggerPool.GetLogger(this.GetType());
-			
+
 			bool couldSet = logConfiguration.TrySetFormatFunctionForType(typeof(SecondConfigurationChangedObserverMock), msg =>
 			{
 				return "";

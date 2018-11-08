@@ -13,10 +13,10 @@ namespace Najlot.Log.Configuration
 
 		internal LogConfiguration()
 		{
-
 		}
-		
-		LogLevel logLevel = LogLevel.Debug;
+
+		private LogLevel logLevel = LogLevel.Debug;
+
 		public LogLevel LogLevel
 		{
 			get
@@ -25,7 +25,7 @@ namespace Najlot.Log.Configuration
 			}
 			set
 			{
-				if(logLevel != value)
+				if (logLevel != value)
 				{
 					logLevel = value;
 					NotifyObservers();
@@ -33,7 +33,8 @@ namespace Najlot.Log.Configuration
 			}
 		}
 
-		IExecutionMiddleware executionMiddleware = new SyncExecutionMiddleware();
+		private IExecutionMiddleware executionMiddleware = new SyncExecutionMiddleware();
+
 		public IExecutionMiddleware ExecutionMiddleware
 		{
 			get
@@ -42,12 +43,12 @@ namespace Najlot.Log.Configuration
 			}
 			set
 			{
-				if(value == null)
+				if (value == null)
 				{
 					return;
 				}
 
-				if(executionMiddleware.GetType().FullName != value.GetType().FullName)
+				if (executionMiddleware.GetType().FullName != value.GetType().FullName)
 				{
 					// Observers get new middleware and we dispose the old one
 					using (var oldMiddleware = executionMiddleware)
@@ -60,11 +61,12 @@ namespace Najlot.Log.Configuration
 		}
 
 		#region ConfigurationChanged observers
+
 		private readonly List<IConfigurationChangedObserver> _observerList = new List<IConfigurationChangedObserver>();
 
 		public void AttachObserver(IConfigurationChangedObserver observer)
 		{
-			lock(_observerList)
+			lock (_observerList)
 			{
 				_observerList.Add(observer);
 			}
@@ -83,40 +85,42 @@ namespace Najlot.Log.Configuration
 				while (couldRemove);
 			}
 		}
-		
+
 		public void NotifyObservers(Type type = null)
 		{
 			lock (_observerList)
 			{
 				foreach (var observer in _observerList)
 				{
-					if(type != null && type != observer.GetType())
+					if (type != null && type != observer.GetType())
 					{
 						continue;
 					}
-					
+
 					observer.NotifyConfigurationChanged(this);
 				}
 			}
 		}
-		#endregion
+
+		#endregion ConfigurationChanged observers
 
 		#region Format functions
+
 		private readonly Dictionary<Type, Func<LogMessage, string>> _formatFunctions = new Dictionary<Type, Func<LogMessage, string>>();
 
 		public bool TryGetFormatFunctionForType(Type type, out Func<LogMessage, string> function)
 		{
-			lock(_formatFunctions)
+			lock (_formatFunctions)
 			{
 				return _formatFunctions.TryGetValue(type, out function);
 			}
 		}
-		
+
 		public bool TrySetFormatFunctionForType(Type type, Func<LogMessage, string> function)
 		{
 			bool addOrUpdateOk;
 
-			if(function == null)
+			if (function == null)
 			{
 				return false;
 			}
@@ -134,7 +138,7 @@ namespace Najlot.Log.Configuration
 				{
 					addOrUpdateOk = oldFunction != function;
 
-					if(addOrUpdateOk)
+					if (addOrUpdateOk)
 					{
 						_formatFunctions[type] = function;
 					}
@@ -156,6 +160,7 @@ namespace Najlot.Log.Configuration
 				_formatFunctions.Clear();
 			}
 		}
-		#endregion
+
+		#endregion Format functions
 	}
 }

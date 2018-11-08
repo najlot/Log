@@ -1,8 +1,8 @@
 ﻿using Najlot.Log.Configuration;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Najlot.Log.Destinations
 {
@@ -16,10 +16,10 @@ namespace Najlot.Log.Destinations
 		public readonly int MaxFiles;
 		public readonly string LogFilePaths = null;
 		public readonly bool AutoCleanUp;
-		
+
 		public string FilePath { get; protected set; }
 		public readonly Func<string> GetPath;
-		
+
 		public FileLogDestination(ILogConfiguration configuration, Func<string> getPath, int maxFiles, string logFilePaths) : base(configuration)
 		{
 			GetPath = getPath;
@@ -31,9 +31,9 @@ namespace Najlot.Log.Destinations
 			var path = GetPath();
 			EnsureDirectoryExists(path);
 			FilePath = path;
-			if(AutoCleanUp) CleanUpOldFiles(path);
+			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
-		
+
 		protected override void Log(LogMessage message)
 		{
 			var path = GetPath();
@@ -46,13 +46,13 @@ namespace Najlot.Log.Destinations
 				if (AutoCleanUp) cleanUp = true;
 			}
 
-			// Ensure directory is created when the path changes, 
+			// Ensure directory is created when the path changes,
 			// but try to create when DirectoryNotFoundException occurs
 			// The directory could be deleted by the user in the meantime...
 			try
 			{
 				File.AppendAllText(FilePath, Format(message) + NewLine);
-				if(cleanUp) CleanUpOldFiles(path);
+				if (cleanUp) CleanUpOldFiles(path);
 			}
 			catch (DirectoryNotFoundException)
 			{
@@ -82,15 +82,15 @@ namespace Najlot.Log.Destinations
 					File.WriteAllLines(LogFilePaths, logFilePathsList.Distinct());
 					return;
 				}
-				
+
 				logFilePathsList = logFilePathsList.Where(p =>
 				{
-					if(string.IsNullOrWhiteSpace(p))
+					if (string.IsNullOrWhiteSpace(p))
 					{
 						return false;
 					}
 
-					if(!File.Exists(p))
+					if (!File.Exists(p))
 					{
 						return false;
 					}
@@ -98,7 +98,7 @@ namespace Najlot.Log.Destinations
 					return true;
 				}).Distinct().ToList();
 
-				while(logFilePathsList.Count > MaxFiles)
+				while (logFilePathsList.Count > MaxFiles)
 				{
 					var file = logFilePathsList[0];
 					logFilePathsList.Remove(file);
@@ -108,7 +108,7 @@ namespace Najlot.Log.Destinations
 
 				File.WriteAllLines(LogFilePaths, logFilePathsList);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				Console.Write("Najlot.Log.Destinations.FileLogDestination (CleanUpOldFiles): ");
 
@@ -119,7 +119,7 @@ namespace Najlot.Log.Destinations
 				}
 			}
 		}
-		
+
 		private void EnsureDirectoryExists(string path)
 		{
 			if (!File.Exists(path))

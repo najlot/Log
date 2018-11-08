@@ -1,10 +1,9 @@
-
 using Najlot.Log.Middleware;
 using System;
-using System.Linq;
 using System.IO;
-using Xunit;
+using System.Linq;
 using System.Reflection;
+using Xunit;
 
 namespace Najlot.Log.Tests
 {
@@ -18,7 +17,7 @@ namespace Najlot.Log.Tests
 
 			var fileName1 = Path.Combine(dir1, "TestDifferentFile1.log");
 			var fileName2 = Path.Combine(dir2, "TestDifferentFile2.log");
-			
+
 			if (Directory.Exists(dir1))
 			{
 				Directory.Delete(dir1, true);
@@ -37,14 +36,14 @@ namespace Najlot.Log.Tests
 				{
 					var fileInfo = new FileInfo(fileName1);
 
-					if(fileInfo.Exists)
+					if (fileInfo.Exists)
 					{
 						if (fileInfo.Length > 0)
 						{
 							return fileName2;
 						}
 					}
-					
+
 					return fileName1;
 				})
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -73,7 +72,7 @@ namespace Najlot.Log.Tests
 		{
 			var fileName = "TestFile.log";
 
-			if(File.Exists(fileName))
+			if (File.Exists(fileName))
 			{
 				File.Delete(fileName);
 			}
@@ -107,8 +106,8 @@ namespace Najlot.Log.Tests
 		{
 			var dir = $"logs_for_{nameof(FileLoggerMustCreateDirectory)}";
 			var fileName = Path.Combine(dir, "TestFile.log");
-			
-			if(Directory.Exists(dir))
+
+			if (Directory.Exists(dir))
 			{
 				Directory.Delete(dir, true);
 			}
@@ -156,7 +155,7 @@ namespace Najlot.Log.Tests
 				.GetLoggerPool(out LoggerPool loggerPool);
 
 			var logger = loggerPool.GetLogger(nameof(FileLoggerMustRecreateDirectory));
-			
+
 			logger.Info("...");
 
 			Directory.Delete(dir, true);
@@ -172,7 +171,7 @@ namespace Najlot.Log.Tests
 			const int maxFiles = 5;
 			const string logFilePaths = ".FilesToCleanUp";
 			string logsDir = $"logs_for_{nameof(FileLoggerMustCleanUpFiles)}";
-			
+
 			if (File.Exists(logFilePaths)) File.Delete(logFilePaths);
 			if (Directory.Exists(logsDir)) Directory.Delete(logsDir, true);
 
@@ -190,10 +189,10 @@ namespace Najlot.Log.Tests
 			for (; i < 100; i++)
 			{
 				// Add some bad data
-				if(i == 50)
+				if (i == 50)
 				{
-					File.AppendAllText(logFilePaths, 
-						Environment.NewLine + " " + 
+					File.AppendAllText(logFilePaths,
+						Environment.NewLine + " " +
 						Environment.NewLine + "not-existing-file.log" +
 						Environment.NewLine + new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath +
 						Environment.NewLine);
@@ -206,7 +205,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(maxFiles, files.Length);
 
-			foreach(var file in files.Select(p => Path.GetFileNameWithoutExtension(p)))
+			foreach (var file in files.Select(p => Path.GetFileNameWithoutExtension(p)))
 			{
 				Assert.True(int.Parse(file) > 99 - maxFiles);
 			}

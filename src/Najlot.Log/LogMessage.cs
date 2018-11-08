@@ -5,7 +5,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// The message to log
 	/// </summary>
-    public class LogMessage
+	public class LogMessage
 	{
 		/// <summary>
 		/// Timestamp the logging was requested
@@ -31,7 +31,7 @@ namespace Najlot.Log
 		/// The instance that was given to the request
 		/// </summary>
 		public object Message { get; }
-		
+
 		/// <summary>
 		/// Exception, if got any, otherwise null. Check ExceptionIsValid
 		/// </summary>

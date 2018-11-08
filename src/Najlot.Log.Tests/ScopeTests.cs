@@ -1,7 +1,6 @@
 ﻿using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -31,7 +30,7 @@ namespace Najlot.Log.Tests
 			{
 				log.Warn("setting scope");
 			}
-			
+
 			Assert.Equal(scope, (string)state);
 
 			log.Warn("scope must be null now");
@@ -134,13 +133,13 @@ namespace Najlot.Log.Tests
 					scopesAreNotCorrect = (string)msg.Message != (string)msg.State;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
-			
+
 			var log = loggerPool.GetLogger(this.GetType());
 
 			using (log.BeginScope("scope 1"))
 			{
 				log.Warn("scope 1");
-				
+
 				using (log.BeginScope("scope 2"))
 				{
 					log.Info("scope 2");
@@ -152,12 +151,11 @@ namespace Najlot.Log.Tests
 					}
 
 					log.Info("scope 2");
-
 				}
 
 				log.Info("scope 1");
 			}
-			
+
 			log.Flush();
 
 			Assert.False(scopesAreNotCorrect, "scopes are not correct");

@@ -31,7 +31,7 @@ namespace Najlot.Log.Tests
 					strActual = str;
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
-			
+
 			var log = loggerPool.GetLogger(this.GetType());
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
@@ -59,7 +59,7 @@ namespace Najlot.Log.Tests
 			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
 
 			var log = loggerPool.GetLogger(this.GetType());
-			
+
 			log.Fatal("this message should not be used");
 
 			Assert.Equal(strExpected, strActual);
@@ -77,7 +77,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
 				{
 					strActual = str;
-				}), 
+				}),
 				msg =>
 				{
 					return strExpected;
@@ -103,12 +103,12 @@ namespace Najlot.Log.Tests
 			Assert.False(canSetFunction, "Function was set to null");
 
 			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(
-				this.GetType(), 
+				this.GetType(),
 				out Func<LogMessage, string> formatFunc);
 
 			Assert.False(canGetFunction, "Could get function, that was not set");
 		}
-		
+
 		[Fact]
 		public void RemovedFormattingFunctionMustReturnFalseOnGet()
 		{
@@ -126,16 +126,16 @@ namespace Najlot.Log.Tests
 			Assert.True(canSetFunction, "Could not set function");
 
 			logConfiguration.ClearAllFormatFunctions();
-			
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), 
+
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(),
 				out Func<LogMessage, string> formatFunc);
 
 			Assert.False(canGetFunction, "Could get not set function");
 		}
 
 		[Fact]
-        public void SetFormatFunctionCanBeRetrieved()
-        {
+		public void SetFormatFunctionCanBeRetrieved()
+		{
 			var returnString = "some sample string";
 
 			var configurator = LogConfigurator
@@ -164,7 +164,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(returnString, formatedString);
 		}
-		
+
 		[Fact]
 		public void LastFormatFunctionCanBeRetrievedAfterMultipleSet()
 		{
@@ -216,8 +216,8 @@ namespace Najlot.Log.Tests
 			LogConfigurator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-			
-			foreach(var type in types)
+
+			foreach (var type in types)
 			{
 				bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(type, (msg) =>
 				{
@@ -226,7 +226,7 @@ namespace Najlot.Log.Tests
 
 				Assert.True(canSetFunction, "Could not set function for " + type.Name);
 			}
-			
+
 			Func<LogMessage, string> formatFunc;
 
 			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);

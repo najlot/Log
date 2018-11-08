@@ -16,14 +16,14 @@ namespace Najlot.Log.Configuration.FileSource
 		public string ExecutionMiddleware { get; set; }
 	}
 
-    public static class LogConfiguratorExtension
+	public static class LogConfiguratorExtension
 	{
 		private static void WriteXmlConfigurationFile(LogConfigurator logConfigurator, string path)
 		{
 			var encoding = Encoding.UTF8;
 
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
-			
+
 			try
 			{
 				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
@@ -72,11 +72,11 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				if (!File.Exists(path))
 				{
-					if(writeExampleIfSourceDoesNotExists)
+					if (writeExampleIfSourceDoesNotExists)
 					{
 						WriteXmlConfigurationFile(logConfigurator, path);
 					}
-					
+
 					return logConfigurator;
 				}
 
@@ -96,7 +96,7 @@ namespace Najlot.Log.Configuration.FileSource
 					fileSystemWatcher.Changed += (object sender, FileSystemEventArgs e) =>
 					{
 						// Ensure the file is not accessed any more
-						Thread.Sleep(75); 
+						Thread.Sleep(75);
 
 						try
 						{
@@ -146,12 +146,12 @@ namespace Najlot.Log.Configuration.FileSource
 				Console.WriteLine($"Najlot.Log: New execution middleware of type '{fileConfiguration.ExecutionMiddleware}' not found!");
 				return;
 			}
-			
-			if(executionMiddlewareType == currentExecutionMiddlewareType)
+
+			if (executionMiddlewareType == currentExecutionMiddlewareType)
 			{
 				return;
 			}
-			
+
 			if (!(Activator.CreateInstance(executionMiddlewareType) is IExecutionMiddleware newExecutionMiddleware))
 			{
 				Console.WriteLine("Najlot.Log: New execution middleware is not " + nameof(IExecutionMiddleware));

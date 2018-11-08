@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Najlot.Log.Configuration;
 using System;
-using System.Threading.Tasks;
 
 namespace Najlot.Log.Extensions.Logging
 {
@@ -15,7 +14,7 @@ namespace Najlot.Log.Extensions.Logging
 				.GetLoggerPool(out LoggerPool loggerPool);
 
 			configure(configurator);
-			
+
 			return builder.AddNajlotLog(configurator);
 		}
 
@@ -45,5 +44,5 @@ namespace Najlot.Log.Extensions.Logging
 			loggerFactory.AddProvider(new NajlotLogProvider(logConfigurator));
 			return loggerFactory;
 		}
-    }
+	}
 }

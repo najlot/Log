@@ -75,7 +75,7 @@ namespace Najlot.Log.Tests
 			bool logged = false;
 			bool loggedToSecond = false;
 			bool fail = false;
-			
+
 			LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)

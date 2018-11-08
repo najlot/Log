@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Najlot.Log.Destinations
+﻿namespace Najlot.Log.Destinations
 {
 	/// <summary>
 	/// Implementation of the prototype pattern with an extension in form of the category

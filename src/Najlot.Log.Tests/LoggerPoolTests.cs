@@ -1,7 +1,6 @@
 using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
-using System;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -17,10 +16,9 @@ namespace Najlot.Log.Tests
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
-
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
-			
+
 			var logForThis1 = loggerPool.GetLogger(this.GetType());
 			var logForPool1 = loggerPool.GetLogger(typeof(LoggerPool));
 
@@ -48,7 +46,6 @@ namespace Najlot.Log.Tests
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
 				{
-
 				}));
 
 			var initializedLog = loggerPool.GetLogger(this.GetType());

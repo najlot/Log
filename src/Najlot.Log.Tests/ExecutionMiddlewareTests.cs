@@ -185,7 +185,7 @@ namespace Najlot.Log.Tests
 			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 
 			log.Info(logMessageExpected);
-			
+
 			Assert.True(loggerGotAction, "Logger did not got the action");
 			Assert.Equal(logMessageExpected, logMessageActual);
 		}
@@ -214,7 +214,7 @@ namespace Najlot.Log.Tests
 			{
 				var logMessageExpected = i.ToString();
 				loggerGotAction = false;
-				
+
 				log.Info(logMessageExpected);
 
 				Assert.True(loggerGotAction, $"Logger did not got the action[{i}]");
@@ -254,7 +254,7 @@ namespace Najlot.Log.Tests
 			{
 				log.Info(i.ToString());
 			}
-			
+
 			log.Flush();
 
 			Assert.Equal(executionsExpected, executionsActual);
@@ -377,7 +377,7 @@ namespace Najlot.Log.Tests
 			var log = loggerPool.GetLogger(this.GetType());
 
 			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
-			
+
 			for (int i = 0; i < executionsExpected * 2; i++)
 			{
 				lock (messages) messages.Add(i.ToString());
@@ -389,7 +389,7 @@ namespace Najlot.Log.Tests
 			}
 
 			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
-			
+
 			for (int i = executionsExpected; i < executionsExpected * 2; i++)
 			{
 				log.Info(i.ToString());

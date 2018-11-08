@@ -14,7 +14,7 @@ namespace Najlot.Log.Middleware
 		{
 			try
 			{
-				lock(_lock) execute();
+				lock (_lock) execute();
 			}
 			catch (Exception exception)
 			{

@@ -86,6 +86,7 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
@@ -102,12 +103,13 @@ namespace Najlot.Log
 				_log = null;
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

@@ -1,18 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using Najlot.Log.Extensions.Logging;
-using Xunit;
-using Najlot.Log.Middleware;
-using System.IO;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Najlot.Log.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Najlot.Log.Extensions.Logging;
+using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
+using System.IO;
+using Xunit;
 
 namespace Najlot.Log.Tests.Mocks
 {
 	public class DependencyInjectionLoggerService
 	{
 		private readonly ILogger<DependencyInjectionLoggerService> _logger;
+
 		public DependencyInjectionLoggerService(ILogger<DependencyInjectionLoggerService> logger)
 		{
 			_logger = logger;
@@ -130,7 +130,7 @@ namespace Najlot.Log.Tests
 		{
 			var logFile = "LoggingBuilderExtension.log";
 			var services = new ServiceCollection();
-			
+
 			services.AddLogging(loggerBuilder =>
 			{
 				loggerBuilder.AddNajlotLog((configurator) =>
@@ -141,11 +141,11 @@ namespace Najlot.Log.Tests
 						.AddFileLogDestination(logFile);
 				});
 			});
-			
+
 			services.AddTransient<DependencyInjectionLoggerService>();
-			
+
 			var serviceProvider = services.BuildServiceProvider();
-			
+
 			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
 			service.GetLogger().LogInformation("Logger created!");
 
@@ -154,6 +154,5 @@ namespace Najlot.Log.Tests
 			Assert.NotEqual(-1, content.IndexOf("Logger created!"));
 			Assert.NotEqual(-1, content.IndexOf(typeof(DependencyInjectionLoggerService).FullName));
 		}
-
 	}
 }

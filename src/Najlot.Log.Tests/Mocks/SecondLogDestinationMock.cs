@@ -6,7 +6,7 @@ namespace Najlot.Log.Tests.Mocks
 {
 	public class SecondLogDestinationMock : LogDestinationBase
 	{
-		Action<LogMessage> _logAction;
+		private Action<LogMessage> _logAction;
 
 		public SecondLogDestinationMock(ILogConfiguration configuration, Action<LogMessage> logAction) : base(configuration)
 		{

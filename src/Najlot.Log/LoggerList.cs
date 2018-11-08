@@ -64,11 +64,11 @@ namespace Najlot.Log
 				item.Flush();
 			}
 		}
-		
+
 		public IDisposable BeginScope<T>(T state)
 		{
 			var disposableListOfDisposables = new DisposableListOfDisposables();
-			
+
 			foreach (var item in this)
 			{
 				disposableListOfDisposables.Add(item.BeginScope(state));
@@ -126,6 +126,7 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
@@ -143,12 +144,13 @@ namespace Najlot.Log
 				}
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

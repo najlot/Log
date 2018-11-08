@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Najlot.Log.Configuration;
+﻿using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Util;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Najlot.Log.Destinations
 {
@@ -24,12 +24,12 @@ namespace Najlot.Log.Destinations
 			var category = message.Category ?? "";
 			string delimiter = " - ";
 			string logLevel = message.LogLevel.ToString().ToUpper();
-			
-			if(logLevel.Length == 4)
+
+			if (logLevel.Length == 4)
 			{
 				logLevel += ' ';
 			}
-			
+
 			var formatted = string.Concat(timestamp,
 				delimiter, logLevel,
 				delimiter, category,
@@ -38,7 +38,7 @@ namespace Najlot.Log.Destinations
 
 			return message.ExceptionIsValid ? formatted + message.Exception.ToString() : formatted;
 		};
-		
+
 		protected LogDestinationBase(ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
@@ -55,18 +55,18 @@ namespace Najlot.Log.Destinations
 
 		public IDisposable BeginScope<T>(T state)
 		{
-			lock(_states)
+			lock (_states)
 			{
 				_states.Push(_currentState);
 				_currentState = state;
 			}
-			
+
 			return new OnDisposeExcecutor(() =>
 			{
 				lock (_states) _currentState = _states.Pop();
 			});
 		}
-		
+
 		protected abstract void Log(LogMessage message);
 
 		public void Trace<T>(T o)
@@ -330,6 +330,7 @@ namespace Najlot.Log.Destinations
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
@@ -340,17 +341,17 @@ namespace Najlot.Log.Destinations
 				{
 					_logConfiguration.DetachObserver(this);
 				}
-				
+
 				disposedValue = true;
 			}
 		}
-		
+
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		#endregion
+		#endregion IDisposable Support
 	}
 }

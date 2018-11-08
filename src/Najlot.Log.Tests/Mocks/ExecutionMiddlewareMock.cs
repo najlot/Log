@@ -24,7 +24,6 @@ namespace Najlot.Log.Tests.Mocks
 
 		public void Flush()
 		{
-			
 		}
 	}
 }
