@@ -134,6 +134,7 @@ namespace Najlot.Log.Destinations
 
 		public void Dispose()
 		{
+			// Nothing to dispose
 		}
 	}
 }

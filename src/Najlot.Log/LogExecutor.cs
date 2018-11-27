@@ -30,8 +30,8 @@ namespace Najlot.Log
 
 		#endregion State Support
 
-		private string _category;
-		private LoggerPool _loggerPool;
+		private readonly string _category;
+		private readonly LoggerPool _loggerPool;
 
 		public LogExecutor(string category, LoggerPool loggerPool)
 		{

@@ -22,6 +22,7 @@ namespace Najlot.Log.Destinations
 
 		public void Dispose()
 		{
+			// Nothing to dispose
 		}
 
 		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
