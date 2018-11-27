@@ -18,7 +18,7 @@ namespace Najlot.Log.Tests
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					state = msg.State;
 				}))
@@ -50,12 +50,11 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					state = msg.State;
 				}))
-				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					secondState = msg.State;
 				}))
@@ -86,8 +85,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					state = msg.State;
 				}))
@@ -126,8 +124,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					if (scopesAreNotCorrect) return;
 					scopesAreNotCorrect = (string)msg.Message != (string)msg.State;

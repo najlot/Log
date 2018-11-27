@@ -1,6 +1,5 @@
 using Najlot.Log.Configuration;
 using Najlot.Log.Tests.Mocks;
-using System;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -8,44 +7,24 @@ namespace Najlot.Log.Tests
 	public class ConfigurationObserverTests
 	{
 		[Fact]
-		public void ConfigurationMustNotifyPrototypes()
+		public void ConfigurationMustNotifyOnLogLevelChanged()
 		{
 			var observerNotified = false;
 
 			var configurator = LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			logConfiguration.LogLevel = LogLevel.Info;
+			var configurationChangedObserverMock = new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			});
 
-			Assert.True(observerNotified, "Observer was not notified");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotifyOnLogLevelChanged()
-		{
-			bool observerNotified = false;
-
-			LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var log = loggerPool.GetLogger(this.GetType());
-
+			logConfiguration.AttachObserver(configurationChangedObserverMock);
 			logConfiguration.LogLevel++;
 
-			Assert.True(observerNotified, "Observer was not notified on log level changed");
+			Assert.True(observerNotified, "Observer was not notified");
 		}
 
 		[Fact]
@@ -53,68 +32,37 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			LogConfigurator
+			var configurator = LogConfigurator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.SetLogLevel(LogLevel.Debug)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var configurationChangedObserverMock = new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			});
+
+			logConfiguration.AttachObserver(configurationChangedObserverMock);
 			logConfiguration.ExecutionMiddleware = new ExecutionMiddlewareMock(null);
 
 			Assert.True(observerNotified, "Observer was not notified on middleware changed");
 		}
 
 		[Fact]
-		public void ConfigurationMustNotifyOnFormatFunctionChanged()
-		{
-			var testString = "new foo";
-			bool observerNotified = false;
-
-			LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-
-					Func<LogMessage, string> format;
-					Assert.True(config.TryGetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), out format),
-						"Observer notified, but could not get function");
-
-					Assert.Equal(testString, format(new LogMessage(DateTime.Now, LogLevel.Info, null, null, null)));
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var log = loggerPool.GetLogger(this.GetType());
-
-			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), msg =>
-			{
-				return testString;
-			});
-
-			Assert.True(observerNotified, "Observer was not notified on format function changed");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwice()
+		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwiceButOnce()
 		{
 			bool observerNotified = false;
 			string testFunc(LogMessage msg) => "";
 
-			LogConfigurator
+			var configurator = LogConfigurator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.SetLogLevel(LogLevel.Debug)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			logConfiguration.AttachObserver(new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			}));
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
 			Assert.True(observerNotified, "Observer was not notified on format function changed");
@@ -122,85 +70,7 @@ namespace Najlot.Log.Tests
 			observerNotified = false;
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
-			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotNotifyOnFormatFunctionAlreadySetBeforeAddingDestination()
-		{
-			bool observerNotified = false;
-			string testFunc(LogMessage msg) => "123";
-
-			var configurator = LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
-
-			configurator
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}), testFunc)
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			Assert.False(observerNotified, "Observer was not notified, but format funtion was the same");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotNotifyOnFormatFunctionChangedForOther()
-		{
-			bool observerNotified = false;
-
-			LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var log = loggerPool.GetLogger(this.GetType());
-
-			bool couldSet = logConfiguration.TrySetFormatFunctionForType(typeof(SecondConfigurationChangedObserverMock), msg =>
-			{
-				return "";
-			});
-
-			Assert.True(couldSet, "Could not set function for " + nameof(SecondConfigurationChangedObserverMock));
-			Assert.False(observerNotified, "Observer was notified on format function changed for other");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotifyOnFormatFunctionChangedForOther()
-		{
-			bool wrongObserverNotified = false;
-			bool rightObserverNotified = false;
-
-			LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					wrongObserverNotified = true;
-				}))
-				.AddCustomDestination(new SecondConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					rightObserverNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var log = loggerPool.GetLogger(this.GetType());
-
-			bool couldSet = logConfiguration.TrySetFormatFunctionForType(typeof(SecondConfigurationChangedObserverMock), msg =>
-			{
-				return "";
-			});
-
-			Assert.True(couldSet, "Could not set function for " + nameof(SecondConfigurationChangedObserverMock));
-			Assert.False(wrongObserverNotified, "Observer was notified on format function changed for other");
-			Assert.True(rightObserverNotified, "Observer was notified on format function changed for other");
+			Assert.False(observerNotified, "Observer was notified, but format funtion was the same");
 		}
 
 		[Fact]
@@ -210,14 +80,12 @@ namespace Najlot.Log.Tests
 
 			LogConfigurator
 				.CreateNew()
-				.GetLogConfiguration(out var logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out var logConfiguration);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			logConfiguration.AttachObserver(new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			}));
 
 			logConfiguration.ExecutionMiddleware = null;
 

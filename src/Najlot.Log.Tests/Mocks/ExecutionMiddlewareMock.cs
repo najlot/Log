@@ -3,7 +3,7 @@ using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	public class ExecutionMiddlewareMock : IExecutionMiddleware
+	public sealed class ExecutionMiddlewareMock : IExecutionMiddleware
 	{
 		private Action<Action> _action;
 

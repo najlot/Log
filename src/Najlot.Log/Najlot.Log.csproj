@@ -14,7 +14,7 @@
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Simple and yet powerful logging library with performance and extensibility in mind.</Description>
-    <Version>1.0.11</Version>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
 </Project>

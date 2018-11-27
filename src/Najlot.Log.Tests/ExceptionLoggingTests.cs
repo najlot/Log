@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Middleware;
+﻿using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
 using Xunit;
@@ -18,8 +17,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					logged = true;
 
@@ -80,8 +78,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					logged = true;
 
@@ -93,7 +90,7 @@ namespace Najlot.Log.Tests
 
 					fail = !msg.ExceptionIsValid;
 				}))
-				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, (msg) =>
+				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					loggedToSecond = true;
 
@@ -152,7 +149,7 @@ namespace Najlot.Log.Tests
 				loggedToSecond = false;
 			}
 
-			Assert.False(fail, "failed");
+			Assert.False(fail, "Test failed");
 		}
 	}
 }

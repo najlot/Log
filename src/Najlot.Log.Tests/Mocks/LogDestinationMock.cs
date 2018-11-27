@@ -1,19 +1,22 @@
-using Najlot.Log.Configuration;
 using Najlot.Log.Destinations;
 using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	public class LogDestinationMock : LogDestinationBase
+	public sealed class LogDestinationMock : ILogDestination
 	{
 		private Action<LogMessage> _logAction;
 
-		public LogDestinationMock(ILogConfiguration configuration, Action<LogMessage> logAction) : base(configuration)
+		public LogDestinationMock(Action<LogMessage> logAction)
 		{
 			_logAction = logAction;
 		}
 
-		protected override void Log(LogMessage message)
+		public void Dispose()
+		{
+		}
+
+		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
 		{
 			_logAction(message);
 		}

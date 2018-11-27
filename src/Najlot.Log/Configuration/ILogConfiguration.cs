@@ -32,12 +32,6 @@ namespace Najlot.Log.Configuration
 		void DetachObserver(IConfigurationChangedObserver observer);
 
 		/// <summary>
-		/// Notifies observers. Can specify the type of observers to notify
-		/// </summary>
-		/// <param name="type">The type of observers to notify</param>
-		void NotifyObservers(Type type = null);
-
-		/// <summary>
 		/// Gets a format function for a type of log destination
 		/// </summary>
 		/// <param name="type">Type of the log destination</param>

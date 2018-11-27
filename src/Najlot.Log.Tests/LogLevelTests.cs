@@ -45,7 +45,7 @@ namespace Najlot.Log.Tests
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out var logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					gotLogMessage = true;
 				}))
@@ -101,11 +101,11 @@ namespace Najlot.Log.Tests
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out var logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					gotLogMessage = true;
 				}))
-				.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					gotSecondLogMessage = true;
 				}))

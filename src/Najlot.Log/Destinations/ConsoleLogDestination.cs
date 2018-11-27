@@ -1,17 +1,16 @@
-﻿using Najlot.Log.Configuration;
-using System;
+﻿using System;
 
 namespace Najlot.Log.Destinations
 {
 	/// <summary>
 	/// Writes all messages to console.
 	/// </summary>
-	public class ConsoleLogDestination : LogDestinationBase
+	public sealed class ConsoleLogDestination : ILogDestination
 	{
 		public readonly bool UseColors;
 		public readonly ConsoleColor DefaultColor;
 
-		public ConsoleLogDestination(ILogConfiguration configuration, bool useColors) : base(configuration)
+		public ConsoleLogDestination(bool useColors)
 		{
 			UseColors = useColors;
 
@@ -21,7 +20,11 @@ namespace Najlot.Log.Destinations
 			}
 		}
 
-		protected override void Log(LogMessage message)
+		public void Dispose()
+		{
+		}
+
+		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
 		{
 			if (UseColors)
 			{
@@ -53,7 +56,7 @@ namespace Najlot.Log.Destinations
 				}
 			}
 
-			Console.WriteLine(Format(message));
+			Console.WriteLine(formatFunc(message));
 
 			if (UseColors)
 			{

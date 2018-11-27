@@ -4,18 +4,22 @@ using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	public class LogDestinationFormatFunctionMock : LogDestinationBase
+	public sealed class LogDestinationFormatFunctionMock : ILogDestination
 	{
 		private Action<string> _logAction;
 
-		public LogDestinationFormatFunctionMock(ILogConfiguration configuration, Action<string> formattedLogAction) : base(configuration)
+		public LogDestinationFormatFunctionMock(ILogConfiguration configuration, Action<string> formattedLogAction)
 		{
 			_logAction = formattedLogAction;
 		}
 
-		protected override void Log(LogMessage message)
+		public void Dispose()
 		{
-			_logAction(Format(message));
+		}
+
+		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+		{
+			_logAction(formatFunc(message));
 		}
 	}
 }

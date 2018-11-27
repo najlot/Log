@@ -89,12 +89,14 @@ namespace Najlot.Log
 		/// <param name="logDestination">Instance of the new destination</param>
 		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogConfigurator AddCustomDestination(LogDestinationBase logDestination, Func<LogMessage, string> formatFunction = null)
+		public LogConfigurator AddCustomDestination(ILogDestination logDestination, Func<LogMessage, string> formatFunction = null)
 		{
 			if (logDestination == null)
 			{
 				throw new ArgumentNullException(nameof(logDestination));
 			}
+
+			_loggerPool.AddLogDestination(logDestination);
 
 			if (formatFunction != null)
 			{
@@ -105,7 +107,6 @@ namespace Najlot.Log
 				}
 			}
 
-			_loggerPool.AddLogDestination(logDestination);
 			return this;
 		}
 
@@ -118,7 +119,7 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogConfigurator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null, bool useColors = false)
 		{
-			var logDestination = new ConsoleLogDestination(_logConfiguration, useColors);
+			var logDestination = new ConsoleLogDestination(useColors);
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 
@@ -131,7 +132,7 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogConfigurator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null)
 		{
-			var logDestination = new FileLogDestination(_logConfiguration, getFileName, maxFiles, logFilePaths);
+			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths);
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 

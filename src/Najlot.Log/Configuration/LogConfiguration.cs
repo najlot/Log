@@ -86,19 +86,11 @@ namespace Najlot.Log.Configuration
 			}
 		}
 
-		public void NotifyObservers(Type type = null)
+		public void NotifyObservers()
 		{
-			lock (_observerList)
+			foreach (var observer in _observerList)
 			{
-				foreach (var observer in _observerList)
-				{
-					if (type != null && type != observer.GetType())
-					{
-						continue;
-					}
-
-					observer.NotifyConfigurationChanged(this);
-				}
+				observer.NotifyConfigurationChanged(this);
 			}
 		}
 
@@ -127,9 +119,7 @@ namespace Najlot.Log.Configuration
 
 			lock (_formatFunctions)
 			{
-				Func<LogMessage, string> oldFunction;
-
-				if (!_formatFunctions.TryGetValue(type, out oldFunction))
+				if (!_formatFunctions.TryGetValue(type, out Func<LogMessage, string> oldFunction))
 				{
 					_formatFunctions.Add(type, function);
 					addOrUpdateOk = true;
@@ -147,7 +137,7 @@ namespace Najlot.Log.Configuration
 
 			if (addOrUpdateOk)
 			{
-				NotifyObservers(type);
+				NotifyObservers();
 			}
 
 			return addOrUpdateOk;

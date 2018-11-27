@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Tests.Mocks;
+﻿using Najlot.Log.Tests.Mocks;
 using System.Collections.Generic;
 using Xunit;
 
@@ -18,8 +17,8 @@ namespace Najlot.Log.Tests
 					LogConfigurator
 						.CreateNew()
 						.GetLogConfiguration(out var logConfiguration)
-						.AddCustomDestination(new LogDestinationMock(logConfiguration, msg => { }))
-						.AddCustomDestination(new SecondLogDestinationMock(logConfiguration, msg => { })));
+						.AddCustomDestination(new LogDestinationMock(msg => { }))
+						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));
 			}
 
 			foreach (var logConfigurator in logConfigurators)
@@ -47,20 +46,21 @@ namespace Najlot.Log.Tests
 			var configurator = LogConfigurator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new ConfigurationChangedObserverMock(logConfiguration, (config) =>
-				{
-					observerNotified = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out var logConfiguration);
 
+			var observer = new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			});
+
+			logConfiguration.AttachObserver(observer);
 			logConfiguration.LogLevel = LogLevel.Info;
-
 			Assert.True(observerNotified, "Observer was not notified before dispose");
+
 			observerNotified = false;
 
-			loggerPool.Dispose();
-
+			logConfiguration.DetachObserver(observer);
+			logConfiguration.LogLevel++;
 			Assert.False(observerNotified, "Observer was notified after dispose");
 		}
 	}

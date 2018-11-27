@@ -1,4 +1,3 @@
-using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using Xunit;
@@ -12,9 +11,8 @@ namespace Najlot.Log.Tests
 		{
 			LogConfigurator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddConsoleLogDestination()
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 				}))
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -33,27 +31,6 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void LoggerPoolMustNotCacheNotInitializedEntries()
-		{
-			var configurator = LogConfigurator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.GetLoggerPool(out LoggerPool loggerPool);
-
-			var notInitializedLog = loggerPool.GetLogger(this.GetType());
-
-			configurator
-				.AddConsoleLogDestination()
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
-				{
-				}));
-
-			var initializedLog = loggerPool.GetLogger(this.GetType());
-
-			Assert.NotStrictEqual(notInitializedLog, initializedLog);
-		}
-
-		[Fact]
 		public void PrototypesMustBeCopiedWithNewCategory()
 		{
 			bool gotLogMessage = false;
@@ -63,8 +40,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					category = msg.Category;
 					gotLogMessage = true;
@@ -111,9 +87,8 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddConsoleLogDestination()
-				.AddCustomDestination(new LogDestinationMock(logConfiguration, msg =>
+				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					category = msg.Category;
 					gotLogMessage = true;

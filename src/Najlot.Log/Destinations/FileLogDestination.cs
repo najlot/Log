@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Writes all messages to a file.
 	/// </summary>
-	public class FileLogDestination : LogDestinationBase
+	public sealed class FileLogDestination : ILogDestination
 	{
 		private readonly string NewLine = Environment.NewLine;
 
@@ -17,10 +16,10 @@ namespace Najlot.Log.Destinations
 		public readonly string LogFilePaths = null;
 		public readonly bool AutoCleanUp;
 
-		public string FilePath { get; protected set; }
+		public string FilePath { get; private set; }
 		public readonly Func<string> GetPath;
 
-		public FileLogDestination(ILogConfiguration configuration, Func<string> getPath, int maxFiles, string logFilePaths) : base(configuration)
+		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths)
 		{
 			GetPath = getPath;
 			MaxFiles = maxFiles;
@@ -34,7 +33,7 @@ namespace Najlot.Log.Destinations
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
-		protected override void Log(LogMessage message)
+		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
 		{
 			var path = GetPath();
 			bool cleanUp = false;
@@ -51,7 +50,7 @@ namespace Najlot.Log.Destinations
 			// The directory could be deleted by the user in the meantime...
 			try
 			{
-				File.AppendAllText(FilePath, Format(message) + NewLine);
+				File.AppendAllText(FilePath, formatFunc(message) + NewLine);
 				if (cleanUp) CleanUpOldFiles(path);
 			}
 			catch (DirectoryNotFoundException)
@@ -131,6 +130,10 @@ namespace Najlot.Log.Destinations
 					Directory.CreateDirectory(dir);
 				}
 			}
+		}
+
+		public void Dispose()
+		{
 		}
 	}
 }
