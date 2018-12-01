@@ -7,7 +7,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LogConfiguratorInstanceMustNotBreak()
 		{
-			LogConfigurator.Instance
+			LogAdminitrator.Instance
 				.GetLogConfiguration(out var logConfiguration)
 				.AddConsoleLogDestination()
 				.GetLoggerPool(out var loggerPool);

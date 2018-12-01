@@ -5,11 +5,11 @@ namespace Najlot.Log.Extensions.Logging
 	[ProviderAlias("Najlot.Log")]
 	public sealed class NajlotLogProvider : ILoggerProvider
 	{
-		private LogConfigurator _logConfigurator;
+		private LogAdminitrator _logConfigurator;
 		private LoggerPool _loggerPool;
 		private bool _disposed = false;
 
-		public NajlotLogProvider(LogConfigurator logConfigurator)
+		public NajlotLogProvider(LogAdminitrator logConfigurator)
 		{
 			_logConfigurator = logConfigurator;
 			_logConfigurator.GetLoggerPool(out _loggerPool);

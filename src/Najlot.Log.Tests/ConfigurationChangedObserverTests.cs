@@ -11,7 +11,7 @@ namespace Najlot.Log.Tests
 		{
 			var observerNotified = false;
 
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -32,7 +32,7 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -54,7 +54,7 @@ namespace Najlot.Log.Tests
 			bool observerNotified = false;
 			string testFunc(LogMessage msg) => "";
 
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -78,7 +78,7 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out var logConfiguration);
 

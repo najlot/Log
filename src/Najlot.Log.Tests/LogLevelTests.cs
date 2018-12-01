@@ -20,7 +20,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void CheckIsLogLevelEnabled()
 		{
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Warn)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -40,7 +40,7 @@ namespace Najlot.Log.Tests
 			var gotLogMessage = false;
 			var shouldGetMessage = true;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -96,7 +96,7 @@ namespace Najlot.Log.Tests
 			var gotSecondLogMessage = false;
 			var shouldGetMessage = true;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

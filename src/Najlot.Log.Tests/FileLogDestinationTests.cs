@@ -28,7 +28,7 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir2, true);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -77,7 +77,7 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -112,7 +112,7 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -147,7 +147,7 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -177,7 +177,7 @@ namespace Najlot.Log.Tests
 
 			int i = 0;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

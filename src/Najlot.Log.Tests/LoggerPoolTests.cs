@@ -9,7 +9,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LoggerPoolMustCacheEntries()
 		{
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -36,7 +36,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -83,7 +83,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

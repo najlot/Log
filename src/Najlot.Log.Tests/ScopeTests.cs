@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 			object state = null;
 			var scope = "testing scopes";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -46,7 +46,7 @@ namespace Najlot.Log.Tests
 
 			var scope = "testing scopes";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -81,7 +81,7 @@ namespace Najlot.Log.Tests
 		{
 			object state = null;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -120,7 +120,7 @@ namespace Najlot.Log.Tests
 		{
 			bool scopesAreNotCorrect = false;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()

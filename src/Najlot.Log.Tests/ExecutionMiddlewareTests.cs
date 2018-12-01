@@ -14,7 +14,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ApplicationMustNotDieFromErrorsInDestinations()
 		{
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out var logConfiguration)
@@ -45,7 +45,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -73,7 +73,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -101,7 +101,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -135,7 +135,7 @@ namespace Najlot.Log.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -167,7 +167,7 @@ namespace Najlot.Log.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -193,7 +193,7 @@ namespace Najlot.Log.Tests
 			bool loggerGotAction = false;
 			var logMessageActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -226,7 +226,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -264,7 +264,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -307,7 +307,7 @@ namespace Najlot.Log.Tests
 			List<string> messages = new List<string>();
 			var manualResetEventSlim = new ManualResetEventSlim(false);
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -354,7 +354,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>

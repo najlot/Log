@@ -7,7 +7,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Class to help the user to configure log destinations, execution middleware, log level etc.
 	/// </summary>
-	public class LogConfigurator : IDisposable
+	public class LogAdminitrator : IDisposable
 	{
 		private ILogConfiguration _logConfiguration;
 		private LoggerPool _loggerPool;
@@ -17,9 +17,9 @@ namespace Najlot.Log
 		/// that has static resistered configuration and pool.
 		/// </summary>
 		/// <returns></returns>
-		public static LogConfigurator Instance { get; } = new LogConfigurator(LogConfiguration.Instance, LoggerPool.Instance);
+		public static LogAdminitrator Instance { get; } = new LogAdminitrator(LogConfiguration.Instance, LoggerPool.Instance);
 
-		internal LogConfigurator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
+		internal LogAdminitrator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
 		{
 			_logConfiguration = logConfiguration;
 			_loggerPool = loggerPool;
@@ -30,12 +30,12 @@ namespace Najlot.Log
 		/// has own configuration and pool.
 		/// </summary>
 		/// <returns></returns>
-		public static LogConfigurator CreateNew()
+		public static LogAdminitrator CreateNew()
 		{
 			var logConfiguration = new LogConfiguration();
 			var loggerPool = new LoggerPool(logConfiguration);
 
-			return new LogConfigurator(logConfiguration, loggerPool);
+			return new LogAdminitrator(logConfiguration, loggerPool);
 		}
 
 		/// <summary>
@@ -43,7 +43,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="logConfiguration">ILogConfiguration instance</param>
 		/// <returns></returns>
-		public LogConfigurator GetLogConfiguration(out ILogConfiguration logConfiguration)
+		public LogAdminitrator GetLogConfiguration(out ILogConfiguration logConfiguration)
 		{
 			logConfiguration = _logConfiguration;
 			return this;
@@ -54,7 +54,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="loggerPool">LoggerPool instance</param>
 		/// <returns></returns>
-		public LogConfigurator GetLoggerPool(out LoggerPool loggerPool)
+		public LogAdminitrator GetLoggerPool(out LoggerPool loggerPool)
 		{
 			loggerPool = _loggerPool;
 			return this;
@@ -65,7 +65,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="logLevel"></param>
 		/// <returns></returns>
-		public LogConfigurator SetLogLevel(LogLevel logLevel)
+		public LogAdminitrator SetLogLevel(LogLevel logLevel)
 		{
 			_logConfiguration.LogLevel = logLevel;
 			return this;
@@ -76,7 +76,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <typeparam name="TExecutionMiddleware"></typeparam>
 		/// <returns></returns>
-		public LogConfigurator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
+		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
 			_logConfiguration.ExecutionMiddleware = new TExecutionMiddleware();
 			return this;
@@ -89,7 +89,7 @@ namespace Najlot.Log
 		/// <param name="logDestination">Instance of the new destination</param>
 		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogConfigurator AddCustomDestination(ILogDestination logDestination, Func<LogMessage, string> formatFunction = null)
+		public LogAdminitrator AddCustomDestination(ILogDestination logDestination, Func<LogMessage, string> formatFunction = null)
 		{
 			if (logDestination == null)
 			{
@@ -117,7 +117,7 @@ namespace Najlot.Log
 		/// <param name="formatFunction"></param>
 		/// <param name="useColors"></param>
 		/// <returns></returns>
-		public LogConfigurator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null, bool useColors = false)
+		public LogAdminitrator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null, bool useColors = false)
 		{
 			var logDestination = new ConsoleLogDestination(useColors);
 			return AddCustomDestination(logDestination, formatFunction);
@@ -130,7 +130,7 @@ namespace Najlot.Log
 		/// <param name="maxFiles">Max count of files.</param>
 		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
 		/// <returns></returns>
-		public LogConfigurator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null)
+		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null)
 		{
 			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths);
 			return AddCustomDestination(logDestination, formatFunction);
@@ -142,7 +142,7 @@ namespace Najlot.Log
 		/// <param name="fileName">Path to the file</param>
 		/// <param name="formatFunction">Function to customize the output</param>
 		/// <returns></returns>
-		public LogConfigurator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
+		public LogAdminitrator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
 		{
 			return AddFileLogDestination(() => fileName, formatFunction);
 		}

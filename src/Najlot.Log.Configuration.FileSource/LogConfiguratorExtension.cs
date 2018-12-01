@@ -18,7 +18,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 	public static class LogConfiguratorExtension
 	{
-		private static void WriteXmlConfigurationFile(LogConfigurator logConfigurator, string path)
+		private static void WriteXmlConfigurationFile(LogAdminitrator logConfigurator, string path)
 		{
 			var encoding = Encoding.UTF8;
 
@@ -64,7 +64,7 @@ namespace Najlot.Log.Configuration.FileSource
 		/// <param name="listenForChanges">Should the canges happened at runtime be reflected to the logger</param>
 		/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>
 		/// <returns></returns>
-		public static LogConfigurator ReadConfigurationFromXmlFile(this LogConfigurator logConfigurator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
+		public static LogAdminitrator ReadConfigurationFromXmlFile(this LogAdminitrator logConfigurator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
 		{
 			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
 

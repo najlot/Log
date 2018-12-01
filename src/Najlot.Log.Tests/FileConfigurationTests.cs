@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 
 			File.WriteAllText(configPath, content);
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -52,7 +52,7 @@ namespace Najlot.Log.Tests
 
 			File.WriteAllText(configPath, content);
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -84,7 +84,7 @@ namespace Najlot.Log.Tests
 
 			File.WriteAllText(configPath, content);
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.SetLogLevel(LogLevel.Trace)
@@ -174,7 +174,7 @@ namespace Najlot.Log.Tests
 				File.Delete(configPath);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -194,7 +194,7 @@ namespace Najlot.Log.Tests
 				File.Delete(configPath);
 			}
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -214,7 +214,7 @@ namespace Najlot.Log.Tests
 
 			File.WriteAllText(configPath, content);
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);

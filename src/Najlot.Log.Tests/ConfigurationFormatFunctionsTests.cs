@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 		{
 			Assert.Throws<ArgumentNullException>(() =>
 			{
-				LogConfigurator.CreateNew().AddCustomDestination(null);
+				LogAdminitrator.CreateNew().AddCustomDestination(null);
 			});
 		}
 
@@ -23,7 +23,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
@@ -47,7 +47,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
@@ -71,7 +71,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
@@ -93,7 +93,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NotSetFormattingFunctionMustReturnFalseOnGet()
 		{
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -114,7 +114,7 @@ namespace Najlot.Log.Tests
 		{
 			var returnString = "some sample string";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -138,7 +138,7 @@ namespace Najlot.Log.Tests
 		{
 			var returnString = "some sample string";
 
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -170,7 +170,7 @@ namespace Najlot.Log.Tests
 		{
 			var returnString = "correct string";
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -213,7 +213,7 @@ namespace Najlot.Log.Tests
 			var returnString = thisType.Name;
 			var types = new List<Type>() { typeof(LogMessage), thisType, typeof(Logger) };
 
-			LogConfigurator
+			LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 

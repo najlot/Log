@@ -6,9 +6,9 @@ namespace Najlot.Log.Extensions.Logging
 {
 	public static class LoggingBuilderExtension
 	{
-		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogConfigurator> configure)
+		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogAdminitrator> configure)
 		{
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -18,7 +18,7 @@ namespace Najlot.Log.Extensions.Logging
 			return builder.AddNajlotLog(configurator);
 		}
 
-		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogConfigurator logConfigurator)
+		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogAdminitrator logConfigurator)
 		{
 			builder.AddProvider(new NajlotLogProvider(logConfigurator));
 			return builder;
@@ -27,9 +27,9 @@ namespace Najlot.Log.Extensions.Logging
 
 	public static class LoggerFactoryExtension
 	{
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory builder, Action<LogConfigurator> configure)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory builder, Action<LogAdminitrator> configure)
 		{
-			var configurator = LogConfigurator
+			var configurator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.GetLoggerPool(out LoggerPool loggerPool);
@@ -39,7 +39,7 @@ namespace Najlot.Log.Extensions.Logging
 			return builder.AddNajlotLog(configurator);
 		}
 
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogConfigurator logConfigurator)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdminitrator logConfigurator)
 		{
 			loggerFactory.AddProvider(new NajlotLogProvider(logConfigurator));
 			return loggerFactory;
