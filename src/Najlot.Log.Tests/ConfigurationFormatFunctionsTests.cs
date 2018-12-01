@@ -23,16 +23,15 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogAdminitrator
+			var logAdmin = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
 				{
 					strActual = str;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdmin.GetLogger(this.GetType());
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
 
@@ -47,18 +46,17 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogAdminitrator
+			var logAdmin = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
 				{
 					strActual = str;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(LogDestinationFormatFunctionMock), msg => strExpected);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdmin.GetLogger(this.GetType());
 
 			log.Fatal("this message should not be used");
 
@@ -71,7 +69,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "AA Bb cc";
 			var strActual = "";
 
-			LogAdminitrator
+			var logAdmin = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
@@ -81,10 +79,9 @@ namespace Najlot.Log.Tests
 				msg =>
 				{
 					return strExpected;
-				})
-				.GetLoggerPool(out LoggerPool loggerPool);
+				});
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdmin.GetLogger(this.GetType());
 			log.Fatal("this message should not be used");
 
 			Assert.Equal(strExpected, strActual);

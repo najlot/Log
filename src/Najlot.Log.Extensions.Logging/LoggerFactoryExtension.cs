@@ -8,14 +8,13 @@ namespace Najlot.Log.Extensions.Logging
 	{
 		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogAdminitrator> configure)
 		{
-			var configurator = LogAdminitrator
+			var admin = LogAdminitrator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+			
+			configure(admin);
 
-			configure(configurator);
-
-			return builder.AddNajlotLog(configurator);
+			return builder.AddNajlotLog(admin);
 		}
 
 		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogAdminitrator logConfigurator)
@@ -29,19 +28,18 @@ namespace Najlot.Log.Extensions.Logging
 	{
 		public static ILoggerFactory AddNajlotLog(this ILoggerFactory builder, Action<LogAdminitrator> configure)
 		{
-			var configurator = LogAdminitrator
+			var admin = LogAdminitrator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			configure(configurator);
+			configure(admin);
 
-			return builder.AddNajlotLog(configurator);
+			return builder.AddNajlotLog(admin);
 		}
 
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdminitrator logConfigurator)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdminitrator logAdministrator)
 		{
-			loggerFactory.AddProvider(new NajlotLogProvider(logConfigurator));
+			loggerFactory.AddProvider(new NajlotLogProvider(logAdministrator));
 			return loggerFactory;
 		}
 	}

@@ -48,18 +48,7 @@ namespace Najlot.Log
 			logConfiguration = _logConfiguration;
 			return this;
 		}
-
-		/// <summary>
-		/// Retrieves a LoggerPool created by this LogConfigurator.
-		/// </summary>
-		/// <param name="loggerPool">LoggerPool instance</param>
-		/// <returns></returns>
-		public LogAdminitrator GetLoggerPool(out LoggerPool loggerPool)
-		{
-			loggerPool = _loggerPool;
-			return this;
-		}
-
+		
 		/// <summary>
 		/// Sets the LogLevel of the LogConfiguration.
 		/// </summary>
@@ -78,6 +67,8 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
+			this.Flush();
+
 			_logConfiguration.ExecutionMiddleware = new TExecutionMiddleware();
 			return this;
 		}
@@ -145,6 +136,37 @@ namespace Najlot.Log
 		public LogAdminitrator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
 		{
 			return AddFileLogDestination(() => fileName, formatFunction);
+		}
+
+		/// <summary>
+		/// Creates a logger for a type or retrieves it from the cache.
+		/// </summary>
+		/// <param name="sourceType">Type to create a logger for</param>
+		/// <returns></returns>
+		public Logger GetLogger(Type sourceType)
+		{
+			return GetLogger(sourceType.FullName);
+		}
+
+		/// <summary>
+		/// Creates a logger for a category or retrieves it from the cache.
+		/// </summary>
+		/// <param name="category">Category to create a logger for</param>
+		/// <returns></returns>
+		public Logger GetLogger(string category)
+		{
+			return _loggerPool.GetLogger(category);
+		}
+
+		/// <summary>
+		/// Tells to flush the execution-middleware
+		/// </summary>
+		public void Flush()
+		{
+			foreach (var destination in _loggerPool.GetLogDestinations())
+			{
+				destination.ExecutionMiddleware.Flush();
+			}
 		}
 
 		#region IDisposable Support

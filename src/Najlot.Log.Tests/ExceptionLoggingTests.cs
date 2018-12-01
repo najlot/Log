@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 			var logged = false;
 			bool fail = false;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -28,10 +28,9 @@ namespace Najlot.Log.Tests
 					if (fail) return;
 
 					fail = !msg.ExceptionIsValid;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger("Exception tests");
+			var log = logAdminitrator.GetLogger("Exception tests");
 
 			try
 			{
@@ -74,7 +73,7 @@ namespace Najlot.Log.Tests
 			bool loggedToSecond = false;
 			bool fail = false;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -101,10 +100,9 @@ namespace Najlot.Log.Tests
 					if (fail) return;
 
 					fail = !msg.ExceptionIsValid;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger("Exception tests");
+			var log = logAdminitrator.GetLogger("Exception tests");
 
 			try
 			{

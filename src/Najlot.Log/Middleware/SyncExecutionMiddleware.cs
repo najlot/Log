@@ -8,7 +8,7 @@ namespace Najlot.Log.Middleware
 	/// </summary>
 	public sealed class SyncExecutionMiddleware : IExecutionMiddleware
 	{
-		private readonly static object _lock = new object();
+		private readonly object _lock = new object();
 
 		public void Execute(Action execute)
 		{

@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 			object state = null;
 			var scope = "testing scopes";
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -21,10 +21,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					state = msg.State;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			using (log.BeginScope(scope))
 			{
@@ -46,7 +45,7 @@ namespace Najlot.Log.Tests
 
 			var scope = "testing scopes";
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -57,10 +56,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					secondState = msg.State;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			using (log.BeginScope(scope))
 			{
@@ -81,17 +79,16 @@ namespace Najlot.Log.Tests
 		{
 			object state = null;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					state = msg.State;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			using (log.BeginScope("scope 1"))
 			{
@@ -120,7 +117,7 @@ namespace Najlot.Log.Tests
 		{
 			bool scopesAreNotCorrect = false;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
@@ -128,10 +125,9 @@ namespace Najlot.Log.Tests
 				{
 					if (scopesAreNotCorrect) return;
 					scopesAreNotCorrect = (string)msg.Message != (string)msg.State;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			using (log.BeginScope("scope 1"))
 			{

@@ -9,11 +9,11 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LogConfiguratorMustBeDisposable()
 		{
-			var logConfigurators = new List<LogAdminitrator>();
+			var logAdminitrators = new List<LogAdminitrator>();
 
 			for (int i = 0; i < 1000; i++)
 			{
-				logConfigurators.Add(
+				logAdminitrators.Add(
 					LogAdminitrator
 						.CreateNew()
 						.GetLogConfiguration(out var logConfiguration)
@@ -21,20 +21,13 @@ namespace Najlot.Log.Tests
 						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));
 			}
 
-			foreach (var logConfigurator in logConfigurators)
+			foreach (var logAdminitrator in logAdminitrators)
 			{
-				logConfigurator.GetLoggerPool(out var loggerPool);
-				var logger = loggerPool.GetLogger("1");
-				var logger2 = loggerPool.GetLogger("2");
-
-				// logConfigurator disposes it, too.
+				var logger = logAdminitrator.GetLogger("1");
+				var logger2 = logAdminitrator.GetLogger("2");
+				
 				// Check there are no exceptions when used wrong
-				loggerPool.Dispose();
-
-				logConfigurator.Dispose();
-
-				// Check there are no exceptions when used wrong
-				logConfigurator.Dispose();
+				logAdminitrator.Dispose();
 			}
 		}
 

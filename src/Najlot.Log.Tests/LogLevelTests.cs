@@ -20,14 +20,13 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void CheckIsLogLevelEnabled()
 		{
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Warn)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			var logger = loggerPool.GetLogger(this.GetType());
+			var logger = logAdminitrator.GetLogger(this.GetType());
 
 			Assert.True(logger.IsEnabled(LogLevel.Warn));
 			Assert.True(logger.IsEnabled(LogLevel.Error));
@@ -40,7 +39,7 @@ namespace Najlot.Log.Tests
 			var gotLogMessage = false;
 			var shouldGetMessage = true;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -48,10 +47,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					gotLogMessage = true;
-				}))
-				.GetLoggerPool(out var loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			foreach (var logLevel in logLevels)
 			{
@@ -96,7 +94,7 @@ namespace Najlot.Log.Tests
 			var gotSecondLogMessage = false;
 			var shouldGetMessage = true;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Fatal)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -109,10 +107,9 @@ namespace Najlot.Log.Tests
 				{
 					gotSecondLogMessage = true;
 				}))
-				.AddConsoleLogDestination(useColors: true)
-				.GetLoggerPool(out var loggerPool);
+				.AddConsoleLogDestination(useColors: true);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			foreach (var logLevel in logLevels)
 			{

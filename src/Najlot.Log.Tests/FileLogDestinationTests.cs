@@ -28,7 +28,7 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir2, true);
 			}
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -45,11 +45,10 @@ namespace Najlot.Log.Tests
 					}
 
 					return fileName1;
-				})
-				.GetLoggerPool(out LoggerPool loggerPool);
+				});
 
-			var logForThis = loggerPool.GetLogger(this.GetType());
-			var logForPool = loggerPool.GetLogger(loggerPool.GetType());
+			var logForThis = logAdminitrator.GetLogger(this.GetType());
+			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
 
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
@@ -77,15 +76,14 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.AddFileLogDestination(fileName);
 
-			var logForThis = loggerPool.GetLogger(this.GetType());
-			var logForPool = loggerPool.GetLogger(loggerPool.GetType());
+			var logForThis = logAdminitrator.GetLogger(this.GetType());
+			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
 
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
@@ -112,15 +110,14 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.AddFileLogDestination(fileName);
 
-			var logForThis = loggerPool.GetLogger(this.GetType());
-			var logForPool = loggerPool.GetLogger(loggerPool.GetType());
+			var logForThis = logAdminitrator.GetLogger(this.GetType());
+			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
 
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
@@ -147,14 +144,13 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.AddFileLogDestination(fileName);
 
-			var logger = loggerPool.GetLogger(nameof(FileLoggerMustRecreateDirectory));
+			var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
 
 			logger.Info("...");
 
@@ -177,14 +173,13 @@ namespace Najlot.Log.Tests
 
 			int i = 0;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(() => Path.Combine(logsDir, i.ToString()), maxFiles: maxFiles, logFilePaths: logFilePaths)
-				.GetLoggerPool(out LoggerPool loggerPool);
+				.AddFileLogDestination(() => Path.Combine(logsDir, i.ToString()), maxFiles: maxFiles, logFilePaths: logFilePaths);
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			for (; i < 100; i++)
 			{

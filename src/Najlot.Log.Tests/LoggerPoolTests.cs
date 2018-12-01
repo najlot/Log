@@ -9,19 +9,18 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LoggerPoolMustCacheEntries()
 		{
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var logForThis1 = loggerPool.GetLogger(this.GetType());
-			var logForPool1 = loggerPool.GetLogger(typeof(LoggerPool));
+			var logForThis1 = logAdminitrator.GetLogger(this.GetType());
+			var logForPool1 = logAdminitrator.GetLogger(typeof(LogAdminitrator));
 
-			var logForThis2 = loggerPool.GetLogger(this.GetType());
-			var logForPool2 = loggerPool.GetLogger(typeof(LoggerPool));
+			var logForThis2 = logAdminitrator.GetLogger(this.GetType());
+			var logForPool2 = logAdminitrator.GetLogger(typeof(LogAdminitrator));
 
 			Assert.StrictEqual(logForThis1, logForThis2);
 			Assert.StrictEqual(logForPool1, logForPool2);
@@ -36,7 +35,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -44,14 +43,13 @@ namespace Najlot.Log.Tests
 				{
 					category = msg.Category;
 					gotLogMessage = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
 			var thisType = this.GetType();
-			var loggerPoolType = typeof(LoggerPool);
+			var syncExecutionMiddlewareType = typeof(SyncExecutionMiddleware);
 
-			var logForThis = loggerPool.GetLogger(thisType);
-			var logForPool = loggerPool.GetLogger(loggerPoolType);
+			var logForThis = logAdminitrator.GetLogger(thisType);
+			var logForPool = logAdminitrator.GetLogger(syncExecutionMiddlewareType);
 
 			logForThis.Info("log this");
 
@@ -64,9 +62,9 @@ namespace Najlot.Log.Tests
 			logForPool.Info("log pool");
 
 			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
-			Assert.Equal(loggerPoolType.FullName, category);
+			Assert.Equal(syncExecutionMiddlewareType.FullName, category);
 
-			logForThis = loggerPool.GetLogger(thisType);
+			logForThis = logAdminitrator.GetLogger(thisType);
 
 			gotLogMessage = false;
 			category = null;
@@ -83,7 +81,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -92,14 +90,13 @@ namespace Najlot.Log.Tests
 				{
 					category = msg.Category;
 					gotLogMessage = true;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
 			var thisType = this.GetType();
-			var loggerPoolType = typeof(LoggerPool);
+			var logAdminitratorType = typeof(LogAdminitrator);
 
-			var logForThis = loggerPool.GetLogger(thisType);
-			var logForPool = loggerPool.GetLogger(loggerPoolType);
+			var logForThis = logAdminitrator.GetLogger(thisType);
+			var logForPool = logAdminitrator.GetLogger(logAdminitratorType);
 
 			logForThis.Info("log this");
 
@@ -112,9 +109,9 @@ namespace Najlot.Log.Tests
 			logForPool.Info("log pool");
 
 			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
-			Assert.Equal(loggerPoolType.FullName, category);
+			Assert.Equal(logAdminitratorType.FullName, category);
 
-			logForThis = loggerPool.GetLogger(thisType);
+			logForThis = logAdminitrator.GetLogger(thisType);
 
 			gotLogMessage = false;
 			category = null;

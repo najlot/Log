@@ -7,12 +7,11 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LogConfiguratorInstanceMustNotBreak()
 		{
-			LogAdminitrator.Instance
+			var logAdminitrator = LogAdminitrator.Instance
 				.GetLogConfiguration(out var logConfiguration)
-				.AddConsoleLogDestination()
-				.GetLoggerPool(out var loggerPool);
+				.AddConsoleLogDestination();
 
-			var log = loggerPool.GetLogger("default");
+			var log = logAdminitrator.GetLogger("default");
 
 			log.Fatal("Hello, World!");
 		}

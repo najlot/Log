@@ -97,7 +97,7 @@ namespace Najlot.Log
 
 				try
 				{
-					_executionMiddleware = value;
+					_executionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(value.GetType());
 				}
 				finally
 				{

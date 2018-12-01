@@ -5,19 +5,17 @@ namespace Najlot.Log.Extensions.Logging
 	[ProviderAlias("Najlot.Log")]
 	public sealed class NajlotLogProvider : ILoggerProvider
 	{
-		private LogAdminitrator _logConfigurator;
-		private LoggerPool _loggerPool;
+		private LogAdminitrator _logAdminitrator;
 		private bool _disposed = false;
 
 		public NajlotLogProvider(LogAdminitrator logConfigurator)
 		{
-			_logConfigurator = logConfigurator;
-			_logConfigurator.GetLoggerPool(out _loggerPool);
+			_logAdminitrator = logConfigurator;
 		}
 
 		public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
 		{
-			return new NajlotLogWrapper(_loggerPool.GetLogger(categoryName));
+			return new NajlotLogWrapper(_logAdminitrator.GetLogger(categoryName));
 		}
 
 		public void Dispose()
@@ -25,10 +23,9 @@ namespace Najlot.Log.Extensions.Logging
 			if (!_disposed)
 			{
 				_disposed = true;
-				_loggerPool = null;
-
-				_logConfigurator.Dispose();
-				_logConfigurator = null;
+				
+				_logAdminitrator.Dispose();
+				_logAdminitrator = null;
 			}
 		}
 	}

@@ -14,7 +14,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ApplicationMustNotDieFromErrorsInDestinations()
 		{
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out var logConfiguration)
@@ -25,10 +25,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					throw new Exception("Test!");
-				}))
-				.GetLoggerPool(out var loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger("default");
+			var log = logAdminitrator.GetLogger("default");
 
 			log.Fatal("We will get some exceptions now!");
 
@@ -45,16 +44,15 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					Interlocked.Increment(ref executionsLogged);
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			Parallel.For(0, 1000000, nr =>
 			{
@@ -73,16 +71,15 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					Interlocked.Increment(ref executionsLogged);
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			Parallel.For(0, 100000, nr =>
 			{
@@ -101,7 +98,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -111,10 +108,9 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new SecondLogDestinationMock(msg =>
 				{
 					Interlocked.Increment(ref executionsLogged);
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			Parallel.For(0, 100000, nr =>
 			{
@@ -128,34 +124,26 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void MiddlewareMockMustGetAndExecuteDefinedAction()
+		public void MiddlewareMockMustExecuteDefinedAction()
 		{
 			bool loggerGotAction = false;
-			bool middlewareGotAction = false;
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var logger = loggerPool.GetLogger(this.GetType());
+			var logger = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new ExecutionMiddlewareMock(action =>
-			{
-				middlewareGotAction = true;
-				action();
-			});
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			logger.Info(logMessageExpected);
-
-			Assert.True(middlewareGotAction, "Middleware did not got the action");
+			
 			Assert.True(loggerGotAction, "Logger did not got the action");
 			Assert.Equal(logMessageExpected, logMessageActual);
 		}
@@ -167,17 +155,16 @@ namespace Najlot.Log.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 
@@ -193,17 +180,16 @@ namespace Najlot.Log.Tests
 			bool loggerGotAction = false;
 			var logMessageActual = "";
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
 					logMessageActual = msg.Message.ToString();
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
 
@@ -226,7 +212,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -235,10 +221,9 @@ namespace Najlot.Log.Tests
 					var logMessageActual = msg.Message.ToString();
 					bool couldRemove = messages.Remove(logMessageActual);
 					Assert.True(couldRemove, "Could not remove " + logMessageActual);
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
 
@@ -264,28 +249,26 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
 					var logMessageActual = msg.Message.ToString();
 					bool couldRemove = messages.Remove(logMessageActual);
 					Assert.True(couldRemove, "Could not remove " + logMessageActual);
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
-
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
+			
 			for (int i = 0; i < executionsExpected; i++)
 			{
 				messages.Add(i.ToString());
 			}
 
-			logConfiguration.ExecutionMiddleware.Flush();
+			logAdminitrator.Flush();
 			Thread.Sleep(100);
 
 			for (int i = 0; i < executionsExpected; i++)
@@ -293,7 +276,7 @@ namespace Najlot.Log.Tests
 				log.Info(i.ToString());
 			}
 
-			logConfiguration.ExecutionMiddleware.Flush();
+			logAdminitrator.Flush();
 
 			Assert.Equal(executionsExpected, executionsActual);
 		}
@@ -307,7 +290,7 @@ namespace Najlot.Log.Tests
 			List<string> messages = new List<string>();
 			var manualResetEventSlim = new ManualResetEventSlim(false);
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -323,10 +306,9 @@ namespace Najlot.Log.Tests
 					{
 						manualResetEventSlim.Set();
 					}
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
 			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
 
@@ -354,9 +336,8 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
@@ -368,12 +349,11 @@ namespace Najlot.Log.Tests
 
 					if (removingError) return;
 					removingError = !couldRemove;
-				}))
-				.GetLoggerPool(out LoggerPool loggerPool);
+				}));
 
-			var log = loggerPool.GetLogger(this.GetType());
+			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
 
 			for (int i = 0; i < executionsExpected * 2; i++)
 			{
@@ -385,8 +365,8 @@ namespace Najlot.Log.Tests
 				log.Info(i.ToString());
 			}
 
-			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
-
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
+			
 			for (int i = executionsExpected; i < executionsExpected * 2; i++)
 			{
 				log.Info(i.ToString());

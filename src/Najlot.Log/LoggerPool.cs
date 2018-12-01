@@ -8,7 +8,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Class for managing instances of loggers and log destinations.
 	/// </summary>
-	public sealed class LoggerPool : IDisposable
+	internal sealed class LoggerPool : IDisposable
 	{
 		/// <summary>
 		/// Static LoggerPool instance
@@ -89,15 +89,13 @@ namespace Najlot.Log
 				return _logDestinations;
 			}
 		}
-
-		/// <summary>
-		/// Creates a logger for a type or retrieves it from the cache.
-		/// </summary>
-		/// <param name="sourceType">Type to create a logger for</param>
-		/// <returns></returns>
-		public Logger GetLogger(Type sourceType)
+		
+		internal void Flush()
 		{
-			return GetLogger(sourceType.FullName);
+			foreach(var destination in GetLogDestinations())
+			{
+				destination.ExecutionMiddleware.Flush();
+			}
 		}
 
 		/// <summary>
@@ -105,7 +103,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="category">Category to create a logger for</param>
 		/// <returns></returns>
-		public Logger GetLogger(string category)
+		internal Logger GetLogger(string category)
 		{
 			Logger logger;
 
