@@ -1,4 +1,5 @@
 using Najlot.Log.Configuration;
+using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using Xunit;
 
@@ -11,7 +12,7 @@ namespace Najlot.Log.Tests
 		{
 			var observerNotified = false;
 
-			var configurator = LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -22,7 +23,7 @@ namespace Najlot.Log.Tests
 			});
 
 			logConfiguration.AttachObserver(configurationChangedObserverMock);
-			logConfiguration.LogLevel++;
+			logAdminitrator.SetLogLevel(LogLevel.Error);
 
 			Assert.True(observerNotified, "Observer was not notified");
 		}
@@ -32,8 +33,9 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			var configurator = LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
+				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
@@ -43,7 +45,7 @@ namespace Najlot.Log.Tests
 			});
 
 			logConfiguration.AttachObserver(configurationChangedObserverMock);
-			logConfiguration.ExecutionMiddleware = new ExecutionMiddlewareMock(null);
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			Assert.True(observerNotified, "Observer was not notified on middleware changed");
 		}
@@ -71,26 +73,6 @@ namespace Najlot.Log.Tests
 
 			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
 			Assert.False(observerNotified, "Observer was notified, but format funtion was the same");
-		}
-
-		[Fact]
-		public void ConfigurationMustNotChangeMiddlewareToNull()
-		{
-			bool observerNotified = false;
-
-			LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out var logConfiguration);
-
-			logConfiguration.AttachObserver(new ConfigurationChangedObserverMock(config =>
-			{
-				observerNotified = true;
-			}));
-
-			logConfiguration.ExecutionMiddleware = null;
-
-			Assert.NotNull(logConfiguration.ExecutionMiddleware);
-			Assert.False(observerNotified, "Observer was notified on format function changed for other");
 		}
 	}
 }

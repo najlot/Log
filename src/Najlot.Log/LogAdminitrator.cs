@@ -9,7 +9,7 @@ namespace Najlot.Log
 	/// </summary>
 	public class LogAdminitrator : IDisposable
 	{
-		private ILogConfiguration _logConfiguration;
+		private LogConfiguration _logConfiguration;
 		private LoggerPool _loggerPool;
 
 		/// <summary>
@@ -19,7 +19,7 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public static LogAdminitrator Instance { get; } = new LogAdminitrator(LogConfiguration.Instance, LoggerPool.Instance);
 
-		internal LogAdminitrator(ILogConfiguration logConfiguration, LoggerPool loggerPool)
+		internal LogAdminitrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
 		{
 			_logConfiguration = logConfiguration;
 			_loggerPool = loggerPool;
@@ -67,9 +67,21 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
+			this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
+			
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the ExecutionMiddleware of the LogConfiguration.
+		/// </summary>
+		/// <typeparam name="TExecutionMiddleware"></typeparam>
+		/// <returns></returns>
+		public LogAdminitrator SetExecutionMiddlewareByType(Type middlewareType)
+		{
 			this.Flush();
 
-			_logConfiguration.ExecutionMiddleware = new TExecutionMiddleware();
+			_logConfiguration.ExecutionMiddleware = (Middleware.IExecutionMiddleware)Activator.CreateInstance(middlewareType);
 			return this;
 		}
 

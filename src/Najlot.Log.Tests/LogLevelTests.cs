@@ -53,7 +53,7 @@ namespace Najlot.Log.Tests
 
 			foreach (var logLevel in logLevels)
 			{
-				logConfiguration.LogLevel = logLevel;
+				logAdminitrator.SetLogLevel(logLevel);
 
 				shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace("");
@@ -113,7 +113,7 @@ namespace Najlot.Log.Tests
 
 			foreach (var logLevel in logLevels)
 			{
-				logConfiguration.LogLevel = logLevel;
+				logAdminitrator.SetLogLevel(logLevel);
 
 				shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace("");

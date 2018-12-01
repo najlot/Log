@@ -12,12 +12,12 @@ namespace Najlot.Log.Configuration
 		/// <summary>
 		/// Current log level for all log destinations observing this configuration
 		/// </summary>
-		LogLevel LogLevel { get; set; }
+		LogLevel LogLevel { get; }
 
 		/// <summary>
 		/// Current execution middleware for all log destinations observing this configuration
 		/// </summary>
-		IExecutionMiddleware ExecutionMiddleware { get; set; }
+		IExecutionMiddleware ExecutionMiddleware { get; }
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur

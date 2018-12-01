@@ -63,7 +63,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void FileConfigurationMustUpdateAtRuntimeWithoutApplicationFailure()
 		{
-			const string configPath = "LogConfigurationToUpdate.config";
+			const string configPath = nameof(FileConfigurationMustUpdateAtRuntimeWithoutApplicationFailure) + ".config";
 
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
@@ -101,13 +101,15 @@ namespace Najlot.Log.Tests
 			File.WriteAllText(configPath, newContent);
 			var stopwatch = Stopwatch.StartNew();
 
-			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Error)
+			while (stopwatch.ElapsedMilliseconds < 5000 && 
+				( logConfiguration.LogLevel == LogLevel.Error || 
+				typeof(TaskExecutionMiddleware).FullName == logConfiguration.ExecutionMiddleware.GetType().FullName))
 			{
 				Thread.Sleep(10);
 			}
 
 			stopwatch.Stop();
-
+			
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 

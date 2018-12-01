@@ -18,11 +18,11 @@ namespace Najlot.Log.Configuration.FileSource
 
 	public static class LogConfiguratorExtension
 	{
-		private static void WriteXmlConfigurationFile(LogAdminitrator logConfigurator, string path)
+		private static void WriteXmlConfigurationFile(LogAdminitrator logAdminitrator, string path)
 		{
 			var encoding = Encoding.UTF8;
 
-			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
+			logAdminitrator.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
 			try
 			{
@@ -59,28 +59,26 @@ namespace Najlot.Log.Configuration.FileSource
 		/// <summary>
 		/// Reads logconfiguration from an XML file
 		/// </summary>
-		/// <param name="logConfigurator">LogConfigurator instance</param>
+		/// <param name="logAdminitrator">LogConfigurator instance</param>
 		/// <param name="path">Path to the XML file</param>
 		/// <param name="listenForChanges">Should the canges happened at runtime be reflected to the logger</param>
 		/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>
 		/// <returns></returns>
-		public static LogAdminitrator ReadConfigurationFromXmlFile(this LogAdminitrator logConfigurator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
+		public static LogAdminitrator ReadConfigurationFromXmlFile(this LogAdminitrator logAdminitrator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
 		{
-			logConfigurator.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
 			try
 			{
 				if (!File.Exists(path))
 				{
 					if (writeExampleIfSourceDoesNotExists)
 					{
-						WriteXmlConfigurationFile(logConfigurator, path);
+						WriteXmlConfigurationFile(logAdminitrator, path);
 					}
 
-					return logConfigurator;
+					return logAdminitrator;
 				}
 
-				ReadConfiguration(path, logConfiguration);
+				ReadConfiguration(path, logAdminitrator);
 
 				if (listenForChanges)
 				{
@@ -100,7 +98,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 						try
 						{
-							ReadConfiguration(path, logConfiguration);
+							ReadConfiguration(path, logAdminitrator);
 						}
 						catch (Exception ex)
 						{
@@ -117,10 +115,10 @@ namespace Najlot.Log.Configuration.FileSource
 				Console.WriteLine("Najlot.Log: " + ex);
 			}
 
-			return logConfigurator;
+			return logAdminitrator;
 		}
 
-		private static void ReadConfiguration(string path, ILogConfiguration logConfiguration)
+		private static void ReadConfiguration(string path, LogAdminitrator logAdminitrator)
 		{
 			FileConfiguration fileConfiguration;
 
@@ -130,13 +128,15 @@ namespace Najlot.Log.Configuration.FileSource
 				fileConfiguration = xmlSerializer.Deserialize(streamReader) as FileConfiguration;
 			}
 
-			logConfiguration.LogLevel = fileConfiguration.LogLevel;
+			logAdminitrator.SetLogLevel(fileConfiguration.LogLevel);
 
-			AssignExecutionMiddlewareIfChanged(logConfiguration, fileConfiguration);
+			AssignExecutionMiddlewareIfChanged(logAdminitrator, fileConfiguration);
 		}
 
-		private static void AssignExecutionMiddlewareIfChanged(ILogConfiguration logConfiguration, FileConfiguration fileConfiguration)
+		private static void AssignExecutionMiddlewareIfChanged(LogAdminitrator logAdminitrator, FileConfiguration fileConfiguration)
 		{
+			logAdminitrator.GetLogConfiguration(out var logConfiguration);
+
 			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
 
 			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, false);
@@ -151,14 +151,8 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				return;
 			}
-
-			if (!(Activator.CreateInstance(executionMiddlewareType) is IExecutionMiddleware newExecutionMiddleware))
-			{
-				Console.WriteLine("Najlot.Log: New execution middleware is not " + nameof(IExecutionMiddleware));
-				return;
-			}
-
-			logConfiguration.ExecutionMiddleware = newExecutionMiddleware;
+			
+			logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
 		}
 	}
 }

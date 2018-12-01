@@ -9,7 +9,7 @@ namespace Najlot.Log.Configuration
 	/// </summary>
 	internal class LogConfiguration : ILogConfiguration
 	{
-		public static ILogConfiguration Instance { get; } = new LogConfiguration();
+		public static LogConfiguration Instance { get; } = new LogConfiguration();
 
 		internal LogConfiguration()
 		{
@@ -45,6 +45,7 @@ namespace Najlot.Log.Configuration
 			{
 				if (value == null)
 				{
+					Console.WriteLine("Najlot.Log: New execution middleware is not " + nameof(IExecutionMiddleware));
 					return;
 				}
 

@@ -20,37 +20,36 @@ namespace Najlot.Log.Tests
 		{
 			using (var loggerFactory = new LoggerFactory())
 			{
-				ILogConfiguration logConfiguration = null;
+				LogAdminitrator logAdminitrator = null;
 
-				loggerFactory.AddNajlotLog((configurator) =>
+				loggerFactory.AddNajlotLog((adminitrator) =>
 				{
-					configurator
+					logAdminitrator = adminitrator
 						.SetLogLevel(LogLevel.Trace)
-						.AddConsoleLogDestination()
-						.GetLogConfiguration(out logConfiguration);
+						.AddConsoleLogDestination();
 				});
 
 				var logger = loggerFactory.CreateLogger("default");
 
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
 
-				logConfiguration.LogLevel = LogLevel.Debug;
+				logAdminitrator.SetLogLevel(LogLevel.Debug);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
-
-				logConfiguration.LogLevel = LogLevel.Info;
+				
+				logAdminitrator.SetLogLevel(LogLevel.Info);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
-
-				logConfiguration.LogLevel = LogLevel.Warn;
+				
+				logAdminitrator.SetLogLevel(LogLevel.Warn);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
-
-				logConfiguration.LogLevel = LogLevel.Error;
+				
+				logAdminitrator.SetLogLevel(LogLevel.Error);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
-
-				logConfiguration.LogLevel = LogLevel.Fatal;
+				
+				logAdminitrator.SetLogLevel(LogLevel.Fatal);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical));
 			}

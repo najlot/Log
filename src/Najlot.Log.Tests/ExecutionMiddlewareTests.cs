@@ -31,7 +31,7 @@ namespace Najlot.Log.Tests
 
 			log.Fatal("We will get some exceptions now!");
 
-			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			log.Fatal("We will get more exceptions now!");
 
@@ -166,7 +166,7 @@ namespace Najlot.Log.Tests
 
 			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			log.Info(logMessageExpected);
 
@@ -191,7 +191,7 @@ namespace Najlot.Log.Tests
 
 			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new SyncExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -225,7 +225,7 @@ namespace Najlot.Log.Tests
 
 			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
@@ -310,7 +310,7 @@ namespace Najlot.Log.Tests
 
 			var log = logAdminitrator.GetLogger(this.GetType());
 
-			logConfiguration.ExecutionMiddleware = new TaskExecutionMiddleware();
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
 
 			for (int i = 0; i < executionsExpected; i++)
 			{

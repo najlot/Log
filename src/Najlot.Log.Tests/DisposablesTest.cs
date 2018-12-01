@@ -36,7 +36,7 @@ namespace Najlot.Log.Tests
 		{
 			var observerNotified = false;
 
-			var configurator = LogAdminitrator
+			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out var logConfiguration);
@@ -47,13 +47,13 @@ namespace Najlot.Log.Tests
 			});
 
 			logConfiguration.AttachObserver(observer);
-			logConfiguration.LogLevel = LogLevel.Info;
+			logAdminitrator.SetLogLevel(LogLevel.Info);
 			Assert.True(observerNotified, "Observer was not notified before dispose");
 
 			observerNotified = false;
 
 			logConfiguration.DetachObserver(observer);
-			logConfiguration.LogLevel++;
+			logAdminitrator.SetLogLevel(LogLevel.Warn);
 			Assert.False(observerNotified, "Observer was notified after dispose");
 		}
 	}
