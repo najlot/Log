@@ -17,7 +17,7 @@ namespace Najlot.Log.Configuration
 		/// <summary>
 		/// Current execution middleware for all log destinations observing this configuration
 		/// </summary>
-		IExecutionMiddleware ExecutionMiddleware { get; }
+		Type ExecutionMiddlewareType { get; }
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur

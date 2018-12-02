@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Najlot.Log.Configuration
@@ -33,30 +34,34 @@ namespace Najlot.Log.Configuration
 			}
 		}
 
-		private IExecutionMiddleware executionMiddleware = new SyncExecutionMiddleware();
+		private Type executionMiddlewareType = typeof(SyncExecutionMiddleware);
 
-		public IExecutionMiddleware ExecutionMiddleware
+		public Type ExecutionMiddlewareType
 		{
 			get
 			{
-				return executionMiddleware;
+				return executionMiddlewareType;
 			}
 			set
 			{
 				if (value == null)
 				{
-					Console.WriteLine("Najlot.Log: New execution middleware is not " + nameof(IExecutionMiddleware));
+					Console.WriteLine("Najlot.Log: New execution middleware type is null.");
 					return;
 				}
 
-				if (executionMiddleware.GetType().FullName != value.GetType().FullName)
+				Type iExecutionMiddlewareType = typeof(IExecutionMiddleware);
+
+				if(value.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
 				{
-					// Observers get new middleware and we dispose the old one
-					using (var oldMiddleware = executionMiddleware)
-					{
-						executionMiddleware = value;
-						NotifyObservers();
-					}
+					Console.WriteLine("Najlot.Log: New execution middleware does not implement " + iExecutionMiddlewareType.Name);
+					return;
+				}
+
+				if (executionMiddlewareType.FullName != value.GetType().FullName)
+				{
+					executionMiddlewareType = value;
+					NotifyObservers();
 				}
 			}
 		}

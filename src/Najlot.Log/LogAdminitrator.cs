@@ -81,7 +81,7 @@ namespace Najlot.Log
 		{
 			this.Flush();
 
-			_logConfiguration.ExecutionMiddleware = (Middleware.IExecutionMiddleware)Activator.CreateInstance(middlewareType);
+			_logConfiguration.ExecutionMiddlewareType = middlewareType;
 			return this;
 		}
 

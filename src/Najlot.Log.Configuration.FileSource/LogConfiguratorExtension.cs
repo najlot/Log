@@ -25,7 +25,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 			try
 			{
-				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
+				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
 
 				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
 				if (currentExecutionMiddlewareType.Assembly != null)
@@ -136,7 +136,7 @@ namespace Najlot.Log.Configuration.FileSource
 		{
 			logAdminitrator.GetLogConfiguration(out var logConfiguration);
 
-			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddleware.GetType();
+			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
 
 			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, false);
 

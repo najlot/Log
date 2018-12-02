@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Configuration;
 using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 
@@ -68,7 +69,7 @@ namespace Najlot.Log
 
 			return new LogDestinationEntry()
 			{
-				ExecutionMiddleware = this._logConfiguration.ExecutionMiddleware,
+				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(_logConfiguration.ExecutionMiddlewareType),
 				LogDestination = logDestination,
 				FormatFunc = formatFunc
 			};

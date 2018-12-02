@@ -97,7 +97,7 @@ namespace Najlot.Log
 
 				try
 				{
-					_executionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(value.GetType());
+					_executionMiddleware = value;
 				}
 				finally
 				{
@@ -113,7 +113,7 @@ namespace Najlot.Log
 				FormatFunc = formatFunc;
 			}
 
-			ExecutionMiddleware = configuration.ExecutionMiddleware;
+			ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
 		}
 	}
 }
