@@ -300,6 +300,23 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void TaskExecutionMiddlewareMustMustNotBreakOnException()
+		{
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					throw new Exception("this exception must not break the application");
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
+
+			log.Info("test");
+		}
+
+		[Fact]
 		public void TaskExecutionMiddlewareMustNotLooseMessages()
 		{
 			int executionsExpected = 10;
@@ -363,7 +380,7 @@ namespace Najlot.Log.Tests
 			}
 
 			logAdminitrator.Flush();
-			Thread.Sleep(100);
+			Thread.Sleep(100); // Wait to restart
 
 			for (int i = 0; i < executionsExpected; i++)
 			{
