@@ -144,20 +144,22 @@ namespace Najlot.Log
 
 				if (disposing)
 				{
+					Flush();
+
+					foreach (var cachedEntry in _loggerCache)
+					{
+						cachedEntry.Value.Dispose();
+					}
+
 					foreach (var destination in _logDestinations)
 					{
 						destination.LogDestination.Dispose();
 					}
 
-					foreach (var cachedDestinationEntry in _loggerCache)
-					{
-						cachedDestinationEntry.Value.Dispose();
-					}
+					_logConfiguration = null;
+					_logDestinations = null;
+					_loggerCache = null;
 				}
-
-				_logConfiguration = null;
-				_logDestinations = null;
-				_loggerCache = null;
 			}
 		}
 
