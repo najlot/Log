@@ -387,7 +387,7 @@ namespace Najlot.Log.Tests
 				log.Info(i.ToString());
 			}
 
-			logAdminitrator.Flush();
+			logAdminitrator.Dispose();
 
 			Assert.Equal(executionsExpected, executionsActual);
 		}
