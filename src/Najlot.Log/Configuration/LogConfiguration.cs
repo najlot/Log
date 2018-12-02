@@ -155,6 +155,8 @@ namespace Najlot.Log.Configuration
 			{
 				_formatFunctions.Clear();
 			}
+
+			NotifyObservers();
 		}
 
 		#endregion Format functions

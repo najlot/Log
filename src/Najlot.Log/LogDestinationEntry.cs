@@ -112,6 +112,10 @@ namespace Najlot.Log
 			{
 				FormatFunc = formatFunc;
 			}
+			else
+			{
+				FormatFunc = DefaultFormatFuncHolder.DefaultFormatFunc;
+			}
 
 			ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
 		}
