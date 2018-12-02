@@ -7,31 +7,6 @@ namespace Najlot.Log.Tests
 	public class DisposablesTest
 	{
 		[Fact]
-		public void LogConfiguratorMustBeDisposable()
-		{
-			var logAdminitrators = new List<LogAdminitrator>();
-
-			for (int i = 0; i < 1000; i++)
-			{
-				logAdminitrators.Add(
-					LogAdminitrator
-						.CreateNew()
-						.GetLogConfiguration(out var logConfiguration)
-						.AddCustomDestination(new LogDestinationMock(msg => { }))
-						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));
-			}
-
-			foreach (var logAdminitrator in logAdminitrators)
-			{
-				var logger = logAdminitrator.GetLogger("1");
-				var logger2 = logAdminitrator.GetLogger("2");
-
-				// Check there are no exceptions when used wrong
-				logAdminitrator.Dispose();
-			}
-		}
-
-		[Fact]
 		public void ConfigurationMustNotNotifyDisposedPrototypes()
 		{
 			var observerNotified = false;
@@ -55,6 +30,31 @@ namespace Najlot.Log.Tests
 			logConfiguration.DetachObserver(observer);
 			logAdminitrator.SetLogLevel(LogLevel.Warn);
 			Assert.False(observerNotified, "Observer was notified after dispose");
+		}
+
+		[Fact]
+		public void LogConfiguratorMustBeDisposable()
+		{
+			var logAdminitrators = new List<LogAdminitrator>();
+
+			for (int i = 0; i < 1000; i++)
+			{
+				logAdminitrators.Add(
+					LogAdminitrator
+						.CreateNew()
+						.GetLogConfiguration(out var logConfiguration)
+						.AddCustomDestination(new LogDestinationMock(msg => { }))
+						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));
+			}
+
+			foreach (var logAdminitrator in logAdminitrators)
+			{
+				var logger = logAdminitrator.GetLogger("1");
+				var logger2 = logAdminitrator.GetLogger("2");
+
+				// Check there are no exceptions when used wrong
+				logAdminitrator.Dispose();
+			}
 		}
 	}
 }

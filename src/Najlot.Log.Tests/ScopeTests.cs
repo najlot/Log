@@ -8,73 +8,6 @@ namespace Najlot.Log.Tests
 	public class ScopeTests
 	{
 		[Fact]
-		public void ScopeMustBeLogged()
-		{
-			object state = null;
-			var scope = "testing scopes";
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					state = msg.State;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			using (log.BeginScope(scope))
-			{
-				log.Warn("setting scope");
-			}
-
-			Assert.Equal(scope, (string)state);
-
-			log.Warn("scope must be null now");
-
-			Assert.Null(state);
-		}
-
-		[Fact]
-		public void ScopeMustBeLoggedToMultiple()
-		{
-			object state = null;
-			object secondState = null;
-
-			var scope = "testing scopes";
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					state = msg.State;
-				}))
-				.AddCustomDestination(new SecondLogDestinationMock(msg =>
-				{
-					secondState = msg.State;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			using (log.BeginScope(scope))
-			{
-				log.Warn("setting scope");
-			}
-
-			Assert.Equal(scope, (string)state);
-			Assert.Equal(scope, (string)secondState);
-
-			log.Warn("scope must be null now");
-
-			Assert.Null(state);
-			Assert.Null(secondState);
-		}
-
-		[Fact]
 		public void NestedScopesMustBeLogged()
 		{
 			object state = null;
@@ -152,6 +85,73 @@ namespace Najlot.Log.Tests
 			log.Flush();
 
 			Assert.False(scopesAreNotCorrect, "scopes are not correct");
+		}
+
+		[Fact]
+		public void ScopeMustBeLogged()
+		{
+			object state = null;
+			var scope = "testing scopes";
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock((msg) =>
+				{
+					state = msg.State;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			using (log.BeginScope(scope))
+			{
+				log.Warn("setting scope");
+			}
+
+			Assert.Equal(scope, (string)state);
+
+			log.Warn("scope must be null now");
+
+			Assert.Null(state);
+		}
+
+		[Fact]
+		public void ScopeMustBeLoggedToMultiple()
+		{
+			object state = null;
+			object secondState = null;
+
+			var scope = "testing scopes";
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock((msg) =>
+				{
+					state = msg.State;
+				}))
+				.AddCustomDestination(new SecondLogDestinationMock(msg =>
+				{
+					secondState = msg.State;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			using (log.BeginScope(scope))
+			{
+				log.Warn("setting scope");
+			}
+
+			Assert.Equal(scope, (string)state);
+			Assert.Equal(scope, (string)secondState);
+
+			log.Warn("scope must be null now");
+
+			Assert.Null(state);
+			Assert.Null(secondState);
 		}
 	}
 }

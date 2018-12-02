@@ -34,60 +34,6 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void LoggerMustLogWithCorrectLogLevel()
-		{
-			var gotLogMessage = false;
-			var shouldGetMessage = true;
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Fatal)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out var logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					gotLogMessage = true;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			foreach (var logLevel in logLevels)
-			{
-				logAdminitrator.SetLogLevel(logLevel);
-
-				shouldGetMessage = logLevel <= LogLevel.Trace;
-				log.Trace("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Trace message");
-				gotLogMessage = false;
-
-				shouldGetMessage = logLevel <= LogLevel.Debug;
-				log.Debug("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Debug message");
-				gotLogMessage = false;
-
-				shouldGetMessage = logLevel <= LogLevel.Info;
-				log.Info("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Info message");
-				gotLogMessage = false;
-
-				shouldGetMessage = logLevel <= LogLevel.Warn;
-				log.Warn("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Warn message");
-				gotLogMessage = false;
-
-				shouldGetMessage = logLevel <= LogLevel.Error;
-				log.Error("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Error message");
-				gotLogMessage = false;
-
-				shouldGetMessage = logLevel <= LogLevel.Fatal;
-				log.Fatal("");
-				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Fatal message");
-				gotLogMessage = false;
-			}
-		}
-
-		[Fact]
 		public void LoggerMustLogMultipleWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
@@ -156,6 +102,60 @@ namespace Najlot.Log.Tests
 				Assert.True(gotSecondLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got second Fatal message");
 				gotLogMessage = false;
 				gotSecondLogMessage = false;
+			}
+		}
+
+		[Fact]
+		public void LoggerMustLogWithCorrectLogLevel()
+		{
+			var gotLogMessage = false;
+			var shouldGetMessage = true;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Fatal)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.GetLogConfiguration(out var logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					gotLogMessage = true;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			foreach (var logLevel in logLevels)
+			{
+				logAdminitrator.SetLogLevel(logLevel);
+
+				shouldGetMessage = logLevel <= LogLevel.Trace;
+				log.Trace("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Trace message");
+				gotLogMessage = false;
+
+				shouldGetMessage = logLevel <= LogLevel.Debug;
+				log.Debug("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Debug message");
+				gotLogMessage = false;
+
+				shouldGetMessage = logLevel <= LogLevel.Info;
+				log.Info("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Info message");
+				gotLogMessage = false;
+
+				shouldGetMessage = logLevel <= LogLevel.Warn;
+				log.Warn("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Warn message");
+				gotLogMessage = false;
+
+				shouldGetMessage = logLevel <= LogLevel.Error;
+				log.Error("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Error message");
+				gotLogMessage = false;
+
+				shouldGetMessage = logLevel <= LogLevel.Fatal;
+				log.Fatal("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logConfiguration.LogLevel}, but did not got Fatal message");
+				gotLogMessage = false;
 			}
 		}
 	}

@@ -10,6 +10,113 @@ namespace Najlot.Log.Tests
 	public class FileLogDestinationTests
 	{
 		[Fact]
+		public void FileLoggerMustCleanUpFiles()
+		{
+			const int maxFiles = 5;
+			const string logFilePaths = ".FilesToCleanUp";
+			string logsDir = $"logs_for_{nameof(FileLoggerMustCleanUpFiles)}";
+
+			if (File.Exists(logFilePaths)) File.Delete(logFilePaths);
+			if (Directory.Exists(logsDir)) Directory.Delete(logsDir, true);
+
+			int i = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(() => Path.Combine(logsDir, i.ToString()), maxFiles: maxFiles, logFilePaths: logFilePaths);
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			for (; i < 100; i++)
+			{
+				// Add some bad data
+				if (i == 50)
+				{
+					File.AppendAllText(logFilePaths,
+						Environment.NewLine + " " +
+						Environment.NewLine + "not-existing-file.log" +
+						Environment.NewLine + new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath +
+						Environment.NewLine);
+				}
+
+				log.Info(Guid.NewGuid());
+			}
+
+			var files = Directory.GetFiles(logsDir);
+
+			Assert.Equal(maxFiles, files.Length);
+
+			foreach (var file in files.Select(p => Path.GetFileNameWithoutExtension(p)))
+			{
+				Assert.True(int.Parse(file) > 99 - maxFiles);
+			}
+		}
+
+		[Fact]
+		public void FileLoggerMustCreateDirectory()
+		{
+			var dir = $"logs_for_{nameof(FileLoggerMustCreateDirectory)}";
+			var fileName = Path.Combine(dir, "TestFile.log");
+
+			if (Directory.Exists(dir))
+			{
+				Directory.Delete(dir, true);
+			}
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(fileName);
+
+			var logForThis = logAdminitrator.GetLogger(this.GetType());
+			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
+
+			var contentThis = "logForThis . Info";
+			var contentPool = "logForPool.Warn";
+
+			logForThis.Info(contentThis);
+			logForPool.Warn(contentPool);
+
+			Assert.True(File.Exists(fileName), $"File {fileName} not found.");
+
+			var content = File.ReadAllText(fileName);
+
+			Assert.NotEqual(-1, content.IndexOf(contentThis));
+			Assert.NotEqual(-1, content.IndexOf(contentPool));
+		}
+
+		[Fact]
+		public void FileLoggerMustRecreateDirectory()
+		{
+			var dir = $"logs_for_{nameof(FileLoggerMustRecreateDirectory)}";
+			var fileName = Path.Combine(dir, "TestFile.log");
+
+			if (Directory.Exists(dir))
+			{
+				Directory.Delete(dir, true);
+			}
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(fileName);
+
+			var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
+
+			logger.Info("...");
+
+			Directory.Delete(dir, true);
+
+			logger.Info("This must recreate the directory.");
+
+			Assert.True(Directory.Exists(dir));
+		}
+
+		[Fact]
 		public void FileLoggerPrototypesMustWriteToDifferentFilesInDifferentDirectories()
 		{
 			var dir1 = "logs_dir_1";
@@ -97,113 +204,6 @@ namespace Najlot.Log.Tests
 
 			Assert.NotEqual(-1, content.IndexOf(contentThis));
 			Assert.NotEqual(-1, content.IndexOf(contentPool));
-		}
-
-		[Fact]
-		public void FileLoggerMustCreateDirectory()
-		{
-			var dir = $"logs_for_{nameof(FileLoggerMustCreateDirectory)}";
-			var fileName = Path.Combine(dir, "TestFile.log");
-
-			if (Directory.Exists(dir))
-			{
-				Directory.Delete(dir, true);
-			}
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName);
-
-			var logForThis = logAdminitrator.GetLogger(this.GetType());
-			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-
-			var contentThis = "logForThis . Info";
-			var contentPool = "logForPool.Warn";
-
-			logForThis.Info(contentThis);
-			logForPool.Warn(contentPool);
-
-			Assert.True(File.Exists(fileName), $"File {fileName} not found.");
-
-			var content = File.ReadAllText(fileName);
-
-			Assert.NotEqual(-1, content.IndexOf(contentThis));
-			Assert.NotEqual(-1, content.IndexOf(contentPool));
-		}
-
-		[Fact]
-		public void FileLoggerMustRecreateDirectory()
-		{
-			var dir = $"logs_for_{nameof(FileLoggerMustRecreateDirectory)}";
-			var fileName = Path.Combine(dir, "TestFile.log");
-
-			if (Directory.Exists(dir))
-			{
-				Directory.Delete(dir, true);
-			}
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName);
-
-			var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
-
-			logger.Info("...");
-
-			Directory.Delete(dir, true);
-
-			logger.Info("This must recreate the directory.");
-
-			Assert.True(Directory.Exists(dir));
-		}
-
-		[Fact]
-		public void FileLoggerMustCleanUpFiles()
-		{
-			const int maxFiles = 5;
-			const string logFilePaths = ".FilesToCleanUp";
-			string logsDir = $"logs_for_{nameof(FileLoggerMustCleanUpFiles)}";
-
-			if (File.Exists(logFilePaths)) File.Delete(logFilePaths);
-			if (Directory.Exists(logsDir)) Directory.Delete(logsDir, true);
-
-			int i = 0;
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(() => Path.Combine(logsDir, i.ToString()), maxFiles: maxFiles, logFilePaths: logFilePaths);
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			for (; i < 100; i++)
-			{
-				// Add some bad data
-				if (i == 50)
-				{
-					File.AppendAllText(logFilePaths,
-						Environment.NewLine + " " +
-						Environment.NewLine + "not-existing-file.log" +
-						Environment.NewLine + new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath +
-						Environment.NewLine);
-				}
-
-				log.Info(Guid.NewGuid());
-			}
-
-			var files = Directory.GetFiles(logsDir);
-
-			Assert.Equal(maxFiles, files.Length);
-
-			foreach (var file in files.Select(p => Path.GetFileNameWithoutExtension(p)))
-			{
-				Assert.True(int.Parse(file) > 99 - maxFiles);
-			}
 		}
 	}
 }

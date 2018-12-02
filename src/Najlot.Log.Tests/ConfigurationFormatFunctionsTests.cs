@@ -88,6 +88,79 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void FormatFunctionCanBeSetAndGetForMultipleTypes()
+		{
+			var thisType = this.GetType();
+			var returnString = thisType.Name;
+			var types = new List<Type>() { typeof(LogMessage), thisType, typeof(Logger) };
+
+			LogAdminitrator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			foreach (var type in types)
+			{
+				bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(type, (msg) =>
+				{
+					return type.Name;
+				});
+
+				Assert.True(canSetFunction, "Could not set function for " + type.Name);
+			}
+
+			Func<LogMessage, string> formatFunc;
+
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+
+			Assert.True(canGetFunction, "Could not get function for type");
+
+			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+
+			Assert.Equal(returnString, formatString);
+		}
+
+		[Fact]
+		public void LastFormatFunctionCanBeRetrievedAfterMultipleSet()
+		{
+			var returnString = "correct string";
+
+			LogAdminitrator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			{
+				return "wrong 1";
+			});
+
+			Assert.True(canSetFunction, "Could not set function 1");
+
+			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			{
+				return "wrong 2";
+			});
+
+			Assert.True(canSetFunction, "Could not set function 2");
+
+			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
+			{
+				return returnString;
+			});
+
+			Assert.True(canSetFunction, "Could not set function 3");
+
+			Func<LogMessage, string> formatFunc;
+
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+
+			Assert.True(canGetFunction, "Could not get function for type");
+
+			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+
+			Assert.Equal(returnString, formatString);
+		}
+
+		[Fact]
 		public void NotSetFormattingFunctionMustReturnFalseOnGet()
 		{
 			LogAdminitrator
@@ -160,79 +233,6 @@ namespace Najlot.Log.Tests
 			}));
 
 			Assert.Equal(returnString, formatedString);
-		}
-
-		[Fact]
-		public void LastFormatFunctionCanBeRetrievedAfterMultipleSet()
-		{
-			var returnString = "correct string";
-
-			LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
-			{
-				return "wrong 1";
-			});
-
-			Assert.True(canSetFunction, "Could not set function 1");
-
-			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
-			{
-				return "wrong 2";
-			});
-
-			Assert.True(canSetFunction, "Could not set function 2");
-
-			canSetFunction = logConfiguration.TrySetFormatFunctionForType(this.GetType(), (msg) =>
-			{
-				return returnString;
-			});
-
-			Assert.True(canSetFunction, "Could not set function 3");
-
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
-
-			Assert.True(canGetFunction, "Could not get function for type");
-
-			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
-
-			Assert.Equal(returnString, formatString);
-		}
-
-		[Fact]
-		public void FormatFunctionCanBeSetAndGetForMultipleTypes()
-		{
-			var thisType = this.GetType();
-			var returnString = thisType.Name;
-			var types = new List<Type>() { typeof(LogMessage), thisType, typeof(Logger) };
-
-			LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			foreach (var type in types)
-			{
-				bool canSetFunction = logConfiguration.TrySetFormatFunctionForType(type, (msg) =>
-				{
-					return type.Name;
-				});
-
-				Assert.True(canSetFunction, "Could not set function for " + type.Name);
-			}
-
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
-
-			Assert.True(canGetFunction, "Could not get function for type");
-
-			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
-
-			Assert.Equal(returnString, formatString);
 		}
 	}
 }

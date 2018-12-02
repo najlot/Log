@@ -30,52 +30,6 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void PrototypesMustBeCopiedWithNewCategory()
-		{
-			bool gotLogMessage = false;
-			string category = null;
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Debug)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					category = msg.Category;
-					gotLogMessage = true;
-				}));
-
-			var thisType = this.GetType();
-			var syncExecutionMiddlewareType = typeof(SyncExecutionMiddleware);
-
-			var logForThis = logAdminitrator.GetLogger(thisType);
-			var logForPool = logAdminitrator.GetLogger(syncExecutionMiddlewareType);
-
-			logForThis.Info("log this");
-
-			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType.FullName, category);
-
-			gotLogMessage = false;
-			category = null;
-
-			logForPool.Info("log pool");
-
-			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
-			Assert.Equal(syncExecutionMiddlewareType.FullName, category);
-
-			logForThis = logAdminitrator.GetLogger(thisType);
-
-			gotLogMessage = false;
-			category = null;
-
-			logForThis.Info("log this 2");
-
-			Assert.True(gotLogMessage, "got no log message for this type");
-			Assert.Equal(thisType.FullName, category);
-		}
-
-		[Fact]
 		public void MultiplePrototypesMustBeCopiedWithNewCategory()
 		{
 			bool gotLogMessage = false;
@@ -110,6 +64,52 @@ namespace Najlot.Log.Tests
 
 			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
 			Assert.Equal(logAdminitratorType.FullName, category);
+
+			logForThis = logAdminitrator.GetLogger(thisType);
+
+			gotLogMessage = false;
+			category = null;
+
+			logForThis.Info("log this 2");
+
+			Assert.True(gotLogMessage, "got no log message for this type");
+			Assert.Equal(thisType.FullName, category);
+		}
+
+		[Fact]
+		public void PrototypesMustBeCopiedWithNewCategory()
+		{
+			bool gotLogMessage = false;
+			string category = null;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Debug)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					category = msg.Category;
+					gotLogMessage = true;
+				}));
+
+			var thisType = this.GetType();
+			var syncExecutionMiddlewareType = typeof(SyncExecutionMiddleware);
+
+			var logForThis = logAdminitrator.GetLogger(thisType);
+			var logForPool = logAdminitrator.GetLogger(syncExecutionMiddlewareType);
+
+			logForThis.Info("log this");
+
+			Assert.True(gotLogMessage, "got no log message for this type");
+			Assert.Equal(thisType.FullName, category);
+
+			gotLogMessage = false;
+			category = null;
+
+			logForPool.Info("log pool");
+
+			Assert.True(gotLogMessage, "got no log message for LoggerPool-type");
+			Assert.Equal(syncExecutionMiddlewareType.FullName, category);
 
 			logForThis = logAdminitrator.GetLogger(thisType);
 

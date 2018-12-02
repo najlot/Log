@@ -66,33 +66,6 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void AsynchronousMessagesShouldNotGetLostWithTaskExecutionMiddleware()
-		{
-			long executionsDone = 0;
-			long executionsLogged = 0;
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetExecutionMiddleware<TaskExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					Interlocked.Increment(ref executionsLogged);
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			Parallel.For(0, 100000, nr =>
-			{
-				Interlocked.Increment(ref executionsDone);
-				log.Info(nr);
-			});
-
-			log.Flush();
-
-			Assert.Equal(executionsDone, executionsLogged);
-		}
-
-		[Fact]
 		public void AsynchronousMessagesShouldNotGetLostWhenDequeueWithMultipleDestinations()
 		{
 			long executionsDone = 0;
@@ -121,6 +94,80 @@ namespace Najlot.Log.Tests
 			log.Flush();
 
 			Assert.Equal(executionsDone * 2, executionsLogged);
+		}
+
+		[Fact]
+		public void AsynchronousMessagesShouldNotGetLostWithTaskExecutionMiddleware()
+		{
+			long executionsDone = 0;
+			long executionsLogged = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetExecutionMiddleware<TaskExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					Interlocked.Increment(ref executionsLogged);
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			Parallel.For(0, 100000, nr =>
+			{
+				Interlocked.Increment(ref executionsDone);
+				log.Info(nr);
+			});
+
+			log.Flush();
+
+			Assert.Equal(executionsDone, executionsLogged);
+		}
+		[Fact]
+		public void MiddlewareCanBeChangedWhileExecuting()
+		{
+			bool removingError = false;
+			int executionsExpected = 10000;
+			int executionsActual = 0;
+			List<string> messages = new List<string>();
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
+
+					bool couldRemove = false;
+
+					lock (messages) couldRemove = messages.Remove(logMessageActual);
+
+					if (removingError) return;
+					removingError = !couldRemove;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
+
+			for (int i = 0; i < executionsExpected * 2; i++)
+			{
+				lock (messages) messages.Add(i.ToString());
+			}
+
+			for (int i = 0; i < executionsExpected; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
+
+			for (int i = executionsExpected; i < executionsExpected * 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			Assert.Equal(executionsExpected * 2, executionsActual);
+			Assert.False(removingError, "got removing errors");
 		}
 
 		[Fact]
@@ -206,6 +253,53 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void TaskExecutionMiddlewareMustFinishWithoutFlush()
+		{
+			bool removingError = false;
+			int executionsExpected = 10;
+			int executionsActual = 0;
+			List<string> messages = new List<string>();
+			var manualResetEventSlim = new ManualResetEventSlim(false);
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+					var logMessageActual = msg.Message.ToString();
+					bool couldRemove = messages.Remove(logMessageActual);
+
+					if (removingError) return;
+					removingError = !couldRemove;
+
+					if (executionsActual == executionsExpected)
+					{
+						manualResetEventSlim.Set();
+					}
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
+
+			for (int i = 0; i < executionsExpected; i++)
+			{
+				messages.Add(i.ToString());
+			}
+
+			for (int i = 0; i < executionsExpected; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			manualResetEventSlim.Wait(5000);
+
+			Assert.Equal(executionsExpected, executionsActual);
+			Assert.False(removingError, "got removing errors");
+		}
+
+		[Fact]
 		public void TaskExecutionMiddlewareMustNotLooseMessages()
 		{
 			int executionsExpected = 10;
@@ -279,101 +373,6 @@ namespace Najlot.Log.Tests
 			logAdminitrator.Flush();
 
 			Assert.Equal(executionsExpected, executionsActual);
-		}
-
-		[Fact]
-		public void TaskExecutionMiddlewareMustFinishWithoutFlush()
-		{
-			bool removingError = false;
-			int executionsExpected = 10;
-			int executionsActual = 0;
-			List<string> messages = new List<string>();
-			var manualResetEventSlim = new ManualResetEventSlim(false);
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
-					bool couldRemove = messages.Remove(logMessageActual);
-
-					if (removingError) return;
-					removingError = !couldRemove;
-
-					if (executionsActual == executionsExpected)
-					{
-						manualResetEventSlim.Set();
-					}
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
-
-			for (int i = 0; i < executionsExpected; i++)
-			{
-				messages.Add(i.ToString());
-			}
-
-			for (int i = 0; i < executionsExpected; i++)
-			{
-				log.Info(i.ToString());
-			}
-
-			manualResetEventSlim.Wait(5000);
-
-			Assert.Equal(executionsExpected, executionsActual);
-			Assert.False(removingError, "got removing errors");
-		}
-
-		[Fact]
-		public void MiddlewareCanBeChangedWhileExecuting()
-		{
-			bool removingError = false;
-			int executionsExpected = 10000;
-			int executionsActual = 0;
-			List<string> messages = new List<string>();
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
-
-					bool couldRemove = false;
-
-					lock (messages) couldRemove = messages.Remove(logMessageActual);
-
-					if (removingError) return;
-					removingError = !couldRemove;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
-
-			for (int i = 0; i < executionsExpected * 2; i++)
-			{
-				lock (messages) messages.Add(i.ToString());
-			}
-
-			for (int i = 0; i < executionsExpected; i++)
-			{
-				log.Info(i.ToString());
-			}
-
-			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
-
-			for (int i = executionsExpected; i < executionsExpected * 2; i++)
-			{
-				log.Info(i.ToString());
-			}
-
-			Assert.Equal(executionsExpected * 2, executionsActual);
-			Assert.False(removingError, "got removing errors");
 		}
 	}
 }

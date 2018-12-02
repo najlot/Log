@@ -8,27 +8,6 @@ namespace Najlot.Log.Tests
 	public class ConfigurationObserverTests
 	{
 		[Fact]
-		public void ConfigurationMustNotifyOnLogLevelChanged()
-		{
-			var observerNotified = false;
-
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Debug)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			var configurationChangedObserverMock = new ConfigurationChangedObserverMock(config =>
-			{
-				observerNotified = true;
-			});
-
-			logConfiguration.AttachObserver(configurationChangedObserverMock);
-			logAdminitrator.SetLogLevel(LogLevel.Error);
-
-			Assert.True(observerNotified, "Observer was not notified");
-		}
-
-		[Fact]
 		public void ConfigurationMustNotifyOnExecutionMiddlewareChanged()
 		{
 			bool observerNotified = false;
@@ -50,6 +29,26 @@ namespace Najlot.Log.Tests
 			Assert.True(observerNotified, "Observer was not notified on middleware changed");
 		}
 
+		[Fact]
+		public void ConfigurationMustNotifyOnLogLevelChanged()
+		{
+			var observerNotified = false;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Debug)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			var configurationChangedObserverMock = new ConfigurationChangedObserverMock(config =>
+			{
+				observerNotified = true;
+			});
+
+			logConfiguration.AttachObserver(configurationChangedObserverMock);
+			logAdminitrator.SetLogLevel(LogLevel.Error);
+
+			Assert.True(observerNotified, "Observer was not notified");
+		}
 		[Fact]
 		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwiceButOnce()
 		{

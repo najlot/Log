@@ -6,10 +6,6 @@ using Najlot.Log.Tests.Mocks;
 using System.IO;
 using Xunit;
 
-namespace Najlot.Log.Tests.Mocks
-{
-}
-
 namespace Najlot.Log.Tests
 {
 	public class ExtensionsLoggingTests

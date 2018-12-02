@@ -11,14 +11,10 @@ namespace Najlot.Log.Tests
 	public class FileConfigurationTests
 	{
 		[Fact]
-		public void ExtensionMustReadLogLevelFromConfigurationFile()
+		public void ApplicationMustNotDieOnBadConfigurationFile()
 		{
-			const string configPath = "LogConfigurationToRead.config";
-			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
-				"</NajlotLogConfiguration>";
+			const string configPath = "BadLogConfiguration.config";
+			var content = "<?xml version=\"1.0\" encod";
 
 			if (File.Exists(configPath))
 			{
@@ -31,8 +27,24 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+		}
 
-			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
+		[Fact]
+		public void ApplicationMustNotDieOnBadConfigurationPath()
+		{
+			// Very bad path :)
+			const string configPath = "::::";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
 		}
 
 		[Fact]
@@ -58,6 +70,49 @@ namespace Najlot.Log.Tests
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
 			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+		}
+
+		[Fact]
+		public void ExtensionMustReadLogLevelFromConfigurationFile()
+		{
+			const string configPath = "LogConfigurationToRead.config";
+			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+					"<LogLevel>Error</LogLevel>" +
+					"<ExecutionMiddleware>Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+				"</NajlotLogConfiguration>";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			File.WriteAllText(configPath, content);
+
+			LogAdminitrator
+				.CreateNew()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
+				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+
+			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
+		}
+		[Fact]
+		public void ExtensionMustWriteExampleFile()
+		{
+			const string configPath = "LogConfigurationExamle.config";
+
+			if (File.Exists(configPath))
+			{
+				File.Delete(configPath);
+			}
+
+			LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
+
+			Assert.True(File.Exists(configPath));
 		}
 
 		[Fact]
@@ -164,62 +219,6 @@ namespace Najlot.Log.Tests
 			File.Delete(configPath);
 
 			Thread.Sleep(300);
-		}
-
-		[Fact]
-		public void ExtensionMustWriteExampleFile()
-		{
-			const string configPath = "LogConfigurationExamle.config";
-
-			if (File.Exists(configPath))
-			{
-				File.Delete(configPath);
-			}
-
-			LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
-
-			Assert.True(File.Exists(configPath));
-		}
-
-		[Fact]
-		public void ApplicationMustNotDieOnBadConfigurationPath()
-		{
-			// Very bad path :)
-			const string configPath = "::::";
-
-			if (File.Exists(configPath))
-			{
-				File.Delete(configPath);
-			}
-
-			LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
-		}
-
-		[Fact]
-		public void ApplicationMustNotDieOnBadConfigurationFile()
-		{
-			const string configPath = "BadLogConfiguration.config";
-			var content = "<?xml version=\"1.0\" encod";
-
-			if (File.Exists(configPath))
-			{
-				File.Delete(configPath);
-			}
-
-			File.WriteAllText(configPath, content);
-
-			LogAdminitrator
-				.CreateNew()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 		}
 	}
 }
