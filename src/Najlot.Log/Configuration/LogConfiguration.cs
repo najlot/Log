@@ -58,7 +58,7 @@ namespace Najlot.Log.Configuration
 					return;
 				}
 
-				if (executionMiddlewareType.FullName != value.GetType().FullName)
+				if (executionMiddlewareType.FullName != value.FullName)
 				{
 					executionMiddlewareType = value;
 					NotifyObservers();
