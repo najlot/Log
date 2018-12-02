@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Najlot.Log.Util
+namespace Najlot.Log.Configuration.FileSource
 {
-	public sealed class CustomStringWriter : StringWriter
+	internal sealed class CustomStringWriter : StringWriter
 	{
 		private readonly Encoding _encoding;
 
