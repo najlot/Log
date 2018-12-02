@@ -48,7 +48,7 @@ namespace Najlot.Log
 			logConfiguration = _logConfiguration;
 			return this;
 		}
-		
+
 		/// <summary>
 		/// Sets the LogLevel of the LogConfiguration.
 		/// </summary>
@@ -68,7 +68,7 @@ namespace Najlot.Log
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
 			this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
-			
+
 			return this;
 		}
 

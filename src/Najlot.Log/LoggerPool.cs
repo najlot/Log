@@ -89,10 +89,10 @@ namespace Najlot.Log
 				return _logDestinations;
 			}
 		}
-		
+
 		internal void Flush()
 		{
-			foreach(var destination in GetLogDestinations())
+			foreach (var destination in GetLogDestinations())
 			{
 				destination.ExecutionMiddleware.Flush();
 			}

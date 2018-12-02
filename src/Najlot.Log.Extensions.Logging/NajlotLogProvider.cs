@@ -23,7 +23,7 @@ namespace Najlot.Log.Extensions.Logging
 			if (!_disposed)
 			{
 				_disposed = true;
-				
+
 				_logAdminitrator.Dispose();
 				_logAdminitrator = null;
 			}

@@ -25,7 +25,7 @@ namespace Najlot.Log.Tests
 			{
 				var logger = logAdminitrator.GetLogger("1");
 				var logger2 = logAdminitrator.GetLogger("2");
-				
+
 				// Check there are no exceptions when used wrong
 				logAdminitrator.Dispose();
 			}

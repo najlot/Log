@@ -11,7 +11,7 @@ namespace Najlot.Log.Extensions.Logging
 			var admin = LogAdminitrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-			
+
 			configure(admin);
 
 			return builder.AddNajlotLog(admin);

@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Middleware;
-using Najlot.Log.Util;
+﻿using Najlot.Log.Util;
 using System;
 using System.IO;
 using System.Text;
@@ -151,7 +150,7 @@ namespace Najlot.Log.Configuration.FileSource
 			{
 				return;
 			}
-			
+
 			logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
 		}
 	}

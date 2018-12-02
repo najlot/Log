@@ -143,7 +143,7 @@ namespace Najlot.Log.Tests
 			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
 
 			logger.Info(logMessageExpected);
-			
+
 			Assert.True(loggerGotAction, "Logger did not got the action");
 			Assert.Equal(logMessageExpected, logMessageActual);
 		}
@@ -262,7 +262,7 @@ namespace Najlot.Log.Tests
 			var log = logAdminitrator.GetLogger(this.GetType());
 
 			logAdminitrator.SetExecutionMiddleware<TaskExecutionMiddleware>();
-			
+
 			for (int i = 0; i < executionsExpected; i++)
 			{
 				messages.Add(i.ToString());
@@ -366,7 +366,7 @@ namespace Najlot.Log.Tests
 			}
 
 			logAdminitrator.SetExecutionMiddleware<SyncExecutionMiddleware>();
-			
+
 			for (int i = executionsExpected; i < executionsExpected * 2; i++)
 			{
 				log.Info(i.ToString());

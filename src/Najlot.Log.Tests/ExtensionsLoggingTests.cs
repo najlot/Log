@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Najlot.Log.Configuration;
 using Najlot.Log.Extensions.Logging;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
@@ -36,19 +35,19 @@ namespace Najlot.Log.Tests
 				logAdminitrator.SetLogLevel(LogLevel.Debug);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
-				
+
 				logAdminitrator.SetLogLevel(LogLevel.Info);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
-				
+
 				logAdminitrator.SetLogLevel(LogLevel.Warn);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
-				
+
 				logAdminitrator.SetLogLevel(LogLevel.Error);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
-				
+
 				logAdminitrator.SetLogLevel(LogLevel.Fatal);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical));

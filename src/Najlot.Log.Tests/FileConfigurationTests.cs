@@ -101,15 +101,15 @@ namespace Najlot.Log.Tests
 			File.WriteAllText(configPath, newContent);
 			var stopwatch = Stopwatch.StartNew();
 
-			while (stopwatch.ElapsedMilliseconds < 5000 && 
-				( logConfiguration.LogLevel == LogLevel.Error || 
+			while (stopwatch.ElapsedMilliseconds < 5000 &&
+				(logConfiguration.LogLevel == LogLevel.Error ||
 				typeof(TaskExecutionMiddleware).FullName == logConfiguration.ExecutionMiddleware.GetType().FullName))
 			{
 				Thread.Sleep(10);
 			}
 
 			stopwatch.Stop();
-			
+
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
 			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddleware.GetType().FullName);
 
