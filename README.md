@@ -77,7 +77,9 @@ class Program
 		  // write an example file when not found,
 		  // listen for and apply changes to all loggers, 
 		  // without restarting your application.
-		  .ReadConfigurationFromXmlFile("Najlot.Log.config", listenForChanges: true, writeExampleIfSourceDoesNotExists: true);
+		  .ReadConfigurationFromXmlFile("Najlot.Log.config", 
+			listenForChanges: true, 
+			writeExampleIfSourceDoesNotExists: true);
 
 		// Take specific logger.
 		Logger log = LogAdminitrator.Instance.GetLogger(typeof(Program));
