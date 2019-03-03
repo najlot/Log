@@ -55,6 +55,11 @@ namespace Najlot.Log.Tests
 		{
 			var logFile = "LoggerFactoryExtension.log";
 
+			if(File.Exists(logFile))
+			{
+				File.Delete(logFile);
+			}
+
 			using (var loggerFactory = new LoggerFactory())
 			{
 				loggerFactory.AddNajlotLog((configurator) =>
@@ -104,11 +109,17 @@ namespace Najlot.Log.Tests
 				Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
 			}
 		}
-
+		
 		[Fact]
 		public void LoggingBuilderExtensionMustLogCorrect()
 		{
 			var logFile = "LoggingBuilderExtension.log";
+
+			if (File.Exists(logFile))
+			{
+				File.Delete(logFile);
+			}
+
 			var services = new ServiceCollection();
 
 			services.AddLogging(loggerBuilder =>
