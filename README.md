@@ -7,119 +7,117 @@ Simple and yet powerful logging library with performance and extensibility in mi
 ### Getting started:
 You can start with just two lines of code:
 ```csharp
-LogConfigurator.Instance.GetLoggerPool(out LoggerPool loggerPool);
-loggerPool.GetLogger(this.GetType()).Info("Hello, World!");
+var log = LogAdminitrator.Instance.AddConsoleLogDestination().GetLogger(typeof(Program));
+log.Info("Hello, World");
 ```
-The logger does not know any destinations to log to and will log to console, starting with the "Debug" logging level.
 
 You can set the logging level on initialization and may change it later:
 ```csharp
-LogConfigurator.Instance
-  .SetLogLevel(LogLevel.Trace)
-  .GetLoggerPool(out LoggerPool loggerPool)
-  .GetLogConfiguration(out ILogConfiguration logConfiguration);
+LogAdminitrator.Instance
+	.AddConsoleLogDestination(useColors: true)
+	.SetLogLevel(LogLevel.Trace);
 
-var log = loggerPool.GetLogger(this.GetType());
+var log = LogAdminitrator.Instance.GetLogger(typeof(Program));
 
 log.Info("Hello, World!");
 
-logConfiguration.LogLevel = LogLevel.Warn;
+LogAdminitrator.Instance.SetLogLevel(LogLevel.Warn);
 log.Info("This message will not be logged.");
 ```
 
 You may set up file and console destinations, 
 tell the logger to use custom formatting function for console destination and log asynchronous (Putting the writing in a Task):
 ```csharp
-LogConfigurator.Instance
-  .SetExecutionMiddleware<TaskExecutionMiddleware>()
-  .AddConsoleLogDestination(message =>
-  {
-    return $"{message.DateTime} {message.Message} {message.Exception}";
-  })
-  .AddFileLogDestination("log.txt")
-  .GetLoggerPool(out LoggerPool loggerPool)
-  .GetLogConfiguration(out ILogConfiguration logConfiguration);
+LogAdminitrator.Instance
+.SetExecutionMiddleware<TaskExecutionMiddleware>()
+.AddConsoleLogDestination(message =>
+{
+	return $"{message.DateTime} {message.Message} {message.Exception}";
+})
+.AddFileLogDestination("log.txt");
 ```
 
 When you need something, then there is an example of a lot of things that are implemented:
 ```csharp
+using Najlot.Log;
+using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
+using Najlot.Log.Configuration.FileSource;
+
 class Program
 {
-  // Function used to format the output for console.
-  private static string FormatForConsole(LogMessage message)
-  {
-    return $"{message.DateTime} {message.Message} {message.Exception}";
-  }
+	// Function used to format the output for console.
+	private static string FormatForConsole(LogMessage message)
+	{
+		return $"{message.DateTime} {message.Message} {message.Exception}";
+	}
 
-  static void Main(string[] args)
-  {
-    LogConfigurator.Instance
-      .GetLogConfiguration(out ILogConfiguration logConfiguration)
-      // Using synchronous or asynchronous middleware.
-      // You can not use both. The last one gets applied.
-      //.SetExecutionMiddleware<SyncExecutionMiddleware>()
-      .SetExecutionMiddleware<TaskExecutionMiddleware>()
+	static void Main(string[] args)
+	{
+		LogAdminitrator.Instance
+		  // Using synchronous or asynchronous middleware.
+		  // You can not use both. The last one gets applied.
+		  //.SetExecutionMiddleware<SyncExecutionMiddleware>()
+		  .SetExecutionMiddleware<TaskExecutionMiddleware>()
 
-      // Tell the logger to write to a file and
-      // calculate the file path it should write to.
-      .AddFileLogDestination(() =>
-      {
-        return $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.log";
-      })
+		  // Tell the logger to write to a file and
+		  // calculate the file path it should write to.
+		  .AddFileLogDestination(() =>
+		  {
+			  return $"{DateTime.UtcNow.ToString("yyyy-MM-dd")}.log";
+		  })
 
-      // Write to console using custom formatting and applying colors for different loglevels
-      .AddConsoleLogDestination(FormatForConsole, useColors: true)
+		  // Write to console using custom formatting and applying colors for different loglevels
+		  .AddConsoleLogDestination(FormatForConsole, useColors: true)
 
-      // Add a destination implemented below.
-      .AddCustomDestination(new DebugDestination(logConfiguration))
+		  // Add a destination implemented below.
+		  .AddCustomDestination(new DebugDestination())
+		  
+		  // Read configuration from an XML file,
+		  // write an example file when not found,
+		  // listen for and apply changes to all loggers, 
+		  // without restarting your application.
+		  .ReadConfigurationFromXmlFile("Najlot.Log.config", listenForChanges: true, writeExampleIfSourceDoesNotExists: true);
 
-      // Read configuration from an XML file,
-      // write an example file when not found,
-      // listen for and apply changes to all loggers, 
-      // without restarting your application.
-      .ReadConfigurationFromXmlFile("Najlot.Log.config", 
-        listenForChanges: true,
-        writeExampleIfSourceDoesNotExists: true)
+		// Take specific logger.
+		Logger log = LogAdminitrator.Instance.GetLogger(typeof(Program));
 
-      // Get the pool of loggers to take specific loggers from.
-      .GetLoggerPool(out LoggerPool loggerPool);
+		// Begin a scope of work
+		using (log.BeginScope("start up"))
+		{
+			log.Trace("Beginning to start...");
 
-    // Take specific logger.
-    Logger log = loggerPool.GetLogger(typeof(Program));
+			try
+			{
+				throw new NotImplementedException();
+			}
+			catch (Exception ex)
+			{
+				// Log a fatal error with the exception that caused the error.
+				log.Fatal("Could not start the application: ", ex);
+			}
+		}
 
-    // Begin a scope of work
-    using (log.BeginScope("start up"))
-    {
-      log.Trace("Beginning to start...");
+		log.Info("Press any key.");
 
-      try
-      {
-        throw new NotImplementedException();
-      }
-      catch (Exception ex)
-      {
-        // Log a fatal error with the exception that caused the error.
-        log.Fatal("Could not start the application: ", ex);
-      }
-    }
+		Console.Read();
 
-    log.Info("Press any key.");
-
-    Console.Read();
-  }
+		LogAdminitrator.Instance.Flush();
+	}
 }
 
 // Custom destination that writes to debug output.
-public class DebugDestination : LogDestinationBase
+public class DebugDestination : ILogDestination
 {
-  public DebugDestination(ILogConfiguration logConfiguration) : base(logConfiguration)
-  {
-  }
+	public void Dispose()
+	{
+		// Nothing to do
+	}
 
-  protected override void Log(LogMessage message)
-  {
-    System.Diagnostics.Debug.WriteLine(Format(message));
-  }
+	public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+	{
+		System.Diagnostics.Debug.WriteLine(formatFunc(message));
+	}
 }
 ```
 
@@ -132,12 +130,12 @@ using Najlot.Log.Extensions.Logging;
 
 var loggerFactory = new LoggerFactory();
 
-loggerFactory.AddNajlotLog((configurator) =>
+loggerFactory.AddNajlotLog(administrator =>
 {
-  configurator
-    .SetLogLevel(LogLevel.Info)
-    .AddConsoleLogDestination()
-    .AddFileLogDestination("log.txt");
+	administrator
+	  .SetLogLevel(LogLevel.Info)
+	  .AddConsoleLogDestination()
+	  .AddFileLogDestination("log.txt");
 });
 
 var logger = loggerFactory.CreateLogger("default");
