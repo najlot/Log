@@ -13,7 +13,7 @@ namespace Najlot.Log.Destinations
 	{
 		private readonly string NewLine = Environment.NewLine;
 		private Stream _stream = null;
-		private Encoding _encoding = Encoding.UTF8;
+		private readonly Encoding _encoding = Encoding.UTF8;
 
 		public readonly int MaxFiles;
 		public readonly string LogFilePaths = null;
@@ -34,7 +34,7 @@ namespace Najlot.Log.Destinations
 			EnsureDirectoryExists(path);
 			FilePath = path;
 
-			SetStream(new FileStream(path, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
 			
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
@@ -55,7 +55,7 @@ namespace Najlot.Log.Destinations
 					EnsureDirectoryExists(path);
 					if (AutoCleanUp) cleanUp = true;
 					
-					SetStream(new FileStream(path, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
 				}
 				
 				Write(formatFunc(message) + NewLine);
