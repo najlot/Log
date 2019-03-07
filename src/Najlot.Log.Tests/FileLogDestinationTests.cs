@@ -65,23 +65,24 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName);
-
-			var logForThis = logAdminitrator.GetLogger(this.GetType());
-			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
 
-			logForThis.Info(contentThis);
-			logForPool.Warn(contentPool);
+			using (var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(fileName))
+			{
+				var logForThis = logAdminitrator.GetLogger(this.GetType());
+				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
+				
+				logForThis.Info(contentThis);
+				logForPool.Warn(contentPool);
 
-			Assert.True(File.Exists(fileName), $"File {fileName} not found.");
-
+				Assert.True(File.Exists(fileName), $"File {fileName} not found.");
+			}
+			
 			var content = File.ReadAllText(fileName);
 
 			Assert.NotEqual(-1, content.IndexOf(contentThis));
@@ -99,20 +100,17 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName);
+				.AddFileLogDestination(fileName))
+			{
+				var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
 
-			var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
-
-			logger.Info("...");
-
-			Directory.Delete(dir, true);
-
-			logger.Info("This must recreate the directory.");
-
+				logger.Info("This must create the directory.");
+			}
+			
 			Assert.True(Directory.Exists(dir));
 		}
 
@@ -135,7 +133,12 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir2, true);
 			}
 
-			var logAdminitrator = LogAdminitrator
+			var contentThis = "logForThis . Info";
+			var contentPool = "logForPool.Warn";
+
+			bool logged = false;
+
+			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -143,26 +146,22 @@ namespace Najlot.Log.Tests
 				{
 					var fileInfo = new FileInfo(fileName1);
 
-					if (fileInfo.Exists)
+					if (logged)
 					{
-						if (fileInfo.Length > 0)
-						{
-							return fileName2;
-						}
+						return fileName2;
 					}
 
 					return fileName1;
-				});
-
-			var logForThis = logAdminitrator.GetLogger(this.GetType());
-			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-
-			var contentThis = "logForThis . Info";
-			var contentPool = "logForPool.Warn";
-
-			logForThis.Info(contentThis);
-			logForPool.Warn(contentPool);
-
+				}))
+			{
+				var logForThis = logAdminitrator.GetLogger(this.GetType());
+				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
+				
+				logForThis.Info(contentThis);
+				logged = true;
+				logForPool.Warn(contentPool);
+			}
+			
 			Assert.True(File.Exists(fileName1), $"File {fileName1} not found.");
 			Assert.True(File.Exists(fileName2), $"File {fileName2} not found.");
 
@@ -183,21 +182,22 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			var logAdminitrator = LogAdminitrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName);
-
-			var logForThis = logAdminitrator.GetLogger(this.GetType());
-			var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
 
-			logForThis.Info(contentThis);
-			logForPool.Warn(contentPool);
-
+			using (var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddFileLogDestination(fileName))
+			{
+				var logForThis = logAdminitrator.GetLogger(this.GetType());
+				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
+				
+				logForThis.Info(contentThis);
+				logForPool.Warn(contentPool);
+			}
+			
 			Assert.True(File.Exists(fileName), $"File {fileName} not found.");
 
 			var content = File.ReadAllText(fileName);

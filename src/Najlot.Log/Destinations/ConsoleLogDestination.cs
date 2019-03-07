@@ -57,8 +57,8 @@ namespace Najlot.Log.Destinations
 				}
 			}
 
-			Console.WriteLine(formatFunc(message));
-
+			Console.Out.WriteLine(formatFunc(message));
+			
 			if (UseColors)
 			{
 				Console.ForegroundColor = DefaultColor;

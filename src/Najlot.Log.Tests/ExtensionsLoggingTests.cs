@@ -89,25 +89,25 @@ namespace Najlot.Log.Tests
 					logger.LogTrace("Trace logged with scope!");
 					logger.LogWarning("Warning logged with scope!");
 				}
-
-				var content = File.ReadAllText(logFile);
-
-				Assert.NotEqual(-1, content.IndexOf("Critical logged!"));
-				Assert.NotEqual(-1, content.IndexOf("Debug logged!"));
-				Assert.NotEqual(-1, content.IndexOf("Error logged!"));
-				Assert.NotEqual(-1, content.IndexOf("Info logged!"));
-				Assert.NotEqual(-1, content.IndexOf("Trace logged!"));
-				Assert.NotEqual(-1, content.IndexOf("Warning logged!"));
-
-				Assert.NotEqual(-1, content.IndexOf("My Scope"));
-
-				Assert.NotEqual(-1, content.IndexOf("Critical logged with scope!"));
-				Assert.NotEqual(-1, content.IndexOf("Debug logged with scope!"));
-				Assert.NotEqual(-1, content.IndexOf("Error logged with scope!"));
-				Assert.NotEqual(-1, content.IndexOf("Info logged with scope!"));
-				Assert.NotEqual(-1, content.IndexOf("Trace logged with scope!"));
-				Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
 			}
+
+			var content = File.ReadAllText(logFile);
+
+			Assert.NotEqual(-1, content.IndexOf("Critical logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Debug logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Error logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Info logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Trace logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Warning logged!"));
+
+			Assert.NotEqual(-1, content.IndexOf("My Scope"));
+
+			Assert.NotEqual(-1, content.IndexOf("Critical logged with scope!"));
+			Assert.NotEqual(-1, content.IndexOf("Debug logged with scope!"));
+			Assert.NotEqual(-1, content.IndexOf("Error logged with scope!"));
+			Assert.NotEqual(-1, content.IndexOf("Info logged with scope!"));
+			Assert.NotEqual(-1, content.IndexOf("Trace logged with scope!"));
+			Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
 		}
 		
 		[Fact]
@@ -122,11 +122,15 @@ namespace Najlot.Log.Tests
 
 			var services = new ServiceCollection();
 
+			LogAdminitrator logAdminitrator = null;
+
 			services.AddLogging(loggerBuilder =>
 			{
 				loggerBuilder.AddNajlotLog((configurator) =>
 				{
-					configurator
+					logAdminitrator = configurator;
+
+					logAdminitrator
 						.SetLogLevel(LogLevel.Trace)
 						.SetExecutionMiddleware<SyncExecutionMiddleware>()
 						.AddFileLogDestination(logFile);
@@ -139,6 +143,8 @@ namespace Najlot.Log.Tests
 
 			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
 			service.GetLogger().LogInformation("Logger created!");
+
+			logAdminitrator.Dispose();
 
 			var content = File.ReadAllText(logFile);
 

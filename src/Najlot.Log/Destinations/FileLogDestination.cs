@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Najlot.Log.Destinations
 {
@@ -11,14 +12,16 @@ namespace Najlot.Log.Destinations
 	public sealed class FileLogDestination : ILogDestination
 	{
 		private readonly string NewLine = Environment.NewLine;
+		private Stream _stream = null;
+		private Encoding _encoding = Encoding.UTF8;
 
 		public readonly int MaxFiles;
 		public readonly string LogFilePaths = null;
 		public readonly bool AutoCleanUp;
-
-		public string FilePath { get; private set; }
 		public readonly Func<string> GetPath;
 
+		public string FilePath { get; private set; }
+		
 		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths)
 		{
 			GetPath = getPath;
@@ -30,27 +33,33 @@ namespace Najlot.Log.Destinations
 			var path = GetPath();
 			EnsureDirectoryExists(path);
 			FilePath = path;
+
+			SetStream(new FileStream(path, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+			
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
-
+		
 		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
 		{
 			var path = GetPath();
 			bool cleanUp = false;
-
-			if (FilePath != path)
-			{
-				FilePath = path;
-				EnsureDirectoryExists(path);
-				if (AutoCleanUp) cleanUp = true;
-			}
-
+			
 			// Ensure directory is created when the path changes,
 			// but try to create when DirectoryNotFoundException occurs
 			// The directory could be deleted by the user in the meantime...
 			try
 			{
-				File.AppendAllText(FilePath, formatFunc(message) + NewLine);
+				if (FilePath != path)
+				{
+					FilePath = path;
+					EnsureDirectoryExists(path);
+					if (AutoCleanUp) cleanUp = true;
+					
+					SetStream(new FileStream(path, FileMode.OpenOrCreate | FileMode.Append, FileAccess.Write));
+				}
+				
+				Write(formatFunc(message) + NewLine);
+				
 				if (cleanUp) CleanUpOldFiles(path);
 			}
 			catch (DirectoryNotFoundException)
@@ -58,7 +67,7 @@ namespace Najlot.Log.Destinations
 				EnsureDirectoryExists(path);
 			}
 		}
-
+		
 		private void CleanUpOldFiles(string path)
 		{
 			try
@@ -82,20 +91,9 @@ namespace Najlot.Log.Destinations
 					return;
 				}
 
-				logFilePathsList = logFilePathsList.Where(p =>
-				{
-					if (string.IsNullOrWhiteSpace(p))
-					{
-						return false;
-					}
-
-					if (!File.Exists(p))
-					{
-						return false;
-					}
-
-					return true;
-				}).Distinct().ToList();
+				logFilePathsList = logFilePathsList
+					.Where(p => !string.IsNullOrWhiteSpace(p) || File.Exists(p))
+					.Distinct().ToList();
 
 				while (logFilePathsList.Count > MaxFiles)
 				{
@@ -131,10 +129,44 @@ namespace Najlot.Log.Destinations
 				}
 			}
 		}
+		
+		private void SetStream(Stream stream)
+		{
+			_stream?.Dispose();
+			_stream = stream;
+		}
+
+		private void Write(byte[] bytes)
+		{
+			_stream.Write(bytes, 0, bytes.Length);
+		}
+
+		private void Write(string msg)
+		{
+			Write(_encoding.GetBytes(msg));
+		}
+
+		#region IDisposable Support
+		private bool disposedValue = false; // To detect redundant calls
+
+		public void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					_stream?.Dispose();
+					_stream = null;
+				}
+
+				disposedValue = true;
+			}
+		}
 
 		public void Dispose()
 		{
-			// Nothing to dispose
+			Dispose(true);
 		}
+		#endregion
 	}
 }
