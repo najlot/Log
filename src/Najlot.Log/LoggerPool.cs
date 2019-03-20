@@ -3,6 +3,7 @@ using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Najlot.Log
 {
@@ -15,6 +16,8 @@ namespace Najlot.Log
 		/// Static LoggerPool instance
 		/// </summary>
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
+
+		private readonly ReaderWriterLockSlim _logDestinationsLock = new ReaderWriterLockSlim();
 
 		private ILogConfiguration _logConfiguration;
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
@@ -32,7 +35,16 @@ namespace Najlot.Log
 
 			_logConfiguration.AttachObserver(entry);
 
-			lock (_logDestinations) _logDestinations.Add(entry);
+			_logDestinationsLock.EnterWriteLock();
+
+			try
+			{
+				_logDestinations.Add(entry);
+			}
+			finally
+			{
+				_logDestinationsLock.ExitWriteLock();
+			}
 
 			hasLogdestinationsAdded = true;
 		}
@@ -64,9 +76,15 @@ namespace Najlot.Log
 				};
 			}
 
-			lock (_logDestinations)
+			_logDestinationsLock.EnterReadLock();
+
+			try
 			{
 				return _logDestinations;
+			}
+			finally
+			{
+				_logDestinationsLock.ExitReadLock();
 			}
 		}
 
@@ -94,13 +112,10 @@ namespace Najlot.Log
 					return logger;
 				}
 
-				lock (_logDestinations)
+				if (!hasLogdestinationsAdded)
 				{
-					if (_logDestinations.Count == 0)
-					{
-						// There are no log destinations specified: Creating console log destination
-						AddLogDestination(new ConsoleLogDestination(false));
-					}
+					// There are no log destinations specified: Creating console log destination
+					AddLogDestination(new ConsoleLogDestination(false));
 				}
 
 				var logExecutor = new LogExecutor(category, this);
