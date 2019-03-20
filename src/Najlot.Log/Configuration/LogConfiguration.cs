@@ -1,7 +1,7 @@
 ﻿using Najlot.Log.Middleware;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Najlot.Log.Configuration
 {
@@ -52,7 +52,7 @@ namespace Najlot.Log.Configuration
 
 				Type iExecutionMiddlewareType = typeof(IExecutionMiddleware);
 
-				if(value.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
+				if (value.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
 				{
 					Console.WriteLine("Najlot.Log: New execution middleware does not implement " + iExecutionMiddlewareType.Name);
 					return;

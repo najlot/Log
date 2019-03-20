@@ -21,7 +21,7 @@ namespace Najlot.Log.Destinations
 		public readonly Func<string> GetPath;
 
 		public string FilePath { get; private set; }
-		
+
 		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths)
 		{
 			GetPath = getPath;
@@ -35,15 +35,15 @@ namespace Najlot.Log.Destinations
 			FilePath = path;
 
 			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
-			
+
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
-		
+
 		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
 		{
 			var path = GetPath();
 			bool cleanUp = false;
-			
+
 			// Ensure directory is created when the path changes,
 			// but try to create when DirectoryNotFoundException occurs
 			// The directory could be deleted by the user in the meantime...
@@ -54,12 +54,12 @@ namespace Najlot.Log.Destinations
 					FilePath = path;
 					EnsureDirectoryExists(path);
 					if (AutoCleanUp) cleanUp = true;
-					
+
 					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
 				}
-				
+
 				Write(formatFunc(message) + NewLine);
-				
+
 				if (cleanUp) CleanUpOldFiles(path);
 			}
 			catch (DirectoryNotFoundException)
@@ -67,7 +67,7 @@ namespace Najlot.Log.Destinations
 				EnsureDirectoryExists(path);
 			}
 		}
-		
+
 		private void CleanUpOldFiles(string path)
 		{
 			try
@@ -129,7 +129,7 @@ namespace Najlot.Log.Destinations
 				}
 			}
 		}
-		
+
 		private void SetStream(Stream stream)
 		{
 			_stream?.Dispose();
@@ -147,6 +147,7 @@ namespace Najlot.Log.Destinations
 		}
 
 		#region IDisposable Support
+
 		private bool disposedValue = false; // To detect redundant calls
 
 		public void Dispose(bool disposing)
@@ -167,6 +168,7 @@ namespace Najlot.Log.Destinations
 		{
 			Dispose(true);
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

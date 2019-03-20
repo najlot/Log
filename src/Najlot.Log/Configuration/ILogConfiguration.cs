@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Middleware;
-using System;
+﻿using System;
 
 namespace Najlot.Log.Configuration
 {
