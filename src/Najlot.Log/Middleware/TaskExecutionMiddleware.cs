@@ -66,7 +66,7 @@ namespace Najlot.Log.Middleware
 
 					while (ex != null)
 					{
-						Console.WriteLine(ex.ToString());
+						Console.WriteLine(ex);
 						ex = ex.InnerException;
 					}
 				}

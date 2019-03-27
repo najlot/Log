@@ -80,7 +80,6 @@ namespace Najlot.Log
 		public LogAdminitrator SetExecutionMiddlewareByType(Type middlewareType)
 		{
 			this.Flush();
-
 			_logConfiguration.ExecutionMiddlewareType = middlewareType;
 			return this;
 		}
@@ -183,13 +182,13 @@ namespace Najlot.Log
 
 		#region IDisposable Support
 
-		private bool disposedValue = false; // To detect redundant calls
+		private bool _disposedValue = false; // To detect redundant calls
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

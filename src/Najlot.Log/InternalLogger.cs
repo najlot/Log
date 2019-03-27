@@ -87,13 +87,13 @@ namespace Najlot.Log
 
 		#region IDisposable Support
 
-		private bool disposedValue = false;
+		private bool _disposedValue = false;
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

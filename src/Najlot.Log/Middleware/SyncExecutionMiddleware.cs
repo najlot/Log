@@ -16,14 +16,14 @@ namespace Najlot.Log.Middleware
 			{
 				lock (_lock) execute();
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
 				Console.Write("Najlot.Log.Middleware.SyncExecutionMiddleware: ");
 
-				while (exception != null)
+				while (ex != null)
 				{
-					Console.WriteLine($"{exception}");
-					exception = exception.InnerException;
+					Console.WriteLine(ex);
+					ex = ex.InnerException;
 				}
 			}
 		}

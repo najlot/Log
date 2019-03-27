@@ -17,12 +17,12 @@ namespace Najlot.Log
 		/// </summary>
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
 
-		private readonly ReaderWriterLockSlim _logDestinationsLock = new ReaderWriterLockSlim();
-
 		private ILogConfiguration _logConfiguration;
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
+		private List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
 		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
-		private bool hasLogdestinationsAdded = false;
+		private bool _hasLogdestinationsAdded = false;
+		private bool _hasLogdestinationsPending = false;
 
 		internal LoggerPool(ILogConfiguration logConfiguration)
 		{
@@ -35,18 +35,10 @@ namespace Najlot.Log
 
 			_logConfiguration.AttachObserver(entry);
 
-			_logDestinationsLock.EnterWriteLock();
+			lock(_pendingLogDestinations) _pendingLogDestinations.Add(entry);
 
-			try
-			{
-				_logDestinations.Add(entry);
-			}
-			finally
-			{
-				_logDestinationsLock.ExitWriteLock();
-			}
-
-			hasLogdestinationsAdded = true;
+			_hasLogdestinationsAdded = true;
+			_hasLogdestinationsPending = true;
 		}
 
 		private LogDestinationEntry CreateLogDestinationEntry<T>(T logDestination) where T : ILogDestination
@@ -68,7 +60,7 @@ namespace Najlot.Log
 
 		internal IEnumerable<LogDestinationEntry> GetLogDestinations()
 		{
-			if (!hasLogdestinationsAdded)
+			if (!_hasLogdestinationsAdded)
 			{
 				return new List<LogDestinationEntry>()
 				{
@@ -76,16 +68,26 @@ namespace Najlot.Log
 				};
 			}
 
-			_logDestinationsLock.EnterReadLock();
+			if(_hasLogdestinationsPending)
+			{
+				lock(_pendingLogDestinations)
+				{
+					if(_hasLogdestinationsPending)
+					{
+						_logDestinations = new List<LogDestinationEntry>(_logDestinations);
 
-			try
-			{
-				return _logDestinations;
+						foreach(var destination in _pendingLogDestinations)
+						{
+							_logDestinations.Add(destination);
+						}
+						
+						_pendingLogDestinations.Clear();
+						_hasLogdestinationsPending = false;
+					}
+				}
 			}
-			finally
-			{
-				_logDestinationsLock.ExitReadLock();
-			}
+
+			return _logDestinations;
 		}
 
 		internal void Flush()
@@ -112,7 +114,7 @@ namespace Najlot.Log
 					return logger;
 				}
 
-				if (!hasLogdestinationsAdded)
+				if (!_hasLogdestinationsAdded)
 				{
 					// There are no log destinations specified: Creating console log destination
 					AddLogDestination(new ConsoleLogDestination(false));
@@ -129,13 +131,13 @@ namespace Najlot.Log
 
 		#region IDisposable Support
 
-		private bool disposedValue = false;
+		private bool _disposedValue = false;
 
 		public void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

@@ -109,9 +109,9 @@ namespace Najlot.Log.Tests
 				var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
 
 				logger.Info("This must create the directory.");
+
+				Assert.True(Directory.Exists(dir));
 			}
-			
-			Assert.True(Directory.Exists(dir));
 		}
 
 		[Fact]

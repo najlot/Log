@@ -76,7 +76,6 @@ namespace Najlot.Log
 			}
 
 			LogDebug = true;
-
 			if (logLevel == LogLevel.Debug)
 			{
 				return;
@@ -206,13 +205,13 @@ namespace Najlot.Log
 
 		#region IDisposable Support
 
-		private bool disposedValue = false;
+		private bool _disposedValue = false;
 
 		private void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

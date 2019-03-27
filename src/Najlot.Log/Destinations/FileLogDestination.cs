@@ -34,7 +34,7 @@ namespace Najlot.Log.Destinations
 			EnsureDirectoryExists(path);
 			FilePath = path;
 
-			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
+			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
 
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
@@ -55,7 +55,7 @@ namespace Najlot.Log.Destinations
 					EnsureDirectoryExists(path);
 					if (AutoCleanUp) cleanUp = true;
 
-					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write));
+					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
 				}
 
 				Write(formatFunc(message) + NewLine);
@@ -74,13 +74,13 @@ namespace Najlot.Log.Destinations
 			{
 				List<string> logFilePathsList = null;
 
-				if (!File.Exists(LogFilePaths))
+				if (File.Exists(LogFilePaths))
 				{
-					logFilePathsList = new List<string>();
+					logFilePathsList = new List<string>(File.ReadAllLines(LogFilePaths));
 				}
 				else
 				{
-					logFilePathsList = new List<string>(File.ReadAllLines(LogFilePaths));
+					logFilePathsList = new List<string>();
 				}
 
 				logFilePathsList.Add(path);
@@ -92,7 +92,7 @@ namespace Najlot.Log.Destinations
 				}
 
 				logFilePathsList = logFilePathsList
-					.Where(p => !string.IsNullOrWhiteSpace(p) || File.Exists(p))
+					.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p))
 					.Distinct().ToList();
 
 				while (logFilePathsList.Count > MaxFiles)
