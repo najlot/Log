@@ -132,9 +132,9 @@ namespace Najlot.Log
 		/// <param name="maxFiles">Max count of files.</param>
 		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null)
+		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
 		{
-			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths);
+			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
 			return AddCustomDestination(logDestination, formatFunction);
 		}
 
@@ -144,9 +144,9 @@ namespace Najlot.Log
 		/// <param name="fileName">Path to the file</param>
 		/// <param name="formatFunction">Function to customize the output</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null)
+		public LogAdminitrator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null, bool keepFileOpen = true)
 		{
-			return AddFileLogDestination(() => fileName, formatFunction);
+			return AddFileLogDestination(() => fileName, formatFunction, keepFileOpen: keepFileOpen);
 		}
 
 		/// <summary>

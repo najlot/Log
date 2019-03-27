@@ -104,11 +104,17 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddFileLogDestination(fileName))
+				.AddFileLogDestination(fileName, keepFileOpen: false))
 			{
 				var logger = logAdminitrator.GetLogger(nameof(FileLoggerMustRecreateDirectory));
 
 				logger.Info("This must create the directory.");
+
+				Assert.True(Directory.Exists(dir));
+
+				Directory.Delete(dir, true);
+
+				logger.Info("This must recreate the directory.");
 
 				Assert.True(Directory.Exists(dir));
 			}

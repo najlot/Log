@@ -18,12 +18,14 @@ namespace Najlot.Log.Destinations
 		public readonly int MaxFiles;
 		public readonly string LogFilePaths = null;
 		public readonly bool AutoCleanUp;
+		public readonly bool KeepFileOpen;
 		public readonly Func<string> GetPath;
 
 		public string FilePath { get; private set; }
 
-		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths)
+		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths, bool keepFileOpen)
 		{
+			KeepFileOpen = keepFileOpen;
 			GetPath = getPath;
 			MaxFiles = maxFiles;
 			LogFilePaths = logFilePaths;
@@ -34,8 +36,11 @@ namespace Najlot.Log.Destinations
 			EnsureDirectoryExists(path);
 			FilePath = path;
 
-			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
-
+			if (KeepFileOpen)
+			{
+				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
+			}
+			
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
@@ -55,10 +60,20 @@ namespace Najlot.Log.Destinations
 					EnsureDirectoryExists(path);
 					if (AutoCleanUp) cleanUp = true;
 
-					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
+					if (KeepFileOpen)
+					{
+						SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
+					}
 				}
 
-				Write(formatFunc(message) + NewLine);
+				if (KeepFileOpen)
+				{
+					Write(formatFunc(message) + NewLine);
+				}
+				else
+				{
+					File.AppendAllText(path, formatFunc(message) + NewLine, _encoding);
+				}
 
 				if (cleanUp) CleanUpOldFiles(path);
 			}
