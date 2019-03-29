@@ -7,7 +7,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Internal class for multiple log destinations
 	/// </summary>
-	internal class LogExecutor
+	internal class LogExecutor : IDisposable
 	{
 		#region State Support
 

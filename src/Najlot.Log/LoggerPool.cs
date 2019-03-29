@@ -19,7 +19,7 @@ namespace Najlot.Log
 
 		private ILogConfiguration _logConfiguration;
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
-		private List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
+		private readonly List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
 		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 		private bool _hasLogdestinationsAdded = false;
 		private bool _hasLogdestinationsPending = false;
