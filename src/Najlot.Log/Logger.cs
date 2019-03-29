@@ -174,11 +174,7 @@ namespace Najlot.Log
 				if (disposing)
 				{
 					_logConfiguration.DetachObserver(this);
-
-					_logExecutor.Dispose();
 				}
-
-				_logExecutor = null;
 			}
 		}
 
