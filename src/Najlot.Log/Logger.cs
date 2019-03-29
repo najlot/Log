@@ -9,7 +9,7 @@ namespace Najlot.Log
 	/// </summary>
 	public sealed class Logger : ILogger, IConfigurationChangedObserver
 	{
-		private InternalLogger internalLogger;
+		private LogExecutor _logExecutor;
 
 		private bool LogTrace = false;
 		private bool LogDebug = false;
@@ -18,12 +18,12 @@ namespace Najlot.Log
 		private bool LogError = false;
 		private bool LogFatal = false;
 
-		internal Logger(ILogger log, ILogConfiguration logConfiguration)
+		internal Logger(LogExecutor logExecutor, ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
 			_logConfiguration.AttachObserver(this);
 
-			internalLogger = new InternalLogger(log ?? throw new ArgumentNullException(nameof(log)));
+			_logExecutor = logExecutor ?? throw new ArgumentNullException(nameof(logExecutor));
 			SetupLogLevel(logConfiguration.LogLevel);
 		}
 
@@ -90,57 +90,36 @@ namespace Najlot.Log
 
 		public void Trace<T>(T o)
 		{
-			if (LogTrace)
-			{
-				internalLogger.Trace(o);
-			}
+			if (LogTrace) _logExecutor.Trace(o);
 		}
 
 		public void Debug<T>(T o)
 		{
-			if (LogDebug)
-			{
-				internalLogger.Debug(o);
-			}
+			if (LogDebug) _logExecutor.Debug(o);
 		}
 
 		public void Info<T>(T o)
 		{
-			if (LogInfo)
-			{
-				internalLogger.Info(o);
-			}
+			if (LogInfo) _logExecutor.Info(o);
 		}
 
 		public void Warn<T>(T o)
 		{
-			if (LogWarn)
-			{
-				internalLogger.Warn(o);
-			}
+			if (LogWarn) _logExecutor.Warn(o);
 		}
 
 		public void Error<T>(T o)
 		{
-			if (LogError)
-			{
-				internalLogger.Error(o);
-			}
+			if (LogError) _logExecutor.Error(o);
 		}
 
 		public void Fatal<T>(T o)
 		{
-			if (LogFatal)
-			{
-				internalLogger.Fatal(o);
-			}
+			if (LogFatal) _logExecutor.Fatal(o);
 		}
 
-		public void Flush()
-		{
-			internalLogger.Flush();
-		}
-
+		public void Flush() => _logExecutor.Flush();
+		
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
 			if (_logLevel != configuration.LogLevel)
@@ -150,57 +129,36 @@ namespace Najlot.Log
 			}
 		}
 
-		public IDisposable BeginScope<T>(T state)
-		{
-			return internalLogger.BeginScope(state);
-		}
-
+		public IDisposable BeginScope<T>(T state) => _logExecutor.BeginScope(state);
+		
 		public void Trace<T>(T o, Exception ex)
 		{
-			if (LogTrace)
-			{
-				internalLogger.Trace(o, ex);
-			}
+			if (LogTrace) _logExecutor.Trace(o, ex);
 		}
 
 		public void Debug<T>(T o, Exception ex)
 		{
-			if (LogDebug)
-			{
-				internalLogger.Debug(o, ex);
-			}
+			if (LogDebug) _logExecutor.Debug(o, ex);
 		}
 
 		public void Error<T>(T o, Exception ex)
 		{
-			if (LogError)
-			{
-				internalLogger.Error(o, ex);
-			}
+			if (LogError) _logExecutor.Error(o, ex);
 		}
 
 		public void Fatal<T>(T o, Exception ex)
 		{
-			if (LogFatal)
-			{
-				internalLogger.Fatal(o, ex);
-			}
+			if (LogFatal) _logExecutor.Fatal(o, ex);
 		}
 
 		public void Info<T>(T o, Exception ex)
 		{
-			if (LogInfo)
-			{
-				internalLogger.Info(o, ex);
-			}
+			if (LogInfo) _logExecutor.Info(o, ex);
 		}
 
 		public void Warn<T>(T o, Exception ex)
 		{
-			if (LogWarn)
-			{
-				internalLogger.Warn(o, ex);
-			}
+			if (LogWarn) _logExecutor.Warn(o, ex);
 		}
 
 		#region IDisposable Support
@@ -217,10 +175,10 @@ namespace Najlot.Log
 				{
 					_logConfiguration.DetachObserver(this);
 
-					internalLogger.Dispose();
+					_logExecutor.Dispose();
 				}
 
-				internalLogger = null;
+				_logExecutor = null;
 			}
 		}
 

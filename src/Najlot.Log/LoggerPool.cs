@@ -114,12 +114,6 @@ namespace Najlot.Log
 					return logger;
 				}
 
-				if (!_hasLogdestinationsAdded)
-				{
-					// There are no log destinations specified: Creating console log destination
-					AddLogDestination(new ConsoleLogDestination(false));
-				}
-
 				var logExecutor = new LogExecutor(category, this);
 				logger = new Logger(logExecutor, _logConfiguration);
 				_loggerCache.Add(category, logger);

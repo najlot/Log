@@ -67,9 +67,7 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
 		{
-			this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
-
-			return this;
+			return this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
 		}
 
 		/// <summary>
@@ -154,21 +152,15 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="sourceType">Type to create a logger for</param>
 		/// <returns></returns>
-		public Logger GetLogger(Type sourceType)
-		{
-			return GetLogger(sourceType.FullName);
-		}
-
+		public Logger GetLogger(Type sourceType) => GetLogger(sourceType.FullName);
+		
 		/// <summary>
 		/// Creates a logger for a category or retrieves it from the cache.
 		/// </summary>
 		/// <param name="category">Category to create a logger for</param>
 		/// <returns></returns>
-		public Logger GetLogger(string category)
-		{
-			return _loggerPool.GetLogger(category);
-		}
-
+		public Logger GetLogger(string category) => _loggerPool.GetLogger(category);
+		
 		/// <summary>
 		/// Tells to flush the execution-middleware
 		/// </summary>
