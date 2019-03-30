@@ -144,7 +144,7 @@ namespace Najlot.Log.Tests
 			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
 			service.GetLogger().LogInformation("Logger created!");
 			service.GetLogger().LogTrace("This should not be logged!");
-			
+
 			logAdminitrator.Dispose();
 
 			var content = File.ReadAllText(logFile);

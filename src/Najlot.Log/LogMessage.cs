@@ -41,7 +41,7 @@ namespace Najlot.Log
 		/// Specifying whether the exception is null or not
 		/// </summary>
 		public bool ExceptionIsValid { get; }
-		
+
 		public LogMessage(DateTime dateTime, LogLevel logLevel, string category, object state, object message, Exception ex)
 		{
 			DateTime = dateTime;
