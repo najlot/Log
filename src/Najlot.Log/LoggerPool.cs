@@ -146,6 +146,7 @@ namespace Najlot.Log
 
 					foreach (var destination in _logDestinations)
 					{
+						destination.ExecutionMiddleware.Dispose();
 						destination.LogDestination.Dispose();
 					}
 
