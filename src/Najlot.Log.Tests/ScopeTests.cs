@@ -1,6 +1,8 @@
 ﻿using Najlot.Log.Configuration;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -152,6 +154,45 @@ namespace Najlot.Log.Tests
 
 			Assert.Null(state);
 			Assert.Null(secondState);
+		}
+
+		[Fact]
+		public void ScopesMustNotBeSharedBetweenThreads()
+		{
+			bool error = false;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock((msg) =>
+				{
+					if(Environment.CurrentManagedThreadId != (int)msg.State)
+					{
+						error = true;
+					}
+				}));
+
+			void action()
+			{
+				var log = logAdminitrator.GetLogger("test");
+
+				using (log.BeginScope(Environment.CurrentManagedThreadId))
+				{
+					log.Info("");
+					log.Info("");
+					log.Info("");
+				}
+			}
+
+			System.Threading.Tasks.Parallel.Invoke(
+				action, action, action, action, action, action, action, action,
+				action, action, action, action, action, action, action, action,
+				action, action, action, action, action, action, action, action);
+
+			logAdminitrator.Dispose();
+
+			Assert.False(error);
 		}
 	}
 }
