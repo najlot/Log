@@ -114,7 +114,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
-			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test", null));
 
 			Assert.Equal(returnString, formatString);
 		}
@@ -155,7 +155,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
-			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+			var formatString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test", null));
 
 			Assert.Equal(returnString, formatString);
 		}
@@ -223,7 +223,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
-			var formatedString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test"));
+			var formatedString = formatFunc(new LogMessage(DateTime.Now, LogLevel.Info, null, null, "test", null));
 
 			Assert.Equal(returnString, formatedString);
 
