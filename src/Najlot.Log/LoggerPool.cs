@@ -20,7 +20,7 @@ namespace Najlot.Log
 		private ILogConfiguration _logConfiguration;
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
 		private readonly List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
-		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
+		private ThreadLocal<Dictionary<string, Logger>> _loggerCache = new ThreadLocal<Dictionary<string, Logger>>(() => new Dictionary<string, Logger>(), true);
 		private bool _hasLogdestinationsAdded = false;
 		private bool _hasLogdestinationsPending = false;
 
@@ -35,7 +35,7 @@ namespace Najlot.Log
 
 			_logConfiguration.AttachObserver(entry);
 
-			lock(_pendingLogDestinations) _pendingLogDestinations.Add(entry);
+			lock (_pendingLogDestinations) _pendingLogDestinations.Add(entry);
 
 			_hasLogdestinationsAdded = true;
 			_hasLogdestinationsPending = true;
@@ -68,19 +68,19 @@ namespace Najlot.Log
 				};
 			}
 
-			if(_hasLogdestinationsPending)
+			if (_hasLogdestinationsPending)
 			{
-				lock(_pendingLogDestinations)
+				lock (_pendingLogDestinations)
 				{
-					if(_hasLogdestinationsPending)
+					if (_hasLogdestinationsPending)
 					{
 						_logDestinations = new List<LogDestinationEntry>(_logDestinations);
 
-						foreach(var destination in _pendingLogDestinations)
+						foreach (var destination in _pendingLogDestinations)
 						{
 							_logDestinations.Add(destination);
 						}
-						
+
 						_pendingLogDestinations.Clear();
 						_hasLogdestinationsPending = false;
 					}
@@ -105,18 +105,13 @@ namespace Najlot.Log
 		/// <returns></returns>
 		internal Logger GetLogger(string category)
 		{
-			Logger logger;
+			var loggerCache = _loggerCache.Value;
 
-			lock (_loggerCache)
+			if (!loggerCache.TryGetValue(category, out Logger logger))
 			{
-				if (_loggerCache.TryGetValue(category, out logger))
-				{
-					return logger;
-				}
-
 				var logExecutor = new LogExecutor(category, this);
 				logger = new Logger(logExecutor, _logConfiguration);
-				_loggerCache.Add(category, logger);
+				loggerCache.Add(category, logger);
 				_logConfiguration.AttachObserver(logger);
 			}
 
@@ -137,10 +132,17 @@ namespace Najlot.Log
 				{
 					Flush();
 
-					foreach (var cachedEntry in _loggerCache)
+					foreach (var dictionary in _loggerCache.Values)
 					{
-						cachedEntry.Value.Dispose();
+						foreach (var cachedEntry in dictionary)
+						{
+							cachedEntry.Value.Dispose();
+						}
+
+						dictionary.Clear();
 					}
+
+					_loggerCache.Dispose();
 
 					foreach (var destination in _logDestinations)
 					{
