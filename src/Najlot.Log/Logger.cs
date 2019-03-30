@@ -119,7 +119,7 @@ namespace Najlot.Log
 		}
 
 		public void Flush() => _logExecutor.Flush();
-		
+
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
 			if (_logLevel != configuration.LogLevel)
@@ -130,7 +130,7 @@ namespace Najlot.Log
 		}
 
 		public IDisposable BeginScope<T>(T state) => _logExecutor.BeginScope(state);
-		
+
 		public void Trace<T>(T o, Exception ex)
 		{
 			if (LogTrace) _logExecutor.Trace(o, ex);

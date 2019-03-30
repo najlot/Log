@@ -122,6 +122,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(executionsDone, executionsLogged);
 		}
+
 		[Fact]
 		public void MiddlewareCanBeChangedWhileExecuting()
 		{

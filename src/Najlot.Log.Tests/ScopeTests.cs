@@ -2,7 +2,6 @@
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -167,7 +166,7 @@ namespace Najlot.Log.Tests
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
-					if(Environment.CurrentManagedThreadId != (int)msg.State)
+					if (Environment.CurrentManagedThreadId != (int)msg.State)
 					{
 						error = true;
 					}

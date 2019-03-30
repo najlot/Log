@@ -40,7 +40,7 @@ namespace Najlot.Log.Destinations
 			{
 				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
 			}
-			
+
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 

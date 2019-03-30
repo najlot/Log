@@ -49,6 +49,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(observerNotified, "Observer was not notified");
 		}
+
 		[Fact]
 		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwiceButOnce()
 		{

@@ -43,7 +43,7 @@ namespace Najlot.Log
 		{
 			var state = _currentState;
 			var time = DateTime.Now;
-			
+
 			foreach (var entry in _loggerPool.GetLogDestinations())
 			{
 				var formatFunc = entry.FormatFunc;
@@ -57,18 +57,29 @@ namespace Najlot.Log
 		}
 
 		public void Trace<T>(T o) => Log(o, LogLevel.Trace);
+
 		public void Info<T>(T o) => Log(o, LogLevel.Info);
+
 		public void Warn<T>(T o) => Log(o, LogLevel.Warn);
+
 		public void Debug<T>(T o) => Log(o, LogLevel.Debug);
+
 		public void Error<T>(T o) => Log(o, LogLevel.Error);
+
 		public void Fatal<T>(T o) => Log(o, LogLevel.Fatal);
+
 		public void Trace<T>(T o, Exception ex) => Log(o, LogLevel.Trace, ex);
+
 		public void Info<T>(T o, Exception ex) => Log(o, LogLevel.Info, ex);
+
 		public void Warn<T>(T o, Exception ex) => Log(o, LogLevel.Warn, ex);
+
 		public void Debug<T>(T o, Exception ex) => Log(o, LogLevel.Debug, ex);
+
 		public void Error<T>(T o, Exception ex) => Log(o, LogLevel.Error, ex);
+
 		public void Fatal<T>(T o, Exception ex) => Log(o, LogLevel.Fatal, ex);
-		
+
 		public void Flush()
 		{
 			foreach (var entry in _loggerPool.GetLogDestinations())

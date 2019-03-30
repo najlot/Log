@@ -76,13 +76,13 @@ namespace Najlot.Log.Tests
 			{
 				var logForThis = logAdminitrator.GetLogger(this.GetType());
 				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-				
+
 				logForThis.Info(contentThis);
 				logForPool.Warn(contentPool);
 
 				Assert.True(File.Exists(fileName), $"File {fileName} not found.");
 			}
-			
+
 			var content = File.ReadAllText(fileName);
 
 			Assert.NotEqual(-1, content.IndexOf(contentThis));
@@ -162,12 +162,12 @@ namespace Najlot.Log.Tests
 			{
 				var logForThis = logAdminitrator.GetLogger(this.GetType());
 				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-				
+
 				logForThis.Info(contentThis);
 				logged = true;
 				logForPool.Warn(contentPool);
 			}
-			
+
 			Assert.True(File.Exists(fileName1), $"File {fileName1} not found.");
 			Assert.True(File.Exists(fileName2), $"File {fileName2} not found.");
 
@@ -199,11 +199,11 @@ namespace Najlot.Log.Tests
 			{
 				var logForThis = logAdminitrator.GetLogger(this.GetType());
 				var logForPool = logAdminitrator.GetLogger(logAdminitrator.GetType());
-				
+
 				logForThis.Info(contentThis);
 				logForPool.Warn(contentPool);
 			}
-			
+
 			Assert.True(File.Exists(fileName), $"File {fileName} not found.");
 
 			var content = File.ReadAllText(fileName);

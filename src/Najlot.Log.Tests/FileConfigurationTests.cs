@@ -96,6 +96,7 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
 		}
+
 		[Fact]
 		public void ExtensionMustWriteExampleFile()
 		{

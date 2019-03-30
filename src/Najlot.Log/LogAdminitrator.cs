@@ -153,14 +153,14 @@ namespace Najlot.Log
 		/// <param name="sourceType">Type to create a logger for</param>
 		/// <returns></returns>
 		public Logger GetLogger(Type sourceType) => GetLogger(sourceType.FullName);
-		
+
 		/// <summary>
 		/// Creates a logger for a category or retrieves it from the cache.
 		/// </summary>
 		/// <param name="category">Category to create a logger for</param>
 		/// <returns></returns>
 		public Logger GetLogger(string category) => _loggerPool.GetLogger(category);
-		
+
 		/// <summary>
 		/// Tells to flush the execution-middleware
 		/// </summary>

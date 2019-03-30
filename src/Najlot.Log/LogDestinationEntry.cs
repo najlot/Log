@@ -2,7 +2,6 @@
 using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
-using System.Threading;
 
 namespace Najlot.Log
 {

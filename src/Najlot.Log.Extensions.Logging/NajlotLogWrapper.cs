@@ -22,7 +22,6 @@ namespace Najlot.Log.Extensions.Logging
 		{
 			if (IsEnabled(logLevel))
 			{
-				
 				switch (logLevel)
 				{
 					case Microsoft.Extensions.Logging.LogLevel.Trace:
