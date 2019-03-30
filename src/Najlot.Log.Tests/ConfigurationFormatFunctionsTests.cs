@@ -88,6 +88,37 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void SameFormatFunctionCanBeSetToTwoDestinations()
+		{
+			var strExpected = "AA Bb cc";
+			var strActual = "";
+			var strActual2 = "";
+
+			string formatFunc(LogMessage message)
+			{
+				return strExpected;
+			}
+
+			var logAdmin = LogAdminitrator
+				.CreateNew()
+				.GetLogConfiguration(out ILogConfiguration logConfiguration)
+				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
+				{
+					strActual = str;
+				}), formatFunc)
+				.AddCustomDestination(new LogDestinationFormatFunctionMock(logConfiguration, str =>
+				{
+					strActual2 = str;
+				}), formatFunc);
+
+			var log = logAdmin.GetLogger(this.GetType());
+			log.Fatal("this message should not be used");
+
+			Assert.Equal(strExpected, strActual);
+			Assert.Equal(strExpected, strActual2);
+		}
+
+		[Fact]
 		public void FormatFunctionCanBeSetAndGetForMultipleTypes()
 		{
 			var thisType = this.GetType();
@@ -108,9 +139,7 @@ namespace Najlot.Log.Tests
 				Assert.True(canSetFunction, "Could not set function for " + type.Name);
 			}
 
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 
@@ -149,9 +178,7 @@ namespace Najlot.Log.Tests
 
 			Assert.True(canSetFunction, "Could not set function 3");
 
-			Func<LogMessage, string> formatFunc;
-
-			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out formatFunc);
+			bool canGetFunction = logConfiguration.TryGetFormatFunctionForType(this.GetType(), out Func<LogMessage, string> formatFunc);
 
 			Assert.True(canGetFunction, "Could not get function for type");
 

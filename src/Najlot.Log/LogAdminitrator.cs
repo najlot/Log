@@ -109,6 +109,7 @@ namespace Najlot.Log
 				var logDestinationType = logDestination.GetType();
 				if (!_logConfiguration.TrySetFormatFunctionForType(logDestinationType, formatFunction))
 				{
+					_logConfiguration.NotifyObservers();
 					Console.WriteLine("Najlot.Log: Could not set format function for " + logDestinationType.Name);
 				}
 			}
