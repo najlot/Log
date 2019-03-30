@@ -392,5 +392,34 @@ namespace Najlot.Log.Tests
 
 			Assert.Equal(executionsExpected, executionsActual);
 		}
+
+		[Fact]
+		public void ExecutionMiddlewareTypeMustNotBeNull()
+		{
+			int executionsActual = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			log.Warn("Normal");
+
+			logAdminitrator.SetExecutionMiddlewareByType(null);
+
+			log.Warn("After set to null");
+
+			var logTest = logAdminitrator.GetLogger("Test");
+
+			log.Warn("After set to null and with other logger");
+
+			logAdminitrator.Dispose();
+
+			Assert.Equal(3, executionsActual);
+		}
 	}
 }

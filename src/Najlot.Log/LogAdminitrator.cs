@@ -77,6 +77,12 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddlewareByType(Type middlewareType)
 		{
+			if (middlewareType == null)
+			{
+				Console.WriteLine("Najlot.Log: New execution middleware type is null.");
+				return this;
+			}
+
 			this.Flush();
 			_logConfiguration.ExecutionMiddlewareType = middlewareType;
 			return this;

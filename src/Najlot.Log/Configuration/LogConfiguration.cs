@@ -44,12 +44,6 @@ namespace Najlot.Log.Configuration
 			}
 			set
 			{
-				if (value == null)
-				{
-					Console.WriteLine("Najlot.Log: New execution middleware type is null.");
-					return;
-				}
-
 				Type iExecutionMiddlewareType = typeof(IExecutionMiddleware);
 
 				if (value.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
