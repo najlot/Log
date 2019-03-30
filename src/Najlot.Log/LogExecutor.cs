@@ -7,7 +7,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Internal class for multiple log destinations
 	/// </summary>
-	internal class LogExecutor : IDisposable
+	internal class LogExecutor
 	{
 		#region State Support
 
@@ -87,35 +87,5 @@ namespace Najlot.Log
 				entry.ExecutionMiddleware.Flush();
 			}
 		}
-
-		#region IDisposable Support
-
-		private bool disposedValue = false; // To detect redundant calls
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				disposedValue = true;
-
-				if (disposing)
-				{
-					foreach (var entry in _loggerPool.GetLogDestinations())
-					{
-						entry.LogDestination.Dispose();
-						entry.ExecutionMiddleware.Dispose();
-					}
-				}
-			}
-		}
-
-		// This code added to correctly implement the disposable pattern.
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		#endregion IDisposable Support
 	}
 }
