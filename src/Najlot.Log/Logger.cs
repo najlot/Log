@@ -9,7 +9,7 @@ namespace Najlot.Log
 	/// </summary>
 	public sealed class Logger : ILogger, IConfigurationChangedObserver
 	{
-		private LogExecutor _logExecutor;
+		private readonly LogExecutor _logExecutor;
 
 		private bool LogTrace = false;
 		private bool LogDebug = false;
