@@ -20,34 +20,31 @@ namespace Najlot.Log.Extensions.Logging
 
 		public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
-			if (IsEnabled(logLevel))
+			switch (logLevel)
 			{
-				switch (logLevel)
-				{
-					case Microsoft.Extensions.Logging.LogLevel.Trace:
-						_logger.Trace(state, exception);
-						return;
+				case Microsoft.Extensions.Logging.LogLevel.Trace:
+					_logger.Trace(state, exception);
+					break;
 
-					case Microsoft.Extensions.Logging.LogLevel.Debug:
-						_logger.Debug(state, exception);
-						return;
+				case Microsoft.Extensions.Logging.LogLevel.Debug:
+					_logger.Debug(state, exception);
+					break;
 
-					case Microsoft.Extensions.Logging.LogLevel.Information:
-						_logger.Info(state, exception);
-						return;
+				case Microsoft.Extensions.Logging.LogLevel.Information:
+					_logger.Info(state, exception);
+					break;
 
-					case Microsoft.Extensions.Logging.LogLevel.Warning:
-						_logger.Warn(state, exception);
-						return;
+				case Microsoft.Extensions.Logging.LogLevel.Warning:
+					_logger.Warn(state, exception);
+					break;
 
-					case Microsoft.Extensions.Logging.LogLevel.Error:
-						_logger.Error(state, exception);
-						return;
+				case Microsoft.Extensions.Logging.LogLevel.Error:
+					_logger.Error(state, exception);
+					break;
 
-					case Microsoft.Extensions.Logging.LogLevel.Critical:
-						_logger.Fatal(state, exception);
-						return;
-				}
+				case Microsoft.Extensions.Logging.LogLevel.Critical:
+					_logger.Fatal(state, exception);
+					break;
 			}
 		}
 	}

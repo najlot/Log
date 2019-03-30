@@ -131,7 +131,7 @@ namespace Najlot.Log.Tests
 					logAdminitrator = configurator;
 
 					logAdminitrator
-						.SetLogLevel(LogLevel.Trace)
+						.SetLogLevel(LogLevel.Debug)
 						.SetExecutionMiddleware<SyncExecutionMiddleware>()
 						.AddFileLogDestination(logFile);
 				});
@@ -143,12 +143,14 @@ namespace Najlot.Log.Tests
 
 			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
 			service.GetLogger().LogInformation("Logger created!");
-
+			service.GetLogger().LogTrace("This should not be logged!");
+			
 			logAdminitrator.Dispose();
 
 			var content = File.ReadAllText(logFile);
 
 			Assert.NotEqual(-1, content.IndexOf("Logger created!"));
+			Assert.Equal(-1, content.IndexOf("This should not be logged!"));
 			Assert.NotEqual(-1, content.IndexOf(typeof(DependencyInjectionLoggerService).FullName));
 		}
 	}
