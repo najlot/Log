@@ -12,7 +12,7 @@ namespace Najlot.Log.Tests
 		{
 			var fileName = nameof(FilterMiddlewareCanBlockMessages) + ".log";
 
-			if(File.Exists(fileName))
+			if (File.Exists(fileName))
 			{
 				File.Delete(fileName);
 			}
@@ -42,7 +42,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
 				.SetFilterMiddleware<DenyAllFilterMiddleware>();
-				
+
 			var log = logAdminitrator.GetLogger("");
 
 			log.Fatal("TEST!");

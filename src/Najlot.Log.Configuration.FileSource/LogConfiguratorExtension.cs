@@ -154,7 +154,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 		private static bool GetMiddleware(string executionMiddleware, out Type type)
 		{
-			if(string.IsNullOrWhiteSpace(executionMiddleware))
+			if (string.IsNullOrWhiteSpace(executionMiddleware))
 			{
 				type = null;
 				return false;
@@ -167,7 +167,7 @@ namespace Najlot.Log.Configuration.FileSource
 				Console.WriteLine($"Najlot.Log: New middleware of type '{executionMiddleware}' not found!");
 				return false;
 			}
-			
+
 			return true;
 		}
 	}

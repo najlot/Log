@@ -35,7 +35,7 @@ namespace Najlot.Log.Configuration
 		}
 
 		private Type _executionMiddlewareType = typeof(SyncExecutionMiddleware);
-		
+
 		public Type ExecutionMiddlewareType
 		{
 			get

@@ -87,7 +87,7 @@ namespace Najlot.Log
 			_logConfiguration.ExecutionMiddlewareType = middlewareType;
 			return this;
 		}
-		
+
 		/// <summary>
 		/// Sets the type of the filter middleware of the LogConfiguration
 		/// </summary>
