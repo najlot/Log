@@ -61,7 +61,7 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
-		/// Sets the ExecutionMiddleware of the LogConfiguration.
+		/// Sets the type of the execution middleware and notifies observing components
 		/// </summary>
 		/// <typeparam name="TExecutionMiddleware"></typeparam>
 		/// <returns></returns>
@@ -71,9 +71,9 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
-		/// Sets the ExecutionMiddleware of the LogConfiguration.
+		/// Sets the type of the execution middleware and notifies observing components
 		/// </summary>
-		/// <typeparam name="TExecutionMiddleware"></typeparam>
+		/// <param name="middlewareType">Type of the execution middleware</param>
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddlewareByType(Type middlewareType)
 		{
@@ -85,6 +85,34 @@ namespace Najlot.Log
 
 			this.Flush();
 			_logConfiguration.ExecutionMiddlewareType = middlewareType;
+			return this;
+		}
+		
+		/// <summary>
+		/// Sets the type of the filter middleware of the LogConfiguration
+		/// </summary>
+		/// <typeparam name="TFilterMiddleware"></typeparam>
+		/// <returns></returns>
+		public LogAdminitrator SetFilterMiddleware<TFilterMiddleware>() where TFilterMiddleware : Middleware.IFilterMiddleware, new()
+		{
+			return this.SetFilterMiddlewareByType(typeof(TFilterMiddleware));
+		}
+
+		/// <summary>
+		/// Sets the type of the filter middleware and notifies observing components
+		/// </summary>
+		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator SetFilterMiddlewareByType(Type middlewareType)
+		{
+			if (middlewareType == null)
+			{
+				Console.WriteLine("Najlot.Log: New execution middleware type is null.");
+				return this;
+			}
+
+			this.Flush();
+			_logConfiguration.FilterMiddlewareType = middlewareType;
 			return this;
 		}
 

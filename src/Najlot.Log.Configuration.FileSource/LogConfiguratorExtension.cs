@@ -12,6 +12,7 @@ namespace Najlot.Log.Configuration.FileSource
 	{
 		public LogLevel LogLevel { get; set; }
 		public string ExecutionMiddleware { get; set; }
+		public string FilterMiddleware { get; set; }
 	}
 
 	public static class LogConfiguratorExtension
@@ -25,11 +26,18 @@ namespace Najlot.Log.Configuration.FileSource
 			try
 			{
 				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
+				var currentFilterMiddlewareFullType = logConfiguration.FilterMiddlewareType;
 
 				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
 				if (currentExecutionMiddlewareType.Assembly != null)
 				{
 					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.GetName().Name;
+				}
+
+				var currentFilterMiddlewareFullTypeName = currentFilterMiddlewareFullType.FullName;
+				if (currentFilterMiddlewareFullType.Assembly != null)
+				{
+					currentFilterMiddlewareFullTypeName += ", " + currentFilterMiddlewareFullType.Assembly.GetName().Name;
 				}
 
 				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
@@ -41,7 +49,8 @@ namespace Najlot.Log.Configuration.FileSource
 						xmlSerializer.Serialize(xmlWriter, new FileConfiguration()
 						{
 							LogLevel = logConfiguration.LogLevel,
-							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName
+							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName,
+							FilterMiddleware = currentFilterMiddlewareFullTypeName
 						});
 
 						File.WriteAllText(path, stringWriter.ToString(), encoding);
@@ -128,29 +137,42 @@ namespace Najlot.Log.Configuration.FileSource
 
 			logAdminitrator.SetLogLevel(fileConfiguration.LogLevel);
 
-			AssignExecutionMiddlewareIfChanged(logAdminitrator, fileConfiguration);
-		}
-
-		private static void AssignExecutionMiddlewareIfChanged(LogAdminitrator logAdminitrator, FileConfiguration fileConfiguration)
-		{
 			logAdminitrator.GetLogConfiguration(out var logConfiguration);
 
-			var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
-
-			var executionMiddlewareType = Type.GetType(fileConfiguration.ExecutionMiddleware, false);
-
-			if (executionMiddlewareType == null)
+			if (GetMiddleware(logAdminitrator, fileConfiguration.ExecutionMiddleware, out Type executionMiddlewareType))
 			{
-				Console.WriteLine($"Najlot.Log: New execution middleware of type '{fileConfiguration.ExecutionMiddleware}' not found!");
-				return;
+				if (executionMiddlewareType != logConfiguration.ExecutionMiddlewareType)
+				{
+					logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
+				}
 			}
 
-			if (executionMiddlewareType == currentExecutionMiddlewareType)
+			if (GetMiddleware(logAdminitrator, fileConfiguration.FilterMiddleware, out Type filterMiddlewareType))
 			{
-				return;
+				if (filterMiddlewareType != logConfiguration.FilterMiddlewareType)
+				{
+					logAdminitrator.SetFilterMiddlewareByType(filterMiddlewareType);
+				}
+			}
+		}
+
+		private static bool GetMiddleware(LogAdminitrator logAdminitrator, string executionMiddleware, out Type type)
+		{
+			if(string.IsNullOrWhiteSpace(executionMiddleware))
+			{
+				type = null;
+				return false;
 			}
 
-			logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
+			type = Type.GetType(executionMiddleware, false);
+
+			if (type == null)
+			{
+				Console.WriteLine($"Najlot.Log: New middleware of type '{executionMiddleware}' not found!");
+				return false;
+			}
+			
+			return true;
 		}
 	}
 }

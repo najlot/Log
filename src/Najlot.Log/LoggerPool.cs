@@ -53,6 +53,7 @@ namespace Najlot.Log
 			return new LogDestinationEntry()
 			{
 				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(_logConfiguration.ExecutionMiddlewareType),
+				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(_logConfiguration.FilterMiddlewareType),
 				LogDestination = logDestination,
 				FormatFunc = formatFunc
 			};

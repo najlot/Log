@@ -13,6 +13,8 @@ namespace Najlot.Log
 
 		public IExecutionMiddleware ExecutionMiddleware;
 
+		public IFilterMiddleware FilterMiddleware;
+
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
 			if (configuration.TryGetFormatFunctionForType(this.LogDestination.GetType(), out var formatFunc))
@@ -25,6 +27,7 @@ namespace Najlot.Log
 			}
 
 			ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
+			FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(configuration.FilterMiddlewareType);
 		}
 	}
 }

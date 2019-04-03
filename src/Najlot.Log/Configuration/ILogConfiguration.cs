@@ -19,6 +19,11 @@ namespace Najlot.Log.Configuration
 		Type ExecutionMiddlewareType { get; }
 
 		/// <summary>
+		/// Type of the filter middleware for all log destinations observing this configuration
+		/// </summary>
+		Type FilterMiddlewareType { get; }
+
+		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur
 		/// </summary>
 		/// <param name="observer">Observer to attach</param>

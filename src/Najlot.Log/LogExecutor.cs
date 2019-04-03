@@ -16,16 +16,10 @@ namespace Najlot.Log
 
 		public IDisposable BeginScope<T>(T state)
 		{
-			lock (_states)
-			{
-				_states.Push(_currentState);
-				_currentState = state;
-			}
+			_states.Push(_currentState);
+			_currentState = state;
 
-			return new OnDisposeExcecutor(() =>
-			{
-				lock (_states) _currentState = _states.Pop();
-			});
+			return new OnDisposeExcecutor(() => _currentState = _states.Pop());
 		}
 
 		#endregion State Support
@@ -48,10 +42,16 @@ namespace Najlot.Log
 			{
 				var formatFunc = entry.FormatFunc;
 				var destination = entry.LogDestination;
+				var filterMiddleware = entry.FilterMiddleware;
 
 				entry.ExecutionMiddleware.Execute(() =>
 				{
-					destination.Log(new LogMessage(time, logLevel, _category, state, o, ex), formatFunc);
+					var message = new LogMessage(time, logLevel, _category, state, o, ex);
+
+					if (filterMiddleware.AllowThrough(message))
+					{
+						destination.Log(message, formatFunc);
+					}
 				});
 			}
 		}

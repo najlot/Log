@@ -16,31 +16,31 @@ namespace Najlot.Log.Configuration
 		{
 		}
 
-		private LogLevel logLevel = LogLevel.Debug;
+		private LogLevel _logLevel = LogLevel.Debug;
 
 		public LogLevel LogLevel
 		{
 			get
 			{
-				return logLevel;
+				return _logLevel;
 			}
 			set
 			{
-				if (logLevel != value)
+				if (_logLevel != value)
 				{
-					logLevel = value;
+					_logLevel = value;
 					NotifyObservers();
 				}
 			}
 		}
 
-		private Type executionMiddlewareType = typeof(SyncExecutionMiddleware);
-
+		private Type _executionMiddlewareType = typeof(SyncExecutionMiddleware);
+		
 		public Type ExecutionMiddlewareType
 		{
 			get
 			{
-				return executionMiddlewareType;
+				return _executionMiddlewareType;
 			}
 			set
 			{
@@ -52,9 +52,32 @@ namespace Najlot.Log.Configuration
 					return;
 				}
 
-				if (executionMiddlewareType.FullName != value.FullName)
+				if (_executionMiddlewareType.FullName != value.FullName)
 				{
-					executionMiddlewareType = value;
+					_executionMiddlewareType = value;
+					NotifyObservers();
+				}
+			}
+		}
+
+		private Type _filterMiddlewareType = typeof(OpenFilterMiddleware);
+
+		public Type FilterMiddlewareType
+		{
+			get => _filterMiddlewareType;
+			set
+			{
+				Type iFilterMiddlewareType = typeof(IFilterMiddleware);
+
+				if (value.GetInterfaces().FirstOrDefault(x => x == iFilterMiddlewareType) == null)
+				{
+					Console.WriteLine("Najlot.Log: New filter middleware does not implement " + iFilterMiddlewareType.Name);
+					return;
+				}
+
+				if (_filterMiddlewareType.FullName != value.FullName)
+				{
+					_filterMiddlewareType = value;
 					NotifyObservers();
 				}
 			}
