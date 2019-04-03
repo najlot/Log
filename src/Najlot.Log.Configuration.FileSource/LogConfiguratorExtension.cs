@@ -139,24 +139,20 @@ namespace Najlot.Log.Configuration.FileSource
 
 			logAdminitrator.GetLogConfiguration(out var logConfiguration);
 
-			if (GetMiddleware(logAdminitrator, fileConfiguration.ExecutionMiddleware, out Type executionMiddlewareType))
+			if (GetMiddleware(fileConfiguration.ExecutionMiddleware, out Type executionMiddlewareType) &&
+				executionMiddlewareType != logConfiguration.ExecutionMiddlewareType)
 			{
-				if (executionMiddlewareType != logConfiguration.ExecutionMiddlewareType)
-				{
-					logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
-				}
+				logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
 			}
 
-			if (GetMiddleware(logAdminitrator, fileConfiguration.FilterMiddleware, out Type filterMiddlewareType))
+			if (GetMiddleware(fileConfiguration.FilterMiddleware, out Type filterMiddlewareType) &&
+				filterMiddlewareType != logConfiguration.FilterMiddlewareType)
 			{
-				if (filterMiddlewareType != logConfiguration.FilterMiddlewareType)
-				{
-					logAdminitrator.SetFilterMiddlewareByType(filterMiddlewareType);
-				}
+				logAdminitrator.SetFilterMiddlewareByType(filterMiddlewareType);
 			}
 		}
 
-		private static bool GetMiddleware(LogAdminitrator logAdminitrator, string executionMiddleware, out Type type)
+		private static bool GetMiddleware(string executionMiddleware, out Type type)
 		{
 			if(string.IsNullOrWhiteSpace(executionMiddleware))
 			{
