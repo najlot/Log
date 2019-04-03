@@ -9,6 +9,8 @@ namespace Najlot.Log
 	{
 		public ILogDestination LogDestination;
 
+		public Type LogDestinationType;
+
 		public Func<LogMessage, string> FormatFunc;
 
 		public IExecutionMiddleware ExecutionMiddleware;

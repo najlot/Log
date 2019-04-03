@@ -55,6 +55,7 @@ namespace Najlot.Log
 				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(_logConfiguration.ExecutionMiddlewareType),
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(_logConfiguration.FilterMiddlewareType),
 				LogDestination = logDestination,
+				LogDestinationType = logDestination.GetType(),
 				FormatFunc = formatFunc
 			};
 		}

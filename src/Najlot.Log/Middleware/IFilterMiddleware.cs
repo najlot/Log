@@ -1,7 +1,9 @@
-﻿namespace Najlot.Log.Middleware
+﻿using System;
+
+namespace Najlot.Log.Middleware
 {
 	public interface IFilterMiddleware
 	{
-		bool AllowThrough(LogMessage message);
+		bool AllowThrough(Type destinationType, LogMessage message);
 	}
 }

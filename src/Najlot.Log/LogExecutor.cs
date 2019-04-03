@@ -42,13 +42,14 @@ namespace Najlot.Log
 			{
 				var formatFunc = entry.FormatFunc;
 				var destination = entry.LogDestination;
+				var destinationType = entry.LogDestinationType;
 				var filterMiddleware = entry.FilterMiddleware;
 
 				entry.ExecutionMiddleware.Execute(() =>
 				{
 					var message = new LogMessage(time, logLevel, _category, state, o, ex);
 
-					if (filterMiddleware.AllowThrough(message))
+					if (filterMiddleware.AllowThrough(destinationType, message))
 					{
 						destination.Log(message, formatFunc);
 					}
