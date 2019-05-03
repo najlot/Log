@@ -181,6 +181,60 @@ namespace Najlot.Log.Tests
 					log.Info("");
 					log.Info("");
 					log.Info("");
+					log.Info("");
+					log.Info("");
+					log.Info("");
+					log.Info("");
+					log.Info("");
+					log.Info("");
+					log.Info("");
+				}
+			}
+
+			System.Threading.Tasks.Parallel.Invoke(
+				action, action, action, action, action, action, action, action,
+				action, action, action, action, action, action, action, action,
+				action, action, action, action, action, action, action, action);
+
+			logAdminitrator.Dispose();
+
+			Assert.False(error);
+		}
+
+		[Fact]
+		public void ScopesMustNotBeSharedBetweenThreadsInTask()
+		{
+			bool error = false;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Info)
+				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock((msg) =>
+				{
+					// state must be the same thread id the message comes from
+					if (msg.Message.ToString() != msg.State.ToString())
+					{
+						error = true;
+					}
+				}));
+
+			void action()
+			{
+				var log = logAdminitrator.GetLogger("test");
+
+				using (log.BeginScope(Environment.CurrentManagedThreadId))
+				{
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
+					log.Info(Environment.CurrentManagedThreadId);
 				}
 			}
 
