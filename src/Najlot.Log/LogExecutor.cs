@@ -1,6 +1,7 @@
 ﻿using Najlot.Log.Util;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Najlot.Log
 {
@@ -11,15 +12,17 @@ namespace Najlot.Log
 	{
 		#region State Support
 
-		private object _currentState;
-		private readonly Stack<object> _states = new Stack<object>();
+		private ThreadLocal<object> _currentState = new ThreadLocal<object>(() => null);
+		private readonly ThreadLocal<Stack<object>> _states = new ThreadLocal<Stack<object>>(() => new Stack<object>());
 
 		public IDisposable BeginScope<T>(T state)
 		{
-			_states.Push(_currentState);
-			_currentState = state;
+			var states = _states.Value;
 
-			return new OnDisposeExcecutor(() => _currentState = _states.Pop());
+			states.Push(_currentState.Value);
+			_currentState.Value = state;
+
+			return new OnDisposeExcecutor(() => _currentState.Value = states.Pop());
 		}
 
 		#endregion State Support
@@ -35,7 +38,7 @@ namespace Najlot.Log
 
 		private void Log<T>(T o, LogLevel logLevel, Exception ex = null)
 		{
-			var state = _currentState;
+			var state = _currentState.Value;
 			var time = DateTime.Now;
 
 			foreach (var entry in _loggerPool.GetLogDestinations())
