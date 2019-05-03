@@ -38,7 +38,7 @@ namespace Najlot.Log.Destinations
 
 			if (KeepFileOpen)
 			{
-				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
+				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 			}
 
 			if (AutoCleanUp) CleanUpOldFiles(path);
@@ -62,7 +62,7 @@ namespace Najlot.Log.Destinations
 
 					if (KeepFileOpen)
 					{
-						SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite));
+						SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 					}
 				}
 
