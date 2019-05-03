@@ -12,7 +12,7 @@ namespace Najlot.Log
 	{
 		#region State Support
 
-		private ThreadLocal<object> _currentState = new ThreadLocal<object>(() => null);
+		private readonly ThreadLocal<object> _currentState = new ThreadLocal<object>(() => null);
 		private readonly ThreadLocal<Stack<object>> _states = new ThreadLocal<Stack<object>>(() => new Stack<object>());
 
 		public IDisposable BeginScope<T>(T state)
