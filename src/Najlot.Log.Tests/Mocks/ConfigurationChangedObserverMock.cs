@@ -1,4 +1,3 @@
-using Najlot.Log.Configuration;
 using System;
 
 namespace Najlot.Log.Tests.Mocks

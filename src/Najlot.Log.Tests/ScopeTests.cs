@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Middleware;
+﻿using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
 using Xunit;

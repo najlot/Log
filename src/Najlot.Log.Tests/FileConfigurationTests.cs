@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Configuration.FileSource;
+﻿using Najlot.Log.Configuration.FileSource;
 using Najlot.Log.Middleware;
 using System.Diagnostics;
 using System.IO;

@@ -220,6 +220,7 @@ namespace Najlot.Log
 		}
 
 		#region IDisposable Support
+
 		private bool _disposedValue = false;
 
 		private void Dispose(bool disposing)
@@ -241,6 +242,7 @@ namespace Najlot.Log
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
+
 		#endregion IDisposable Support
 	}
 }

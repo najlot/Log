@@ -149,6 +149,7 @@ namespace Najlot.Log
 				}
 			}
 		}
+
 		#endregion Format middleware
 	}
 }

@@ -12,6 +12,7 @@ namespace Najlot.Log.Util
 		}
 
 		#region IDisposable Support
+
 		private bool _disposedValue = false; // To detect redundant calls
 
 		public void Dispose()
@@ -22,6 +23,7 @@ namespace Najlot.Log.Util
 				_action();
 			}
 		}
-		#endregion
+
+		#endregion IDisposable Support
 	}
 }

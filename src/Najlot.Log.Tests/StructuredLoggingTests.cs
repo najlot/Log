@@ -74,6 +74,5 @@ namespace Najlot.Log.Tests
 				Assert.True(index != -1, output);
 			}
 		}
-
 	}
 }

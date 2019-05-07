@@ -29,7 +29,7 @@ namespace Najlot.Log
 
 					if (startIndex == message.Length - 1)
 					{
-						startIndex = - 1;
+						startIndex = -1;
 						break;
 					}
 

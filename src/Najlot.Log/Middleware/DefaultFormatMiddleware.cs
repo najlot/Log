@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-
-namespace Najlot.Log.Middleware
+﻿namespace Najlot.Log.Middleware
 {
 	public class DefaultFormatMiddleware : IFormatMiddleware
 	{
