@@ -1,9 +1,7 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Destinations;
+﻿using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Najlot.Log
 {
@@ -17,10 +15,10 @@ namespace Najlot.Log
 		/// </summary>
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
 
-		private ILogConfiguration _logConfiguration;
+		private readonly ILogConfiguration _logConfiguration;
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
 		private readonly List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
-		private Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
+		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 		private bool _hasLogdestinationsAdded = false;
 		private bool _hasLogdestinationsPending = false;
 
@@ -43,12 +41,7 @@ namespace Najlot.Log
 
 		private LogDestinationEntry CreateLogDestinationEntry<T>(T logDestination) where T : ILogDestination
 		{
-			var couldGetFormatFunc = this._logConfiguration.TryGetFormatFunctionForType(typeof(T), out var formatFunc);
-
-			if (!couldGetFormatFunc)
-			{
-				formatFunc = DefaultFormatFuncHolder.DefaultFormatFunc;
-			}
+			_logConfiguration.GetFormatMiddlewareTypeForType(typeof(T), out var formatMiddlewareType);
 
 			return new LogDestinationEntry()
 			{
@@ -56,7 +49,7 @@ namespace Najlot.Log
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(_logConfiguration.FilterMiddlewareType),
 				LogDestination = logDestination,
 				LogDestinationType = logDestination.GetType(),
-				FormatFunc = formatFunc
+				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType)
 			};
 		}
 
@@ -150,9 +143,8 @@ namespace Najlot.Log
 						destination.LogDestination.Dispose();
 					}
 
-					_logConfiguration = null;
+					_logDestinations.Clear();
 					_logDestinations = null;
-					_loggerCache = null;
 				}
 			}
 		}

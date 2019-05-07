@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Najlot.Log.Middleware;
+using System;
 
 namespace Najlot.Log.Destinations
 {
@@ -25,7 +26,7 @@ namespace Najlot.Log.Destinations
 			// Nothing to dispose
 		}
 
-		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 		{
 			if (UseColors)
 			{
@@ -57,7 +58,7 @@ namespace Najlot.Log.Destinations
 				}
 			}
 
-			Console.Out.WriteLine(formatFunc(message));
+			Console.Out.WriteLine(formatMiddleware.Format(message));
 
 			if (UseColors)
 			{

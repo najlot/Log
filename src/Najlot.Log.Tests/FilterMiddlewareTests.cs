@@ -85,7 +85,7 @@ namespace Najlot.Log.Tests
 		public void LoggerShouldNotDieBecauseOfFilterMiddleware()
 		{
 			var fileName = nameof(LoggerShouldNotDieBecauseOfFilterMiddleware) + ".log";
-			
+
 			if (File.Exists(fileName))
 			{
 				File.Delete(fileName);

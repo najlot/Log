@@ -1,10 +1,13 @@
-﻿namespace Najlot.Log
+﻿using System.Collections.Generic;
+using System.Text;
+
+namespace Najlot.Log.Middleware
 {
-	internal static class DefaultFormatFuncHolder
+	public class DefaultFormatMiddleware : IFormatMiddleware
 	{
 		private const string _delimiter = " - ";
 
-		internal static string DefaultFormatFunc(LogMessage message)
+		public string Format(LogMessage message)
 		{
 			string timestamp = message.DateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
 			var category = message.Category ?? "";
@@ -15,11 +18,18 @@
 				logLevel += ' ';
 			}
 
+			var messageString = message.Message.ToString();
+
+			if (message.Arguments.Count > 0 && messageString.Length > 0)
+			{
+				messageString = LogArgumentsParser.InsertArguments(message.Arguments, messageString);
+			}
+
 			var formatted = string.Concat(timestamp,
 				_delimiter, logLevel,
 				_delimiter, category,
 				_delimiter, message.State,
-				_delimiter, message.Message);
+				_delimiter, messageString);
 
 			return message.ExceptionIsValid ? formatted + message.Exception.ToString() : formatted;
 		}

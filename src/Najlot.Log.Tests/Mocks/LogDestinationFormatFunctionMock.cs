@@ -1,25 +1,26 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Destinations;
+﻿using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
 using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
 	public sealed class LogDestinationFormatFunctionMock : ILogDestination
 	{
-		private Action<string> _logAction;
+		private readonly Action<string> _logAction;
 
-		public LogDestinationFormatFunctionMock(ILogConfiguration configuration, Action<string> formattedLogAction)
+		public LogDestinationFormatFunctionMock(Action<string> formattedLogAction)
 		{
 			_logAction = formattedLogAction;
 		}
 
 		public void Dispose()
 		{
+			// Nothing to do
 		}
 
-		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 		{
-			_logAction(formatFunc(message));
+			_logAction(formatMiddleware.Format(message));
 		}
 	}
 }

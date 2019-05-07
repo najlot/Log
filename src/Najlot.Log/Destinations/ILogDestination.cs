@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Najlot.Log.Middleware;
+using System;
 
 namespace Najlot.Log.Destinations
 {
@@ -8,10 +9,10 @@ namespace Najlot.Log.Destinations
 	public interface ILogDestination : IDisposable
 	{
 		/// <summary>
-		/// Tells the destination to take the message
+		/// Tells the destination to log the message
 		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="formatFunc"></param>
-		void Log(LogMessage message, Func<LogMessage, string> formatFunc);
+		/// <param name="message">Message to be logged</param>
+		/// <param name="formatMiddleware">Middleware to be used for formatting</param>
+		void Log(LogMessage message, IFormatMiddleware formatMiddleware);
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Najlot.Log.Middleware;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Najlot.Log.Destinations
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
-		public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 		{
 			var path = GetPath();
 			bool cleanUp = false;
@@ -68,11 +69,11 @@ namespace Najlot.Log.Destinations
 
 				if (KeepFileOpen)
 				{
-					Write(formatFunc(message) + NewLine);
+					Write(formatMiddleware.Format(message) + NewLine);
 				}
 				else
 				{
-					File.AppendAllText(path, formatFunc(message) + NewLine, _encoding);
+					File.AppendAllText(path, formatMiddleware.Format(message) + NewLine, _encoding);
 				}
 
 				if (cleanUp) CleanUpOldFiles(path);

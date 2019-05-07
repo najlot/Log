@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using System;
+﻿using System;
 
 namespace Najlot.Log
 {
@@ -83,10 +82,11 @@ namespace Najlot.Log
 
 			if (logLevel == LogLevel.Trace)
 			{
-				// Must be carefull with this one...
 				LogTrace = true;
 			}
 		}
+
+		public IDisposable BeginScope<T>(T state) => _logExecutor.BeginScope(state);
 
 		public void Trace<T>(T o)
 		{
@@ -118,6 +118,96 @@ namespace Najlot.Log
 			if (LogFatal) _logExecutor.Fatal(o);
 		}
 
+		public void Trace<T>(Exception ex, T o)
+		{
+			if (LogTrace) _logExecutor.Trace(ex, o);
+		}
+
+		public void Debug<T>(Exception ex, T o)
+		{
+			if (LogDebug) _logExecutor.Debug(ex, o);
+		}
+
+		public void Info<T>(Exception ex, T o)
+		{
+			if (LogInfo) _logExecutor.Info(ex, o);
+		}
+
+		public void Warn<T>(Exception ex, T o)
+		{
+			if (LogWarn) _logExecutor.Warn(ex, o);
+		}
+
+		public void Error<T>(Exception ex, T o)
+		{
+			if (LogError) _logExecutor.Error(ex, o);
+		}
+
+		public void Fatal<T>(Exception ex, T o)
+		{
+			if (LogFatal) _logExecutor.Fatal(ex, o);
+		}
+
+		public void Trace(string s, params object[] args)
+		{
+			if (LogTrace) _logExecutor.Trace(s, args);
+		}
+
+		public void Debug(string s, params object[] args)
+		{
+			if (LogDebug) _logExecutor.Debug(s, args);
+		}
+
+		public void Info(string s, params object[] args)
+		{
+			if (LogInfo) _logExecutor.Info(s, args);
+		}
+
+		public void Warn(string s, params object[] args)
+		{
+			if (LogWarn) _logExecutor.Warn(s, args);
+		}
+
+		public void Error(string s, params object[] args)
+		{
+			if (LogError) _logExecutor.Error(s, args);
+		}
+
+		public void Fatal(string s, params object[] args)
+		{
+			if (LogFatal) _logExecutor.Fatal(s, args);
+		}
+
+		public void Trace(Exception ex, string s, params object[] args)
+		{
+			if (LogTrace) _logExecutor.Trace(ex, s, args);
+		}
+
+		public void Debug(Exception ex, string s, params object[] args)
+		{
+			if (LogDebug) _logExecutor.Debug(ex, s, args);
+		}
+
+		public void Info(Exception ex, string s, params object[] args)
+		{
+			if (LogInfo) _logExecutor.Info(ex, s, args);
+		}
+
+		public void Warn(Exception ex, string s, params object[] args)
+		{
+			if (LogWarn) _logExecutor.Warn(ex, s, args);
+		}
+
+		public void Error(Exception ex, string s, params object[] args)
+		{
+			if (LogError) _logExecutor.Error(ex, s, args);
+		}
+
+		public void Fatal(Exception ex, string s, params object[] args)
+		{
+			if (LogFatal) _logExecutor.Fatal(ex, s, args);
+		}
+
 		public void Flush() => _logExecutor.Flush();
 
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
@@ -129,40 +219,7 @@ namespace Najlot.Log
 			}
 		}
 
-		public IDisposable BeginScope<T>(T state) => _logExecutor.BeginScope(state);
-
-		public void Trace<T>(T o, Exception ex)
-		{
-			if (LogTrace) _logExecutor.Trace(o, ex);
-		}
-
-		public void Debug<T>(T o, Exception ex)
-		{
-			if (LogDebug) _logExecutor.Debug(o, ex);
-		}
-
-		public void Error<T>(T o, Exception ex)
-		{
-			if (LogError) _logExecutor.Error(o, ex);
-		}
-
-		public void Fatal<T>(T o, Exception ex)
-		{
-			if (LogFatal) _logExecutor.Fatal(o, ex);
-		}
-
-		public void Info<T>(T o, Exception ex)
-		{
-			if (LogInfo) _logExecutor.Info(o, ex);
-		}
-
-		public void Warn<T>(T o, Exception ex)
-		{
-			if (LogWarn) _logExecutor.Warn(o, ex);
-		}
-
 		#region IDisposable Support
-
 		private bool _disposedValue = false;
 
 		private void Dispose(bool disposing)
@@ -174,6 +231,7 @@ namespace Najlot.Log
 				if (disposing)
 				{
 					_logConfiguration.DetachObserver(this);
+					_logExecutor.Dispose();
 				}
 			}
 		}
@@ -183,7 +241,6 @@ namespace Najlot.Log
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-
 		#endregion IDisposable Support
 	}
 }

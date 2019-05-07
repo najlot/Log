@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log.Extensions.Logging
 {
@@ -20,31 +22,81 @@ namespace Najlot.Log.Extensions.Logging
 
 		public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
-			switch (logLevel)
+			if (!IsEnabled(logLevel))
 			{
-				case Microsoft.Extensions.Logging.LogLevel.Trace:
-					_logger.Trace(state, exception);
-					break;
+				return;
+			}
 
-				case Microsoft.Extensions.Logging.LogLevel.Debug:
-					_logger.Debug(state, exception);
-					break;
+			if (state is IReadOnlyList<KeyValuePair<string, object>> values && values.Count > 1)
+			{
+				var format = "Unknown";
+				var args = new List<KeyValuePair<string, object>>(values);
 
-				case Microsoft.Extensions.Logging.LogLevel.Information:
-					_logger.Info(state, exception);
-					break;
+				foreach (KeyValuePair<string, object> value in values)
+				{
+					if (value.Key == "{OriginalFormat}")
+					{
+						format = value.Value.ToString();
+						args.Remove(value);
+						break;
+					}
+				}
 
-				case Microsoft.Extensions.Logging.LogLevel.Warning:
-					_logger.Warn(state, exception);
-					break;
+				switch (logLevel)
+				{
+					case Microsoft.Extensions.Logging.LogLevel.Trace:
+						_logger.Trace(exception, format, args);
+						break;
 
-				case Microsoft.Extensions.Logging.LogLevel.Error:
-					_logger.Error(state, exception);
-					break;
+					case Microsoft.Extensions.Logging.LogLevel.Debug:
+						_logger.Debug(exception, format, args);
+						break;
 
-				case Microsoft.Extensions.Logging.LogLevel.Critical:
-					_logger.Fatal(state, exception);
-					break;
+					case Microsoft.Extensions.Logging.LogLevel.Information:
+						_logger.Info(exception, format, args);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Warning:
+						_logger.Warn(exception, format, args);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Error:
+						_logger.Error(exception, format, args);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Critical:
+						_logger.Fatal(exception, format, args);
+						break;
+				}
+			}
+			else
+			{
+				switch (logLevel)
+				{
+					case Microsoft.Extensions.Logging.LogLevel.Trace:
+						_logger.Trace(exception, state);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Debug:
+						_logger.Debug(exception, state);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Information:
+						_logger.Info(exception, state);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Warning:
+						_logger.Warn(exception, state);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Error:
+						_logger.Error(exception, state);
+						break;
+
+					case Microsoft.Extensions.Logging.LogLevel.Critical:
+						_logger.Fatal(exception, state);
+						break;
+				}
 			}
 		}
 	}

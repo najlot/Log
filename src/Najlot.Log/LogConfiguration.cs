@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Najlot.Log.Configuration
+namespace Najlot.Log
 {
-	/// <summary>
-	/// Internal implementation of the ILogConfiguration interface
-	/// </summary>
 	internal class LogConfiguration : ILogConfiguration
 	{
 		public static LogConfiguration Instance { get; } = new LogConfiguration();
@@ -119,63 +116,39 @@ namespace Najlot.Log.Configuration
 
 		#endregion ConfigurationChanged observers
 
-		#region Format functions
+		#region Format middleware
 
-		private readonly Dictionary<Type, Func<LogMessage, string>> _formatFunctions = new Dictionary<Type, Func<LogMessage, string>>();
+		private readonly Dictionary<Type, Type> _formatMiddlewareTypes = new Dictionary<Type, Type>();
 
-		public bool TryGetFormatFunctionForType(Type type, out Func<LogMessage, string> function)
+		public void GetFormatMiddlewareTypeForType(Type type, out Type middlewareType)
 		{
-			lock (_formatFunctions)
+			lock (_formatMiddlewareTypes)
 			{
-				return _formatFunctions.TryGetValue(type, out function);
-			}
-		}
-
-		public bool TrySetFormatFunctionForType(Type type, Func<LogMessage, string> function)
-		{
-			bool addOrUpdateOk;
-
-			if (function == null)
-			{
-				return false;
-			}
-
-			lock (_formatFunctions)
-			{
-				if (!_formatFunctions.TryGetValue(type, out Func<LogMessage, string> oldFunction))
+				if (!_formatMiddlewareTypes.TryGetValue(type, out middlewareType))
 				{
-					_formatFunctions.Add(type, function);
-					addOrUpdateOk = true;
-				}
-				else
-				{
-					addOrUpdateOk = oldFunction != function;
-
-					if (addOrUpdateOk)
-					{
-						_formatFunctions[type] = function;
-					}
+					middlewareType = typeof(DefaultFormatMiddleware);
 				}
 			}
-
-			if (addOrUpdateOk)
-			{
-				NotifyObservers();
-			}
-
-			return addOrUpdateOk;
 		}
 
-		public void ClearAllFormatFunctions()
+		public void SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
 		{
-			lock (_formatFunctions)
+			var middlewareType = typeof(TMiddleware);
+
+			lock (_formatMiddlewareTypes)
 			{
-				_formatFunctions.Clear();
+				if (!_formatMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				{
+					_formatMiddlewareTypes.Add(type, middlewareType);
+					NotifyObservers();
+				}
+				else if (oldMiddlewareType != middlewareType)
+				{
+					_formatMiddlewareTypes[type] = middlewareType;
+					NotifyObservers();
+				}
 			}
-
-			NotifyObservers();
 		}
-
-		#endregion Format functions
+		#endregion Format middleware
 	}
 }

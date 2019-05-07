@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log
 {
@@ -13,7 +14,7 @@ namespace Najlot.Log
 		public DateTime DateTime { get; }
 
 		/// <summary>
-		/// Logging level it was requested to log with
+		/// Logging level logging was requested with
 		/// </summary>
 		public LogLevel LogLevel { get; }
 
@@ -42,7 +43,18 @@ namespace Najlot.Log
 		/// </summary>
 		public bool ExceptionIsValid { get; }
 
-		public LogMessage(DateTime dateTime, LogLevel logLevel, string category, object state, object message, Exception ex)
+		/// <summary>
+		/// Arguments received through one of the Trace / Debug / Info / Warn / Error / Fatal functions
+		/// </summary>
+		public IReadOnlyList<KeyValuePair<string, object>> Arguments { get; }
+
+		public LogMessage(DateTime dateTime,
+			LogLevel logLevel,
+			string category,
+			object state,
+			object message,
+			Exception ex,
+			IReadOnlyList<KeyValuePair<string, object>> args)
 		{
 			DateTime = dateTime;
 			LogLevel = logLevel;
@@ -50,6 +62,7 @@ namespace Najlot.Log
 			State = state;
 			Message = message;
 			Exception = ex;
+			Arguments = args;
 
 			ExceptionIsValid = ex != null;
 		}

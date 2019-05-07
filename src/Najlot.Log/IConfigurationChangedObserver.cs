@@ -1,4 +1,4 @@
-﻿namespace Najlot.Log.Configuration
+﻿namespace Najlot.Log
 {
 	public interface IConfigurationChangedObserver
 	{

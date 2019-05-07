@@ -38,27 +38,27 @@ namespace Najlot.Log.Tests
 			}
 			catch (Exception ex)
 			{
-				log.Trace("Trace: ", ex);
+				log.Trace(ex, "Trace: ");
 				Assert.True(logged);
 				logged = false;
 
-				log.Debug("Debug: ", ex);
+				log.Debug(ex, "Debug: ");
 				Assert.True(logged);
 				logged = false;
 
-				log.Info("Info: ", ex);
+				log.Info(ex, "Info: ");
 				Assert.True(logged);
 				logged = false;
 
-				log.Warn("Warn: ", ex);
+				log.Warn(ex, "Warn: ");
 				Assert.True(logged);
 				logged = false;
 
-				log.Error("Error: ", ex);
+				log.Error(ex, "Error: ");
 				Assert.True(logged);
 				logged = false;
 
-				log.Fatal("Fatal: ", ex);
+				log.Fatal(ex, "Fatal: ");
 				Assert.True(logged);
 				logged = false;
 			}
@@ -110,37 +110,37 @@ namespace Najlot.Log.Tests
 			}
 			catch (Exception ex)
 			{
-				log.Trace("Trace: ", ex);
+				log.Trace(ex, "Trace: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;
 				loggedToSecond = false;
 
-				log.Debug("Debug: ", ex);
+				log.Debug(ex, "Debug: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;
 				loggedToSecond = false;
 
-				log.Info("Info: ", ex);
+				log.Info(ex, "Info: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;
 				loggedToSecond = false;
 
-				log.Warn("Warn: ", ex);
+				log.Warn(ex, "Warn: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;
 				loggedToSecond = false;
 
-				log.Error("Error: ", ex);
+				log.Error(ex, "Error: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;
 				loggedToSecond = false;
 
-				log.Fatal("Fatal: ", ex);
+				log.Fatal(ex, "Fatal: ");
 				Assert.True(logged);
 				Assert.True(loggedToSecond);
 				logged = false;

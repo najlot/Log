@@ -89,6 +89,20 @@ namespace Najlot.Log.Tests
 					logger.LogTrace("Trace logged with scope!");
 					logger.LogWarning("Warning logged with scope!");
 				}
+
+				logger.LogTrace("{Kind} logged!", "Structured Trace");
+				logger.LogDebug("{Kind} logged!", "Structured Debug");
+				logger.LogInformation("{Kind} logged!", "Structured Info");
+				logger.LogWarning("{Kind} logged!", "Structured Warning");
+				logger.LogError("{Kind} logged!", "Structured Error");
+				logger.LogCritical("{Kind} logged!", "Structured Critical");
+
+				logger.LogTrace("{0}, {1} logged!", "Structured Trace", "0");
+				logger.LogDebug("{0}, {1} logged!", "Structured Debug", "0");
+				logger.LogInformation("{0}, {1} logged!", "Structured Info", "0");
+				logger.LogWarning("{0}, {1} logged!", "Structured Warning", "0");
+				logger.LogError("{0}, {1} logged!", "Structured Error", "0");
+				logger.LogCritical("{0}, {1} logged!", "Structured Critical", "0");
 			}
 
 			var content = File.ReadAllText(logFile);
@@ -108,6 +122,20 @@ namespace Najlot.Log.Tests
 			Assert.NotEqual(-1, content.IndexOf("Info logged with scope!"));
 			Assert.NotEqual(-1, content.IndexOf("Trace logged with scope!"));
 			Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
+
+			Assert.NotEqual(-1, content.IndexOf("Structured Critical logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Debug logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Error logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Info logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Trace logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Warning logged!"));
+
+			Assert.NotEqual(-1, content.IndexOf("Structured Critical, 0 logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Debug, 0 logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Error, 0 logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Info, 0 logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Trace, 0 logged!"));
+			Assert.NotEqual(-1, content.IndexOf("Structured Warning, 0 logged!"));
 		}
 
 		[Fact]

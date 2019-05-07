@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Najlot.Log.Configuration;
 using System;
 
 namespace Najlot.Log.Extensions.Logging
@@ -8,12 +7,8 @@ namespace Najlot.Log.Extensions.Logging
 	{
 		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogAdminitrator> configure)
 		{
-			var admin = LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
+			var admin = LogAdminitrator.CreateNew();
 			configure(admin);
-
 			return builder.AddNajlotLog(admin);
 		}
 
@@ -26,15 +21,11 @@ namespace Najlot.Log.Extensions.Logging
 
 	public static class LoggerFactoryExtension
 	{
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory builder, Action<LogAdminitrator> configure)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, Action<LogAdminitrator> configure)
 		{
-			var admin = LogAdminitrator
-				.CreateNew()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
+			var admin = LogAdminitrator.CreateNew();
 			configure(admin);
-
-			return builder.AddNajlotLog(admin);
+			return loggerFactory.AddNajlotLog(admin);
 		}
 
 		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdminitrator logAdministrator)

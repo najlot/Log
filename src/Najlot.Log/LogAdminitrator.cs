@@ -1,5 +1,5 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Destinations;
+﻿using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
 using System;
 
 namespace Najlot.Log
@@ -65,7 +65,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <typeparam name="TExecutionMiddleware"></typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : Middleware.IExecutionMiddleware, new()
+		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
 		{
 			return this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
 		}
@@ -93,7 +93,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <typeparam name="TFilterMiddleware"></typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddleware<TFilterMiddleware>() where TFilterMiddleware : Middleware.IFilterMiddleware, new()
+		public LogAdminitrator SetFilterMiddleware<TFilterMiddleware>() where TFilterMiddleware : IFilterMiddleware, new()
 		{
 			return this.SetFilterMiddlewareByType(typeof(TFilterMiddleware));
 		}
@@ -117,13 +117,36 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
+		/// Sets the type of the format middleware and notifies observing components
+		/// </summary>
+		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
+		{
+			this.Flush();
+			_logConfiguration.SetFormatMiddlewareForType<TMiddleware>(type);
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the type of the format middleware and notifies observing components
+		/// </summary>
+		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator GetFormatMiddlewareTypeForType(Type type, out Type middlewareType)
+		{
+			_logConfiguration.GetFormatMiddlewareTypeForType(type, out middlewareType);
+			return this;
+		}
+
+		/// <summary>
 		/// Adds a custom destination.
 		/// All destinations will be used when creating a logger from a LoggerPool.
 		/// </summary>
 		/// <param name="logDestination">Instance of the new destination</param>
 		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogAdminitrator AddCustomDestination(ILogDestination logDestination, Func<LogMessage, string> formatFunction = null)
+		public LogAdminitrator AddCustomDestination(ILogDestination logDestination)
 		{
 			if (logDestination == null)
 			{
@@ -131,16 +154,6 @@ namespace Najlot.Log
 			}
 
 			_loggerPool.AddLogDestination(logDestination);
-
-			if (formatFunction != null)
-			{
-				var logDestinationType = logDestination.GetType();
-				if (!_logConfiguration.TrySetFormatFunctionForType(logDestinationType, formatFunction))
-				{
-					_logConfiguration.NotifyObservers();
-					Console.WriteLine("Najlot.Log: Could not set format function for " + logDestinationType.Name);
-				}
-			}
 
 			return this;
 		}
@@ -152,10 +165,10 @@ namespace Najlot.Log
 		/// <param name="formatFunction"></param>
 		/// <param name="useColors"></param>
 		/// <returns></returns>
-		public LogAdminitrator AddConsoleLogDestination(Func<LogMessage, string> formatFunction = null, bool useColors = false)
+		public LogAdminitrator AddConsoleLogDestination(bool useColors = false)
 		{
 			var logDestination = new ConsoleLogDestination(useColors);
-			return AddCustomDestination(logDestination, formatFunction);
+			return AddCustomDestination(logDestination);
 		}
 
 		/// Adds a FileLogDestination that calculates the path
@@ -165,10 +178,10 @@ namespace Najlot.Log
 		/// <param name="maxFiles">Max count of files.</param>
 		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, Func<LogMessage, string> formatFunction = null, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
+		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
 		{
 			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
-			return AddCustomDestination(logDestination, formatFunction);
+			return AddCustomDestination(logDestination);
 		}
 
 		/// <summary>
@@ -177,9 +190,9 @@ namespace Najlot.Log
 		/// <param name="fileName">Path to the file</param>
 		/// <param name="formatFunction">Function to customize the output</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(string fileName, Func<LogMessage, string> formatFunction = null, bool keepFileOpen = true)
+		public LogAdminitrator AddFileLogDestination(string fileName, bool keepFileOpen = true)
 		{
-			return AddFileLogDestination(() => fileName, formatFunction, keepFileOpen: keepFileOpen);
+			return AddFileLogDestination(() => fileName, keepFileOpen: keepFileOpen);
 		}
 
 		/// <summary>

@@ -1,5 +1,4 @@
-﻿using Najlot.Log.Configuration;
-using Najlot.Log.Destinations;
+﻿using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
 
@@ -11,7 +10,7 @@ namespace Najlot.Log
 
 		public Type LogDestinationType;
 
-		public Func<LogMessage, string> FormatFunc;
+		public IFormatMiddleware FormatMiddleware;
 
 		public IExecutionMiddleware ExecutionMiddleware;
 
@@ -19,17 +18,22 @@ namespace Najlot.Log
 
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
-			if (configuration.TryGetFormatFunctionForType(this.LogDestination.GetType(), out var formatFunc))
+			if (ExecutionMiddleware.GetType() != configuration.ExecutionMiddlewareType)
 			{
-				FormatFunc = formatFunc;
-			}
-			else
-			{
-				FormatFunc = DefaultFormatFuncHolder.DefaultFormatFunc;
+				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
 			}
 
-			ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
-			FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(configuration.FilterMiddlewareType);
+			if (FilterMiddleware.GetType() != configuration.FilterMiddlewareType)
+			{
+				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(configuration.FilterMiddlewareType);
+			}
+
+			configuration.GetFormatMiddlewareTypeForType(LogDestinationType, out var formatMiddlewareType);
+
+			if (FormatMiddleware.GetType() != formatMiddlewareType)
+			{
+				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
+			}
 		}
 	}
 }

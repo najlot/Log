@@ -25,15 +25,11 @@ LogAdminitrator.Instance.SetLogLevel(LogLevel.Warn);
 log.Info("This message will not be logged.");
 ```
 
-You may set up file and console destinations, 
-tell the logger to use custom formatting function for console destination and log asynchronous (Putting the writing in a Task):
+You tell the logger to log asynchronous (Putting the writing in a Task):
 ```csharp
 LogAdminitrator.Instance
 .SetExecutionMiddleware<TaskExecutionMiddleware>()
-.AddConsoleLogDestination(message =>
-{
-	return $"{message.DateTime} {message.Message} {message.Exception}";
-})
+.AddConsoleLogDestination(useColors: true)
 .AddFileLogDestination("log.txt");
 ```
 
@@ -46,12 +42,15 @@ using Najlot.Log.Configuration.FileSource;
 
 class Program
 {
-	// Function used to format the output for console.
-	private static string FormatForConsole(LogMessage message)
+	// Middleware used to format the output for console.
+	public class ConsoleFormatMiddleware : IFormatMiddleware
 	{
-		return $"{message.DateTime} {message.Message} {message.Exception}";
+		public string Format(LogMessage message)
+		{
+			return $"{message.DateTime} {LogArgumentsParser.InsertArguments(message.Arguments, message.Message.ToString())} {message.Exception}";
+		}
 	}
-
+	
 	static void Main(string[] args)
 	{
 		LogAdminitrator.Instance
@@ -68,7 +67,8 @@ class Program
 		  })
 
 		  // Write to console using custom formatting and applying colors for different loglevels
-		  .AddConsoleLogDestination(FormatForConsole, useColors: true)
+		  .AddConsoleLogDestination(useColors: true)
+		  .SetFormatMiddlewareForType<ConsoleFormatMiddleware>(typeof(ConsoleLogDestination));
 
 		  // Add a destination implemented below.
 		  .AddCustomDestination(new DebugDestination())
@@ -96,7 +96,7 @@ class Program
 			catch (Exception ex)
 			{
 				// Log a fatal error with the exception that caused the error.
-				log.Fatal("Could not start the application: ", ex);
+				log.Fatal(ex, "Could not start the application: ");
 			}
 		}
 
@@ -108,7 +108,7 @@ class Program
 	}
 }
 
-// Custom destination that writes to debug output.
+// Custom destination that writes to System.Diagnostics.Debug.
 public class DebugDestination : ILogDestination
 {
 	public void Dispose()
@@ -116,9 +116,9 @@ public class DebugDestination : ILogDestination
 		// Nothing to do
 	}
 
-	public void Log(LogMessage message, Func<LogMessage, string> formatFunc)
+	public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 	{
-		System.Diagnostics.Debug.WriteLine(formatFunc(message));
+		System.Diagnostics.Debug.WriteLine(formatMiddleware.Format(message));
 	}
 }
 ```
@@ -143,6 +143,3 @@ loggerFactory.AddNajlotLog(administrator =>
 var logger = loggerFactory.CreateLogger("default");
 logger.LogInformation("Hello, World!");
 ```
-
-###### TODO:
-- [ ] Implement structured logging.

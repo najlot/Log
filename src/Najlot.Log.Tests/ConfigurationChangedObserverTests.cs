@@ -54,7 +54,6 @@ namespace Najlot.Log.Tests
 		public void ConfigurationMustNotNotifyOnFormatFunctionSetTwiceButOnce()
 		{
 			bool observerNotified = false;
-			string testFunc(LogMessage msg) => "";
 
 			var configurator = LogAdminitrator
 				.CreateNew()
@@ -66,12 +65,12 @@ namespace Najlot.Log.Tests
 				observerNotified = true;
 			}));
 
-			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			logConfiguration.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(typeof(ConfigurationChangedObserverMock));
 			Assert.True(observerNotified, "Observer was not notified on format function changed");
 
 			observerNotified = false;
 
-			logConfiguration.TrySetFormatFunctionForType(typeof(ConfigurationChangedObserverMock), testFunc);
+			logConfiguration.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(typeof(ConfigurationChangedObserverMock));
 			Assert.False(observerNotified, "Observer was notified, but format funtion was the same");
 		}
 	}
