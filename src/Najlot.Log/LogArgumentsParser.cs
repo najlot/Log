@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Najlot.Log
 {
@@ -46,14 +48,17 @@ namespace Najlot.Log
 				if (endIndex != -1)
 				{
 					var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
+					var splittedKey = key.Split(':');
+					var keyWithoutFormat = splittedKey[0];
+
 					startIndex = endIndex + 1;
 
-					if (arguments.FindIndex(0, p => p.Key == key) > -1)
+					if (arguments.FindIndex(0, p => p.Key == keyWithoutFormat) > -1)
 					{
 						continue;
 					}
 
-					arguments.Add(new KeyValuePair<string, object>(key, args[argId]));
+					arguments.Add(new KeyValuePair<string, object>(keyWithoutFormat, args[argId]));
 
 					argId++;
 					if (argId >= args.Length)
@@ -117,12 +122,27 @@ namespace Najlot.Log
 				if (endIndex != -1)
 				{
 					var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
+					var splittedKey = key.Split(':');
+					var keyWithoutFormat = splittedKey[0];
 
-					int index = argList.FindIndex(0, p => p.Key == key);
+					int index = argList.FindIndex(0, p => p.Key == keyWithoutFormat);
 
 					if (index > -1)
 					{
-						message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, argList[index].Value.ToString());
+						string valueString;
+						var value = argList[index].Value;
+
+						if (splittedKey.Length > 1 && value is IFormattable formattable)
+						{
+							var format = string.Join(":", splittedKey.Skip(1));
+							valueString = formattable.ToString(format, null);
+						}
+						else
+						{
+							valueString = (value == null ? "" : value.ToString());
+						}
+
+						message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
 					}
 
 					startIndex = endIndex + 1;
