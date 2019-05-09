@@ -31,7 +31,7 @@ namespace Najlot.Log
 		/// <summary>
 		/// The instance that was given to the request
 		/// </summary>
-		public object Message { get; }
+		public string Message { get; }
 
 		/// <summary>
 		/// Exception, if got any, otherwise null. Check ExceptionIsValid
@@ -52,7 +52,7 @@ namespace Najlot.Log
 			LogLevel logLevel,
 			string category,
 			object state,
-			object message,
+			string message,
 			Exception ex,
 			IReadOnlyList<KeyValuePair<string, object>> args)
 		{

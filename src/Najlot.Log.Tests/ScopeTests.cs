@@ -57,7 +57,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					if (scopesAreNotCorrect) return;
-					scopesAreNotCorrect = (string)msg.Message != (string)msg.State;
+					scopesAreNotCorrect = msg.Message != (string)msg.State;
 				}));
 
 			var log = logAdminitrator.GetLogger(this.GetType());
@@ -212,7 +212,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
 					// state must be the same thread id the message comes from
-					if (msg.Message.ToString() != msg.State.ToString())
+					if (msg.Message != msg.State.ToString())
 					{
 						error = true;
 					}

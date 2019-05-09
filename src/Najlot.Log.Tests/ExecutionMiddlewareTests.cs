@@ -135,11 +135,10 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
-
+					
 					bool couldRemove = false;
 
-					lock (messages) couldRemove = messages.Remove(logMessageActual);
+					lock (messages) couldRemove = messages.Remove(msg.Message);
 
 					if (removingError) return;
 					removingError = !couldRemove;
@@ -182,7 +181,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
-					logMessageActual = msg.Message.ToString();
+					logMessageActual = msg.Message;
 				}));
 
 			var logger = logAdminitrator.GetLogger(this.GetType());
@@ -208,7 +207,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
-					logMessageActual = msg.Message.ToString();
+					logMessageActual = msg.Message;
 				}));
 
 			var log = logAdminitrator.GetLogger(this.GetType());
@@ -233,7 +232,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					loggerGotAction = true;
-					logMessageActual = msg.Message.ToString();
+					logMessageActual = msg.Message;
 				}));
 
 			var log = logAdminitrator.GetLogger(this.GetType());
@@ -267,7 +266,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
+					var logMessageActual = msg.Message;
 					bool couldRemove = messages.Remove(logMessageActual);
 
 					if (removingError) return;
@@ -329,7 +328,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
+					var logMessageActual = msg.Message;
 					bool couldRemove = messages.Remove(logMessageActual);
 					Assert.True(couldRemove, "Could not remove " + logMessageActual);
 				}));
@@ -365,7 +364,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
-					var logMessageActual = msg.Message.ToString();
+					var logMessageActual = msg.Message;
 					bool couldRemove = messages.Remove(logMessageActual);
 					Assert.True(couldRemove, "Could not remove " + logMessageActual);
 				}));

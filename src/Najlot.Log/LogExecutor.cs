@@ -110,16 +110,16 @@ namespace Najlot.Log
 					}
 					else if(args.Length == 0)
 					{
-						message = new LogMessage(time, logLevel, _category, state, msg, ex, _emptyKeyValueList);
+						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, _emptyKeyValueList);
 					}
 					else if (args.Length == 1 && args[0] is IReadOnlyList<KeyValuePair<string, object>> pair)
 					{
-						message = new LogMessage(time, logLevel, _category, state, msg, ex, pair);
+						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, pair);
 					}
 					else
 					{
 						var parsedKeyValuePairs = LogArgumentsParser.ParseArguments(msg.ToString(), args);
-						message = new LogMessage(time, logLevel, _category, state, msg, ex, parsedKeyValuePairs);
+						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, parsedKeyValuePairs);
 					}
 
 					if (filterMiddleware.AllowThrough(destinationType, message))

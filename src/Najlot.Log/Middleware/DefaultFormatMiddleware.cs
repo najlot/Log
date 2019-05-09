@@ -15,7 +15,7 @@
 				logLevel += ' ';
 			}
 
-			var messageString = message.Message.ToString();
+			var messageString = message.Message;
 
 			if (message.Arguments.Count > 0 && messageString.Length > 0)
 			{
