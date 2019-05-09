@@ -11,6 +11,7 @@ namespace Najlot.Log
 	{
 		public string Name { get; }
 
+		// TODO: name of this class may change
 		public LogClassNameAttribute(string name)
 		{
 			Name = name;
