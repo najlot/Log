@@ -1,4 +1,5 @@
-﻿using Najlot.Log.Util;
+﻿using Najlot.Log.Middleware;
+using Najlot.Log.Util;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -97,6 +98,7 @@ namespace Najlot.Log
 				var destinationType = entry.LogDestinationType;
 				var filterMiddleware = entry.FilterMiddleware;
 				var formatMiddleware = entry.FormatMiddleware;
+				var queueMiddleware = new NoQueueMiddleware();
 
 				entry.ExecutionMiddleware.Execute(() =>
 				{
@@ -124,7 +126,13 @@ namespace Najlot.Log
 
 					if (filterMiddleware.AllowThrough(destinationType, message))
 					{
-						destination.Log(message, formatMiddleware);
+						LogQueueMessage queueMessage;
+
+						queueMessage.Destination = destination;
+						queueMessage.FormatMiddleware = formatMiddleware;
+						queueMessage.Message = message;
+
+						queueMiddleware.QueueWriteMessage(queueMessage);
 					}
 				});
 			}

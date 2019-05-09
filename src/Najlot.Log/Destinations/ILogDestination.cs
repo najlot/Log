@@ -9,10 +9,9 @@ namespace Najlot.Log.Destinations
 	public interface ILogDestination : IDisposable
 	{
 		/// <summary>
-		/// Tells the destination to log the message
+		/// Tells the destination to log the messages
 		/// </summary>
-		/// <param name="message">Message to be logged</param>
-		/// <param name="formatMiddleware">Middleware to be used for formatting</param>
-		void Log(LogMessage message, IFormatMiddleware formatMiddleware);
+		/// <param name="logMessageFormattingPair">Messages to be logged</param>
+		void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair);
 	}
 }

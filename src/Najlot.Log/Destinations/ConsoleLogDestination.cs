@@ -26,6 +26,14 @@ namespace Najlot.Log.Destinations
 			// Nothing to dispose
 		}
 
+		public void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair)
+		{
+			foreach (var entry in logMessageFormattingPair)
+			{
+				Log(entry.Item1, entry.Item2);
+			}
+		}
+
 		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 		{
 			if (UseColors)
