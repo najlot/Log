@@ -12,6 +12,6 @@ namespace Najlot.Log.Tests.Mocks
 
 		public void Dispose() => Flush();
 
-		public void Flush(){}
+		public void Flush() { }
 	}
 }

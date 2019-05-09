@@ -108,7 +108,7 @@ namespace Najlot.Log
 					{
 						message = new LogMessage(time, logLevel, _category, state, "", ex, _emptyKeyValueList);
 					}
-					else if(args.Length == 0)
+					else if (args.Length == 0)
 					{
 						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, _emptyKeyValueList);
 					}

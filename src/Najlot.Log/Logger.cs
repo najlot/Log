@@ -27,7 +27,7 @@ namespace Najlot.Log
 		}
 
 		public bool IsEnabled(LogLevel logLevel) => logLevel >= _logLevel;
-		
+
 		private LogLevel _logLevel;
 		private readonly ILogConfiguration _logConfiguration;
 

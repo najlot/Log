@@ -122,7 +122,7 @@ namespace Najlot.Log.Tests
 				})))
 			{
 				var log = logAdminitrator.GetLogger("default");
-				
+
 				// null as args -> nothing will be parsed
 				log.Info("This is null: {var}.", null);
 				index = output.IndexOf("This is null: {var}.");

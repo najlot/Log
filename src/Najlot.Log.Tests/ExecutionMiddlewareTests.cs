@@ -135,7 +135,7 @@ namespace Najlot.Log.Tests
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					executionsActual++;
-					
+
 					bool couldRemove = false;
 
 					lock (messages) couldRemove = messages.Remove(msg.Message);
