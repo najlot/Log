@@ -17,12 +17,12 @@ namespace Najlot.Log
 		/// <summary>
 		/// Current execution middleware for all log destinations observing this configuration
 		/// </summary>
-		Type ExecutionMiddlewareType { get; }
+		Type ExecutionMiddlewareType { get; } // TODO log class name
 
 		/// <summary>
 		/// Type of the filter middleware for all log destinations observing this configuration
 		/// </summary>
-		Type FilterMiddlewareType { get; }
+		Type FilterMiddlewareType { get; } // TODO log class name
 
 		/// <summary>
 		/// Gets a format function for a type of log destination
