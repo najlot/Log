@@ -19,7 +19,7 @@
 
 			if (message.Arguments.Count > 0 && messageString.Length > 0)
 			{
-				messageString = LogArgumentsParser.InsertArguments(message.Arguments, messageString);
+				messageString = LogArgumentsParser.InsertArguments(messageString, message.Arguments);
 			}
 
 			var formatted = string.Concat(timestamp,

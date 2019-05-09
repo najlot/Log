@@ -72,7 +72,7 @@ namespace Najlot.Log
 			return arguments;
 		}
 
-		public static string InsertArguments(IReadOnlyList<KeyValuePair<string, object>> arguments, string message)
+		public static string InsertArguments(string message, IReadOnlyList<KeyValuePair<string, object>> arguments)
 		{
 			if (arguments.Count == 0 || string.IsNullOrWhiteSpace(message))
 			{

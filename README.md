@@ -47,7 +47,7 @@ class Program
 	{
 		public string Format(LogMessage message)
 		{
-			return $"{message.DateTime} {LogArgumentsParser.InsertArguments(message.Arguments, message.Message.ToString())} {message.Exception}";
+			return $"{message.DateTime} {LogArgumentsParser.InsertArguments(message.Message.ToString(), message.Arguments)} {message.Exception}";
 		}
 	}
 	
