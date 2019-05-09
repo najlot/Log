@@ -17,7 +17,7 @@ namespace Najlot.Log.Tests
 			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					output = middleware.Format(msg);
@@ -86,7 +86,7 @@ namespace Najlot.Log.Tests
 			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					output = middleware.Format(msg);
@@ -115,7 +115,7 @@ namespace Najlot.Log.Tests
 			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
+				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
 					output = middleware.Format(msg);
@@ -150,6 +150,28 @@ namespace Najlot.Log.Tests
 				log.Info("This is a time: {time:yyyy-MM-dd HH:mm:ss.fff}", now);
 				index = output.IndexOf($"This is a time: {formattedNow}");
 				Assert.True(index != -1, output);
+			}
+		}
+
+		[Fact]
+		public void NullMessageShouldNotMakeExceptions()
+		{
+			var middleware = new DefaultFormatMiddleware();
+
+			using (var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetLogLevel(LogLevel.Trace)
+				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					var output = middleware.Format(msg);
+				})))
+			{
+				var log = logAdminitrator.GetLogger("default");
+
+				// log null variables must not produce exceptions
+				log.Info(null);
+				log.Info(default(string), 0);
 			}
 		}
 	}

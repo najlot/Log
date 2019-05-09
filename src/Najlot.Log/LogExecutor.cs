@@ -104,7 +104,11 @@ namespace Najlot.Log
 
 					args = args ?? _emptyArgs;
 
-					if (args.Length == 0)
+					if (msg == null)
+					{
+						message = new LogMessage(time, logLevel, _category, state, "", ex, _emptyKeyValueList);
+					}
+					else if(args.Length == 0)
 					{
 						message = new LogMessage(time, logLevel, _category, state, msg, ex, _emptyKeyValueList);
 					}
