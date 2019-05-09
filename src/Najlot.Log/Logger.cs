@@ -211,7 +211,7 @@ namespace Najlot.Log
 		{
 			if (_logLevel != configuration.LogLevel)
 			{
-				SetupLogLevel(_logLevel);
+				SetupLogLevel(configuration.LogLevel);
 			}
 		}
 
