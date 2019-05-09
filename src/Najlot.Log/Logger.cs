@@ -22,7 +22,7 @@ namespace Najlot.Log
 			_logConfiguration = logConfiguration;
 			_logConfiguration.AttachObserver(this);
 
-			_logExecutor = logExecutor ?? throw new ArgumentNullException(nameof(logExecutor));
+			_logExecutor = logExecutor;
 			SetupLogLevel(logConfiguration.LogLevel);
 		}
 
