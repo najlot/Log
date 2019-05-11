@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log
 {
@@ -25,11 +26,17 @@ namespace Najlot.Log
 		Type FilterMiddlewareType { get; } // TODO log class name
 
 		/// <summary>
-		/// Gets a format function for a type of log destination
+		/// Gets a format middleware for a type of log destination
 		/// </summary>
 		/// <param name="type">Type of the log destination</param>
 		/// <param name="middlewareType">Type of the middleware</param>
 		void GetFormatMiddlewareTypeForType(Type type, out Type middlewareType);
+
+		/// <summary>
+		/// Returns all destination types and their registered format middleware type
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares();
 
 		/// <summary>
 		/// Sets a format middleware for a type of log destination
@@ -39,15 +46,35 @@ namespace Najlot.Log
 		void SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new();
 
 		/// <summary>
+		/// Gets a queue middleware for a type of log destination
+		/// </summary>
+		/// <param name="type">Type of the log destination</param>
+		/// <param name="middlewareType">Type of the middleware</param>
+		void GetQueueMiddlewareTypeForType(Type type, out Type middlewareType);
+
+		/// <summary>
+		/// Returns all destination types and their registered queue middleware type
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<Type, Type>> GetQueueMiddlewares();
+
+		/// <summary>
+		/// Sets a queue middleware for a type of log destination
+		/// </summary>
+		/// <typeparam name="TMiddleware">Type of the queue middleware</typeparam>
+		/// <param name="type">Type of the log destination</param>
+		void SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new();
+
+		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur
 		/// </summary>
 		/// <param name="observer">Observer to attach</param>
-		void AttachObserver(IConfigurationChangedObserver observer);
+		void AttachObserver(IConfigurationObserver observer);
 
 		/// <summary>
 		/// Detaches the observer, so that it does not get notified anymore
 		/// </summary>
 		/// <param name="observer">Observer to detach</param>
-		void DetachObserver(IConfigurationChangedObserver observer);
+		void DetachObserver(IConfigurationObserver observer);
 	}
 }

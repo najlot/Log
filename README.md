@@ -116,9 +116,15 @@ public class DebugDestination : ILogDestination
 		// Nothing to do
 	}
 
-	public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
+	public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 	{
-		System.Diagnostics.Debug.WriteLine(formatMiddleware.Format(message));
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		{
+			foreach (var message in messages)
+			{
+				System.Diagnostics.Debug.WriteLine(formatMiddleware.Format(message));
+			}
+		}
 	}
 }
 ```

@@ -42,6 +42,13 @@ namespace Najlot.Log
 		private LogDestinationEntry CreateLogDestinationEntry<T>(T logDestination) where T : ILogDestination
 		{
 			_logConfiguration.GetFormatMiddlewareTypeForType(typeof(T), out var formatMiddlewareType);
+			_logConfiguration.GetQueueMiddlewareTypeForType(typeof(T), out var queueMiddlewareType);
+
+			var formatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
+			var queueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
+
+			queueMiddleware.FormatMiddleware = formatMiddleware;
+			queueMiddleware.Destination = logDestination;
 
 			return new LogDestinationEntry()
 			{
@@ -49,7 +56,8 @@ namespace Najlot.Log
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(_logConfiguration.FilterMiddlewareType),
 				LogDestination = logDestination,
 				LogDestinationType = logDestination.GetType(),
-				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType)
+				FormatMiddleware = formatMiddleware,
+				QueueMiddleware = queueMiddleware
 			};
 		}
 
@@ -90,6 +98,7 @@ namespace Najlot.Log
 			foreach (var destination in GetLogDestinations())
 			{
 				destination.ExecutionMiddleware.Flush();
+				destination.QueueMiddleware.Flush();
 			}
 		}
 
@@ -140,6 +149,7 @@ namespace Najlot.Log
 					foreach (var destination in _logDestinations)
 					{
 						destination.ExecutionMiddleware.Dispose();
+						destination.QueueMiddleware.Dispose();
 						destination.LogDestination.Dispose();
 					}
 

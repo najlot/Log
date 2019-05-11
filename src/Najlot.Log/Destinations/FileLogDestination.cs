@@ -46,6 +46,14 @@ namespace Najlot.Log.Destinations
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		{
+			foreach (var message in messages)
+			{
+				Log(message, formatMiddleware);
+			}
+		}
+
 		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
 		{
 			var path = GetPath();

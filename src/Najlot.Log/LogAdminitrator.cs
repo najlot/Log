@@ -1,6 +1,7 @@
 ﻿using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log
 {
@@ -119,7 +120,8 @@ namespace Najlot.Log
 		/// <summary>
 		/// Sets the type of the format middleware and notifies observing components
 		/// </summary>
-		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
+		/// <param name="type">Target destination</param>
 		/// <returns></returns>
 		public LogAdminitrator SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
 		{
@@ -129,13 +131,58 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
-		/// Sets the type of the format middleware and notifies observing components
+		/// Gets the format middleware type for a destination
 		/// </summary>
-		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <param name="type">Type of the destination</param>
+		/// <param name="middlewareType">Type of the middleware</param>
 		/// <returns></returns>
 		public LogAdminitrator GetFormatMiddlewareTypeForType(Type type, out Type middlewareType)
 		{
 			_logConfiguration.GetFormatMiddlewareTypeForType(type, out middlewareType);
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the type of the queue middleware and notifies observing components
+		/// </summary>
+		/// <param name="middlewareType">Type of the queue middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new()
+		{
+			this.Flush();
+			_logConfiguration.SetQueueMiddlewareForType<TMiddleware>(type);
+			return this;
+		}
+
+		/// <summary>
+		/// Returns all destination types and their registered format middleware type
+		/// </summary>
+		/// <returns></returns>
+		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> formatMiddlewares)
+		{
+			formatMiddlewares = _logConfiguration.GetFormatMiddlewares();
+			return this;
+		}
+
+		/// <summary>
+		/// Gets the queue middleware type for a destination
+		/// </summary>
+		/// <param name="type">Type of the destination</param>
+		/// <param name="middlewareType">Type of the middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator GetQueueMiddlewareTypeForType(Type type, out Type middlewareType)
+		{
+			_logConfiguration.GetQueueMiddlewareTypeForType(type, out middlewareType);
+			return this;
+		}
+
+		/// <summary>
+		/// Returns all destination types and their registered queue middleware type
+		/// </summary>
+		/// <returns></returns>
+		public LogAdminitrator GetQueueMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> queueMiddlewares)
+		{
+			queueMiddlewares = _logConfiguration.GetQueueMiddlewares();
 			return this;
 		}
 
@@ -217,6 +264,7 @@ namespace Najlot.Log
 			foreach (var destination in _loggerPool.GetLogDestinations())
 			{
 				destination.ExecutionMiddleware.Flush();
+				destination.QueueMiddleware.Flush();
 			}
 		}
 

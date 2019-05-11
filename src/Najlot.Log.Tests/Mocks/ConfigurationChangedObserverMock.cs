@@ -2,7 +2,7 @@ using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	public sealed class ConfigurationChangedObserverMock : IConfigurationChangedObserver
+	public sealed class ConfigurationChangedObserverMock : IConfigurationObserver
 	{
 		private Action<ILogConfiguration> _configurationChangedAction;
 

@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log.Destinations
 {
@@ -25,6 +26,14 @@ namespace Najlot.Log.Destinations
 		public void Dispose()
 		{
 			// Nothing to dispose
+		}
+
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		{
+			foreach (var message in messages)
+			{
+				Log(message, formatMiddleware);
+			}
 		}
 
 		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)

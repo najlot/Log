@@ -93,10 +93,9 @@ namespace Najlot.Log
 
 			foreach (var entry in _loggerPool.GetLogDestinations())
 			{
-				var destination = entry.LogDestination;
 				var destinationType = entry.LogDestinationType;
 				var filterMiddleware = entry.FilterMiddleware;
-				var formatMiddleware = entry.FormatMiddleware;
+				var queueMiddleware = entry.QueueMiddleware;
 
 				entry.ExecutionMiddleware.Execute(() =>
 				{
@@ -124,7 +123,7 @@ namespace Najlot.Log
 
 					if (filterMiddleware.AllowThrough(destinationType, message))
 					{
-						destination.Log(message, formatMiddleware);
+						queueMiddleware.QueueWriteMessage(message);
 					}
 				});
 			}
@@ -135,6 +134,7 @@ namespace Najlot.Log
 			foreach (var entry in _loggerPool.GetLogDestinations())
 			{
 				entry.ExecutionMiddleware.Flush();
+				entry.QueueMiddleware.Flush();
 			}
 		}
 

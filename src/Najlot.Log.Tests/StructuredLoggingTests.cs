@@ -10,7 +10,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void StructuredLoggingMustParseCorrect()
 		{
-			var middleware = new DefaultFormatMiddleware();
+			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
@@ -79,7 +79,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void StructuredLoggingMustFormatCorrect()
 		{
-			var middleware = new DefaultFormatMiddleware();
+			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
@@ -108,7 +108,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NullShouldBeLoggedAsEmpty()
 		{
-			var middleware = new DefaultFormatMiddleware();
+			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
@@ -156,7 +156,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NullMessageShouldNotMakeExceptions()
 		{
-			var middleware = new DefaultFormatMiddleware();
+			var middleware = new FormatMiddleware();
 
 			using (var logAdminitrator = LogAdminitrator
 				.CreateNew()
