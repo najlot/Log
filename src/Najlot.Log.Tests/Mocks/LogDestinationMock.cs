@@ -1,6 +1,7 @@
 using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
@@ -18,11 +19,11 @@ namespace Najlot.Log.Tests.Mocks
 			// Nothing to clean up
 		}
 
-		public void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair)
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			foreach (var entry in logMessageFormattingPair)
+			foreach (var message in messages)
 			{
-				Log(entry.Item1, entry.Item2);
+				Log(message, formatMiddleware);
 			}
 		}
 

@@ -3,13 +3,6 @@ using System;
 
 namespace Najlot.Log.Middleware
 {
-	public struct LogQueueMessage
-	{
-		public ILogDestination Destination;
-		public IFormatMiddleware FormatMiddleware;
-		public LogMessage Message;
-	}
-
 	/// <summary>
 	/// Allows to queue messages for bulk-write to improve performance.
 	/// QueueMiddlewares will be registered per LogDestination. 
@@ -17,24 +10,11 @@ namespace Najlot.Log.Middleware
 	/// </summary>
 	public interface IQueueMiddleware : IDisposable
 	{
-		void QueueWriteMessage(LogQueueMessage queueMessage);
+		ILogDestination Destination { get; set; }
+		IFormatMiddleware FormatMiddleware { get; set; }
+
+		void QueueWriteMessage(LogMessage message);
 
 		void Flush();
-	}
-
-	public sealed class NoQueueMiddleware : IQueueMiddleware
-	{
-		public void QueueWriteMessage(LogQueueMessage queueMessage)
-		{
-			var entries = new (LogMessage, IFormatMiddleware)[] { (queueMessage.Message, queueMessage.FormatMiddleware) };
-			queueMessage.Destination.Log(entries);
-		}
-
-		public void Flush()
-		{
-			// Nothing to do
-		}
-
-		public void Dispose() => Flush();
 	}
 }

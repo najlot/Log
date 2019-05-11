@@ -1,6 +1,6 @@
 ﻿namespace Najlot.Log
 {
-	public interface IConfigurationChangedObserver
+	public interface IConfigurationObserver
 	{
 		void NotifyConfigurationChanged(ILogConfiguration configuration);
 	}

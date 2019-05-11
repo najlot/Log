@@ -4,7 +4,7 @@ using System;
 
 namespace Najlot.Log
 {
-	internal sealed class LogDestinationEntry : IConfigurationChangedObserver
+	internal sealed class LogDestinationEntry : IConfigurationObserver
 	{
 		public ILogDestination LogDestination;
 
@@ -15,6 +15,8 @@ namespace Najlot.Log
 		public IExecutionMiddleware ExecutionMiddleware;
 
 		public IFilterMiddleware FilterMiddleware;
+
+		public IQueueMiddleware QueueMiddleware;
 
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
@@ -30,9 +32,19 @@ namespace Najlot.Log
 
 			configuration.GetFormatMiddlewareTypeForType(LogDestinationType, out var formatMiddlewareType);
 
+			configuration.GetQueueMiddlewareTypeForType(LogDestinationType, out var queueMiddlewareType);
+
+			if (QueueMiddleware.GetType() != queueMiddlewareType)
+			{
+				var priviousFormatMiddleware = QueueMiddleware.FormatMiddleware;
+				QueueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
+				QueueMiddleware.FormatMiddleware = priviousFormatMiddleware;
+			}
+
 			if (FormatMiddleware.GetType() != formatMiddlewareType)
 			{
 				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
+				QueueMiddleware.FormatMiddleware = FormatMiddleware;
 			}
 		}
 	}

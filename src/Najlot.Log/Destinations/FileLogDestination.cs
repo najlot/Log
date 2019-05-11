@@ -45,11 +45,11 @@ namespace Najlot.Log.Destinations
 			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
-		public void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair)
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			foreach(var entry in logMessageFormattingPair)
+			foreach (var message in messages)
 			{
-				Log(entry.Item1, entry.Item2);
+				Log(message, formatMiddleware);
 			}
 		}
 

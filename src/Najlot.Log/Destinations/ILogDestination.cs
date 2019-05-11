@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log.Destinations
 {
@@ -11,7 +12,8 @@ namespace Najlot.Log.Destinations
 		/// <summary>
 		/// Tells the destination to log the messages
 		/// </summary>
-		/// <param name="logMessageFormattingPair">Messages to be logged</param>
-		void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair);
+		/// <param name="messages">Messages to be logged</param>
+		/// <param name="formatMiddleware">Middleware to be used for formatting</param>
+		void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware);
 	}
 }

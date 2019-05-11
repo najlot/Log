@@ -217,6 +217,7 @@ namespace Najlot.Log
 			foreach (var destination in _loggerPool.GetLogDestinations())
 			{
 				destination.ExecutionMiddleware.Flush();
+				destination.QueueMiddleware.Flush();
 			}
 		}
 

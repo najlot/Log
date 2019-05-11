@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log.Destinations
 {
@@ -26,11 +27,11 @@ namespace Najlot.Log.Destinations
 			// Nothing to dispose
 		}
 
-		public void Log((LogMessage, IFormatMiddleware)[] logMessageFormattingPair)
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			foreach (var entry in logMessageFormattingPair)
+			foreach (var message in messages)
 			{
-				Log(entry.Item1, entry.Item2);
+				Log(message, formatMiddleware);
 			}
 		}
 

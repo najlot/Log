@@ -6,7 +6,7 @@ namespace Najlot.Log
 	/// Class to be used for logging.
 	/// Can bundle multiple log destinations and decides whether the message should be logged
 	/// </summary>
-	public sealed class Logger : ILogger, IConfigurationChangedObserver
+	public sealed class Logger : ILogger, IConfigurationObserver
 	{
 		private readonly LogExecutor _logExecutor;
 

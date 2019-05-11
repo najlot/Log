@@ -80,11 +80,11 @@ namespace Najlot.Log
 			}
 		}
 
-		#region ConfigurationChanged observers
+		#region Configuration observers
 
-		private readonly List<IConfigurationChangedObserver> _observerList = new List<IConfigurationChangedObserver>();
+		private readonly List<IConfigurationObserver> _observerList = new List<IConfigurationObserver>();
 
-		public void AttachObserver(IConfigurationChangedObserver observer)
+		public void AttachObserver(IConfigurationObserver observer)
 		{
 			lock (_observerList)
 			{
@@ -92,7 +92,7 @@ namespace Najlot.Log
 			}
 		}
 
-		public void DetachObserver(IConfigurationChangedObserver observer)
+		public void DetachObserver(IConfigurationObserver observer)
 		{
 			bool couldRemove;
 
@@ -114,7 +114,7 @@ namespace Najlot.Log
 			}
 		}
 
-		#endregion ConfigurationChanged observers
+		#endregion Configuration observers
 
 		#region Format middleware
 
@@ -127,6 +127,7 @@ namespace Najlot.Log
 				if (!_formatMiddlewareTypes.TryGetValue(type, out middlewareType))
 				{
 					middlewareType = typeof(DefaultFormatMiddleware);
+					_formatMiddlewareTypes.Add(type, middlewareType);
 				}
 			}
 		}
@@ -151,5 +152,42 @@ namespace Najlot.Log
 		}
 
 		#endregion Format middleware
+
+		#region Queue middleware
+
+		private readonly Dictionary<Type, Type> _queueMiddlewareTypes = new Dictionary<Type, Type>();
+
+		public void GetQueueMiddlewareTypeForType(Type type, out Type middlewareType)
+		{
+			lock (_queueMiddlewareTypes)
+			{
+				if (!_queueMiddlewareTypes.TryGetValue(type, out middlewareType))
+				{
+					middlewareType = typeof(NoQueueMiddleware);
+					_queueMiddlewareTypes.Add(type, middlewareType);
+				}
+			}
+		}
+
+		public void SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new()
+		{
+			var middlewareType = typeof(TMiddleware);
+
+			lock (_queueMiddlewareTypes)
+			{
+				if (!_queueMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				{
+					_queueMiddlewareTypes.Add(type, middlewareType);
+					NotifyObservers();
+				}
+				else if (oldMiddlewareType != middlewareType)
+				{
+					_queueMiddlewareTypes[type] = middlewareType;
+					NotifyObservers();
+				}
+			}
+		}
+
+		#endregion Queue middleware
 	}
 }
