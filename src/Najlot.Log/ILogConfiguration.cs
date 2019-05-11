@@ -1,5 +1,6 @@
 ﻿using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log
 {
@@ -32,6 +33,12 @@ namespace Najlot.Log
 		void GetFormatMiddlewareTypeForType(Type type, out Type middlewareType);
 
 		/// <summary>
+		/// Returns all destination types and their registered format middleware type
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares();
+
+		/// <summary>
 		/// Sets a format middleware for a type of log destination
 		/// </summary>
 		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
@@ -44,6 +51,12 @@ namespace Najlot.Log
 		/// <param name="type">Type of the log destination</param>
 		/// <param name="middlewareType">Type of the middleware</param>
 		void GetQueueMiddlewareTypeForType(Type type, out Type middlewareType);
+
+		/// <summary>
+		/// Returns all destination types and their registered queue middleware type
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<Type, Type>> GetQueueMiddlewares();
 
 		/// <summary>
 		/// Sets a queue middleware for a type of log destination

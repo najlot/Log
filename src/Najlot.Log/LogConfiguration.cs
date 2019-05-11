@@ -132,6 +132,14 @@ namespace Najlot.Log
 			}
 		}
 
+		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares()
+		{
+			lock(_formatMiddlewareTypes)
+			{
+				return new Dictionary<Type, Type>(_formatMiddlewareTypes);
+			}
+		}
+
 		public void SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
 		{
 			var middlewareType = typeof(TMiddleware);
@@ -166,6 +174,14 @@ namespace Najlot.Log
 					middlewareType = typeof(NoQueueMiddleware);
 					_queueMiddlewareTypes.Add(type, middlewareType);
 				}
+			}
+		}
+
+		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetQueueMiddlewares()
+		{
+			lock (_queueMiddlewareTypes)
+			{
+				return new Dictionary<Type, Type>(_queueMiddlewareTypes);
 			}
 		}
 
