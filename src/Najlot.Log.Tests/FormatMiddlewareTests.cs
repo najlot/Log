@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Najlot.Log.Tests
 {
-	public class ConfigurationFormatMiddlewareTests
+	public class FormatMiddlewareTests
 	{
 		[Fact]
 		public void ConfiguratorMustNotAcceptNullDestinations()
@@ -107,7 +107,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void FormatFunctionCanBeSetAndGetForMultipleTypes()
+		public void FormatMiddlewareCanBeSetAndGetForMultipleTypes()
 		{
 			var admin = LogAdminitrator.CreateNew();
 
