@@ -1,6 +1,6 @@
 ﻿namespace Najlot.Log.Middleware
 {
-	public class DefaultFormatMiddleware : IFormatMiddleware
+	public class FormatMiddleware : IFormatMiddleware
 	{
 		private const string _delimiter = " - ";
 

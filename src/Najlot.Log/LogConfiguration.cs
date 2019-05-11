@@ -126,7 +126,7 @@ namespace Najlot.Log
 			{
 				if (!_formatMiddlewareTypes.TryGetValue(type, out middlewareType))
 				{
-					middlewareType = typeof(DefaultFormatMiddleware);
+					middlewareType = typeof(FormatMiddleware);
 					_formatMiddlewareTypes.Add(type, middlewareType);
 				}
 			}
