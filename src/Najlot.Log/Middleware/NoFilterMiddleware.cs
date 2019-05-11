@@ -2,7 +2,8 @@
 
 namespace Najlot.Log.Middleware
 {
-	public class OpenFilterMiddleware : IFilterMiddleware
+	[LogClassName(nameof(NoFilterMiddleware))]
+	public class NoFilterMiddleware : IFilterMiddleware
 	{
 		public bool AllowThrough(Type destinationType, LogMessage message) => true;
 	}

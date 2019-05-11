@@ -10,7 +10,7 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Writes all messages to a file.
 	/// </summary>
-	[LogClassName("file")]
+	[LogClassName(nameof(FileLogDestination))]
 	public sealed class FileLogDestination : ILogDestination
 	{
 		private readonly string NewLine = Environment.NewLine;

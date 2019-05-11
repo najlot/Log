@@ -49,7 +49,7 @@ namespace Najlot.Log.Tests
 
 			Assert.False(File.Exists(fileName));
 
-			logAdminitrator.SetFilterMiddleware<OpenFilterMiddleware>();
+			logAdminitrator.SetFilterMiddleware<NoFilterMiddleware>();
 
 			log.Fatal("TEST!");
 

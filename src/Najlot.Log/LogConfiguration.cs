@@ -57,7 +57,7 @@ namespace Najlot.Log
 			}
 		}
 
-		private Type _filterMiddlewareType = typeof(OpenFilterMiddleware);
+		private Type _filterMiddlewareType = typeof(NoFilterMiddleware);
 
 		public Type FilterMiddlewareType
 		{
