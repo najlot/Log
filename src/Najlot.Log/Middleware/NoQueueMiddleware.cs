@@ -5,14 +5,14 @@ namespace Najlot.Log.Middleware
 {
 	public sealed class NoQueueMiddleware : IQueueMiddleware
 	{
-		private readonly List<LogMessage> _queue = new List<LogMessage>();
+		private readonly Queue<LogMessage> _queue = new Queue<LogMessage>();
 
 		public ILogDestination Destination { get; set; }
 		public IFormatMiddleware FormatMiddleware { get; set; }
 
 		public void QueueWriteMessage(LogMessage message)
 		{
-			_queue.Add(message);
+			_queue.Enqueue(message);
 			Destination.Log(_queue, FormatMiddleware);
 			_queue.Clear();
 		}
