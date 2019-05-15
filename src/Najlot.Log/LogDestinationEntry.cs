@@ -20,19 +20,19 @@ namespace Najlot.Log
 
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
+			configuration.GetFormatMiddlewareTypeForType(LogDestinationType, out var formatMiddlewareType);
+			configuration.GetQueueMiddlewareTypeForType(LogDestinationType, out var queueMiddlewareType);
+			configuration.GetFilterMiddlewareTypeForType(LogDestinationType, out var filterMiddlewareType);
+
 			if (ExecutionMiddleware.GetType() != configuration.ExecutionMiddlewareType)
 			{
 				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
 			}
 
-			if (FilterMiddleware.GetType() != configuration.FilterMiddlewareType)
+			if (FilterMiddleware.GetType() != filterMiddlewareType)
 			{
-				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(configuration.FilterMiddlewareType);
+				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType);
 			}
-
-			configuration.GetFormatMiddlewareTypeForType(LogDestinationType, out var formatMiddlewareType);
-
-			configuration.GetQueueMiddlewareTypeForType(LogDestinationType, out var queueMiddlewareType);
 
 			if (QueueMiddleware.GetType() != queueMiddlewareType)
 			{

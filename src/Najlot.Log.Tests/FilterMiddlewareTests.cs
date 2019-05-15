@@ -1,4 +1,5 @@
-﻿using Najlot.Log.Middleware;
+﻿using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System.IO;
 using Xunit;
@@ -20,7 +21,7 @@ namespace Najlot.Log.Tests
 			var log = LogAdminitrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddleware<DenyAllFilterMiddleware>()
+				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination))
 				.GetLogger("");
 
 			log.Fatal("TEST!");
@@ -41,7 +42,7 @@ namespace Najlot.Log.Tests
 			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddleware<DenyAllFilterMiddleware>();
+				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination));
 
 			var log = logAdminitrator.GetLogger("");
 
@@ -49,7 +50,7 @@ namespace Najlot.Log.Tests
 
 			Assert.False(File.Exists(fileName));
 
-			logAdminitrator.SetFilterMiddleware<OpenFilterMiddleware>();
+			logAdminitrator.SetFilterMiddlewareForType<NoFilterMiddleware>(typeof(FileLogDestination));
 
 			log.Fatal("TEST!");
 
@@ -72,7 +73,7 @@ namespace Najlot.Log.Tests
 				{
 					loggedToSecond = true;
 				}))
-				.SetFilterMiddleware<DenyLogDestinationMockFilterMiddleware>()
+				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(LogDestinationMock))
 				.GetLogger("");
 
 			log.Fatal("TEST!");
@@ -95,7 +96,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddleware<DenyAllFilterMiddleware>();
+				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination));
 
 			var log = logAdminitrator.GetLogger("");
 
@@ -103,15 +104,9 @@ namespace Najlot.Log.Tests
 
 			Assert.False(File.Exists(fileName));
 
-			logAdminitrator.SetFilterMiddlewareByType(null);
+			logAdminitrator.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(string));
 
 			log.Debug("TEST 2!");
-
-			Assert.False(File.Exists(fileName));
-
-			logAdminitrator.SetFilterMiddlewareByType(typeof(string));
-
-			log.Debug("TEST 3!");
 
 			Assert.False(File.Exists(fileName));
 		}

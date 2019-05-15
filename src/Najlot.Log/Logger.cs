@@ -17,6 +17,8 @@ namespace Najlot.Log
 		private bool LogError = false;
 		private bool LogFatal = false;
 
+		private static readonly object[] _emptyArgs = new object[0];
+
 		internal Logger(LogExecutor logExecutor, ILogConfiguration logConfiguration)
 		{
 			_logConfiguration = logConfiguration;
@@ -87,122 +89,122 @@ namespace Najlot.Log
 
 		public void Trace<T>(T o)
 		{
-			if (LogTrace) _logExecutor.Trace(o);
+			if (LogTrace) _logExecutor.Log(LogLevel.Trace, null, o, _emptyArgs);
 		}
 
 		public void Debug<T>(T o)
 		{
-			if (LogDebug) _logExecutor.Debug(o);
+			if (LogDebug) _logExecutor.Log(LogLevel.Debug, null, o, _emptyArgs);
 		}
 
 		public void Info<T>(T o)
 		{
-			if (LogInfo) _logExecutor.Info(o);
+			if (LogInfo) _logExecutor.Log(LogLevel.Info, null, o, _emptyArgs);
 		}
 
 		public void Warn<T>(T o)
 		{
-			if (LogWarn) _logExecutor.Warn(o);
+			if (LogWarn) _logExecutor.Log(LogLevel.Warn, null, o, _emptyArgs);
 		}
 
 		public void Error<T>(T o)
 		{
-			if (LogError) _logExecutor.Error(o);
+			if (LogError) _logExecutor.Log(LogLevel.Error, null, o, _emptyArgs);
 		}
 
 		public void Fatal<T>(T o)
 		{
-			if (LogFatal) _logExecutor.Fatal(o);
+			if (LogFatal) _logExecutor.Log(LogLevel.Fatal, null, o, _emptyArgs);
 		}
 
 		public void Trace<T>(Exception ex, T o)
 		{
-			if (LogTrace) _logExecutor.Trace(ex, o);
+			if (LogTrace) _logExecutor.Log(LogLevel.Trace, ex, o, _emptyArgs);
 		}
 
 		public void Debug<T>(Exception ex, T o)
 		{
-			if (LogDebug) _logExecutor.Debug(ex, o);
+			if (LogDebug) _logExecutor.Log(LogLevel.Debug, ex, o, _emptyArgs);
 		}
 
 		public void Info<T>(Exception ex, T o)
 		{
-			if (LogInfo) _logExecutor.Info(ex, o);
+			if (LogInfo) _logExecutor.Log(LogLevel.Info, ex, o, _emptyArgs);
 		}
 
 		public void Warn<T>(Exception ex, T o)
 		{
-			if (LogWarn) _logExecutor.Warn(ex, o);
+			if (LogWarn) _logExecutor.Log(LogLevel.Warn, ex, o, _emptyArgs);
 		}
 
 		public void Error<T>(Exception ex, T o)
 		{
-			if (LogError) _logExecutor.Error(ex, o);
+			if (LogError) _logExecutor.Log(LogLevel.Error, ex, o, _emptyArgs);
 		}
 
 		public void Fatal<T>(Exception ex, T o)
 		{
-			if (LogFatal) _logExecutor.Fatal(ex, o);
+			if (LogFatal) _logExecutor.Log(LogLevel.Fatal, ex, o, _emptyArgs);
 		}
 
 		public void Trace(string s, params object[] args)
 		{
-			if (LogTrace) _logExecutor.Trace(s, args);
+			if (LogTrace) _logExecutor.Log(LogLevel.Trace, null, s, args);
 		}
 
 		public void Debug(string s, params object[] args)
 		{
-			if (LogDebug) _logExecutor.Debug(s, args);
+			if (LogDebug) _logExecutor.Log(LogLevel.Debug, null, s, args);
 		}
 
 		public void Info(string s, params object[] args)
 		{
-			if (LogInfo) _logExecutor.Info(s, args);
+			if (LogInfo) _logExecutor.Log(LogLevel.Info, null, s, args);
 		}
 
 		public void Warn(string s, params object[] args)
 		{
-			if (LogWarn) _logExecutor.Warn(s, args);
+			if (LogWarn) _logExecutor.Log(LogLevel.Warn, null, s, args);
 		}
 
 		public void Error(string s, params object[] args)
 		{
-			if (LogError) _logExecutor.Error(s, args);
+			if (LogError) _logExecutor.Log(LogLevel.Error, null, s, args);
 		}
 
 		public void Fatal(string s, params object[] args)
 		{
-			if (LogFatal) _logExecutor.Fatal(s, args);
+			if (LogFatal) _logExecutor.Log(LogLevel.Fatal, null, s, args);
 		}
 
 		public void Trace(Exception ex, string s, params object[] args)
 		{
-			if (LogTrace) _logExecutor.Trace(ex, s, args);
+			if (LogTrace) _logExecutor.Log(LogLevel.Trace, ex, s, args);
 		}
 
 		public void Debug(Exception ex, string s, params object[] args)
 		{
-			if (LogDebug) _logExecutor.Debug(ex, s, args);
+			if (LogDebug) _logExecutor.Log(LogLevel.Debug, ex, s, args);
 		}
 
 		public void Info(Exception ex, string s, params object[] args)
 		{
-			if (LogInfo) _logExecutor.Info(ex, s, args);
+			if (LogInfo) _logExecutor.Log(LogLevel.Info, ex, s, args);
 		}
 
 		public void Warn(Exception ex, string s, params object[] args)
 		{
-			if (LogWarn) _logExecutor.Warn(ex, s, args);
+			if (LogWarn) _logExecutor.Log(LogLevel.Warn, ex, s, args);
 		}
 
 		public void Error(Exception ex, string s, params object[] args)
 		{
-			if (LogError) _logExecutor.Error(ex, s, args);
+			if (LogError) _logExecutor.Log(LogLevel.Error, ex, s, args);
 		}
 
 		public void Fatal(Exception ex, string s, params object[] args)
 		{
-			if (LogFatal) _logExecutor.Fatal(ex, s, args);
+			if (LogFatal) _logExecutor.Log(LogLevel.Fatal, ex, s, args);
 		}
 
 		public void Flush() => _logExecutor.Flush();

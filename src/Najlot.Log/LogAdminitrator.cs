@@ -89,34 +89,7 @@ namespace Najlot.Log
 			return this;
 		}
 
-		/// <summary>
-		/// Sets the type of the filter middleware of the LogConfiguration
-		/// </summary>
-		/// <typeparam name="TFilterMiddleware"></typeparam>
-		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddleware<TFilterMiddleware>() where TFilterMiddleware : IFilterMiddleware, new()
-		{
-			return this.SetFilterMiddlewareByType(typeof(TFilterMiddleware));
-		}
-
-		/// <summary>
-		/// Sets the type of the filter middleware and notifies observing components
-		/// </summary>
-		/// <param name="middlewareType">Type of the filter middleware</param>
-		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddlewareByType(Type middlewareType)
-		{
-			if (middlewareType == null)
-			{
-				Console.WriteLine("Najlot.Log: New execution middleware type is null.");
-				return this;
-			}
-
-			this.Flush();
-			_logConfiguration.FilterMiddlewareType = middlewareType;
-			return this;
-		}
-
+		#region Format middleware
 		/// <summary>
 		/// Sets the type of the format middleware and notifies observing components
 		/// </summary>
@@ -143,6 +116,18 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
+		/// Returns all destination types and their registered format middleware type
+		/// </summary>
+		/// <returns></returns>
+		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> formatMiddlewares)
+		{
+			formatMiddlewares = _logConfiguration.GetFormatMiddlewares();
+			return this;
+		}
+		#endregion
+
+		#region Queue middleware
+		/// <summary>
 		/// Sets the type of the queue middleware and notifies observing components
 		/// </summary>
 		/// <param name="middlewareType">Type of the queue middleware</param>
@@ -151,16 +136,6 @@ namespace Najlot.Log
 		{
 			this.Flush();
 			_logConfiguration.SetQueueMiddlewareForType<TMiddleware>(type);
-			return this;
-		}
-
-		/// <summary>
-		/// Returns all destination types and their registered format middleware type
-		/// </summary>
-		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> formatMiddlewares)
-		{
-			formatMiddlewares = _logConfiguration.GetFormatMiddlewares();
 			return this;
 		}
 
@@ -185,6 +160,43 @@ namespace Najlot.Log
 			queueMiddlewares = _logConfiguration.GetQueueMiddlewares();
 			return this;
 		}
+		#endregion
+
+		#region Filter middleware
+		/// <summary>
+		/// Sets the type of the filter middleware and notifies observing components
+		/// </summary>
+		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new()
+		{
+			this.Flush();
+			_logConfiguration.SetFilterMiddlewareForType<TMiddleware>(type);
+			return this;
+		}
+
+		/// <summary>
+		/// Gets the filter middleware type for a destination
+		/// </summary>
+		/// <param name="type">Type of the destination</param>
+		/// <param name="middlewareType">Type of the middleware</param>
+		/// <returns></returns>
+		public LogAdminitrator GetFilterMiddlewareTypeForType(Type type, out Type middlewareType)
+		{
+			_logConfiguration.GetFilterMiddlewareTypeForType(type, out middlewareType);
+			return this;
+		}
+
+		/// <summary>
+		/// Returns all destination types and their registered filter middleware type
+		/// </summary>
+		/// <returns></returns>
+		public LogAdminitrator GetFilterMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> filterMiddlewares)
+		{
+			filterMiddlewares = _logConfiguration.GetFilterMiddlewares();
+			return this;
+		}
+		#endregion
 
 		/// <summary>
 		/// Adds a custom destination.

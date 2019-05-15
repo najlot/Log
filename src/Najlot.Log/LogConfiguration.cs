@@ -57,29 +57,6 @@ namespace Najlot.Log
 			}
 		}
 
-		private Type _filterMiddlewareType = typeof(OpenFilterMiddleware);
-
-		public Type FilterMiddlewareType
-		{
-			get => _filterMiddlewareType;
-			set
-			{
-				Type iFilterMiddlewareType = typeof(IFilterMiddleware);
-
-				if (value.GetInterfaces().FirstOrDefault(x => x == iFilterMiddlewareType) == null)
-				{
-					Console.WriteLine("Najlot.Log: New filter middleware does not implement " + iFilterMiddlewareType.Name);
-					return;
-				}
-
-				if (_filterMiddlewareType.FullName != value.FullName)
-				{
-					_filterMiddlewareType = value;
-					NotifyObservers();
-				}
-			}
-		}
-
 		#region Configuration observers
 
 		private readonly List<IConfigurationObserver> _observerList = new List<IConfigurationObserver>();
@@ -205,5 +182,50 @@ namespace Najlot.Log
 		}
 
 		#endregion Queue middleware
+
+		#region Filter middleware
+
+		private readonly Dictionary<Type, Type> _filterMiddlewareTypes = new Dictionary<Type, Type>();
+
+		public void GetFilterMiddlewareTypeForType(Type type, out Type middlewareType)
+		{
+			lock (_filterMiddlewareTypes)
+			{
+				if (!_filterMiddlewareTypes.TryGetValue(type, out middlewareType))
+				{
+					middlewareType = typeof(NoFilterMiddleware);
+					_filterMiddlewareTypes.Add(type, middlewareType);
+				}
+			}
+		}
+
+		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetFilterMiddlewares()
+		{
+			lock (_filterMiddlewareTypes)
+			{
+				return new Dictionary<Type, Type>(_filterMiddlewareTypes);
+			}
+		}
+
+		public void SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new()
+		{
+			var middlewareType = typeof(TMiddleware);
+
+			lock (_filterMiddlewareTypes)
+			{
+				if (!_filterMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				{
+					_filterMiddlewareTypes.Add(type, middlewareType);
+					NotifyObservers();
+				}
+				else if (oldMiddlewareType != middlewareType)
+				{
+					_filterMiddlewareTypes[type] = middlewareType;
+					NotifyObservers();
+				}
+			}
+		}
+
+		#endregion Filter middleware
 	}
 }

@@ -5,6 +5,6 @@ namespace Najlot.Log.Tests.Mocks
 {
 	public sealed class DenyAllFilterMiddleware : IFilterMiddleware
 	{
-		public bool AllowThrough(Type destinationType, LogMessage message) => false;
+		public bool AllowThrough(LogMessage message) => false;
 	}
 }

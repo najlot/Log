@@ -43,6 +43,7 @@ namespace Najlot.Log
 		{
 			_logConfiguration.GetFormatMiddlewareTypeForType(typeof(T), out var formatMiddlewareType);
 			_logConfiguration.GetQueueMiddlewareTypeForType(typeof(T), out var queueMiddlewareType);
+			_logConfiguration.GetFilterMiddlewareTypeForType(typeof(T), out var filterMiddlewareType);
 
 			var formatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
 			var queueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
@@ -53,7 +54,7 @@ namespace Najlot.Log
 			return new LogDestinationEntry()
 			{
 				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(_logConfiguration.ExecutionMiddlewareType),
-				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(_logConfiguration.FilterMiddlewareType),
+				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType),
 				LogDestination = logDestination,
 				LogDestinationType = logDestination.GetType(),
 				FormatMiddleware = formatMiddleware,

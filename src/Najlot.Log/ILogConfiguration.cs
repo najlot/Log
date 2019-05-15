@@ -21,11 +21,6 @@ namespace Najlot.Log
 		Type ExecutionMiddlewareType { get; }
 
 		/// <summary>
-		/// Type of the filter middleware for all log destinations observing this configuration
-		/// </summary>
-		Type FilterMiddlewareType { get; }
-
-		/// <summary>
 		/// Gets a format middleware for a type of log destination
 		/// </summary>
 		/// <param name="type">Type of the log destination</param>
@@ -64,6 +59,26 @@ namespace Najlot.Log
 		/// <typeparam name="TMiddleware">Type of the queue middleware</typeparam>
 		/// <param name="type">Type of the log destination</param>
 		void SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new();
+
+		/// <summary>
+		/// Gets a filter middleware for a type of log destination
+		/// </summary>
+		/// <param name="type">Type of the log destination</param>
+		/// <param name="middlewareType">Type of the middleware</param>
+		void GetFilterMiddlewareTypeForType(Type type, out Type middlewareType);
+
+		/// <summary>
+		/// Returns all destination types and their registered filter middleware type
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<Type, Type>> GetFilterMiddlewares();
+
+		/// <summary>
+		/// Sets a filter middleware for a type of log destination
+		/// </summary>
+		/// <typeparam name="TMiddleware">Type of the filter middleware</typeparam>
+		/// <param name="type">Type of the log destination</param>
+		void SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new();
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur

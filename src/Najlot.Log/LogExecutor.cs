@@ -38,55 +38,7 @@ namespace Najlot.Log
 			_category = category;
 		}
 
-		public void Trace<T>(T o) => Log(LogLevel.Trace, null, o, _emptyArgs);
-
-		public void Info<T>(T o) => Log(LogLevel.Info, null, o, _emptyArgs);
-
-		public void Warn<T>(T o) => Log(LogLevel.Warn, null, o, _emptyArgs);
-
-		public void Debug<T>(T o) => Log(LogLevel.Debug, null, o, _emptyArgs);
-
-		public void Error<T>(T o) => Log(LogLevel.Error, null, o, _emptyArgs);
-
-		public void Fatal<T>(T o) => Log(LogLevel.Fatal, null, o, _emptyArgs);
-
-		public void Trace<T>(Exception ex, T o) => Log(LogLevel.Trace, ex, o, _emptyArgs);
-
-		public void Info<T>(Exception ex, T o) => Log(LogLevel.Info, ex, o, _emptyArgs);
-
-		public void Warn<T>(Exception ex, T o) => Log(LogLevel.Warn, ex, o, _emptyArgs);
-
-		public void Debug<T>(Exception ex, T o) => Log(LogLevel.Debug, ex, o, _emptyArgs);
-
-		public void Error<T>(Exception ex, T o) => Log(LogLevel.Error, ex, o, _emptyArgs);
-
-		public void Fatal<T>(Exception ex, T o) => Log(LogLevel.Fatal, ex, o, _emptyArgs);
-
-		public void Trace(string s, params object[] args) => Log(LogLevel.Trace, null, s, args);
-
-		public void Debug(string s, params object[] args) => Log(LogLevel.Debug, null, s, args);
-
-		public void Info(string s, params object[] args) => Log(LogLevel.Info, null, s, args);
-
-		public void Warn(string s, params object[] args) => Log(LogLevel.Warn, null, s, args);
-
-		public void Error(string s, params object[] args) => Log(LogLevel.Error, null, s, args);
-
-		public void Fatal(string s, params object[] args) => Log(LogLevel.Fatal, null, s, args);
-
-		public void Trace(Exception ex, string s, params object[] args) => Log(LogLevel.Trace, ex, s, args);
-
-		public void Debug(Exception ex, string s, params object[] args) => Log(LogLevel.Debug, ex, s, args);
-
-		public void Info(Exception ex, string s, params object[] args) => Log(LogLevel.Info, ex, s, args);
-
-		public void Warn(Exception ex, string s, params object[] args) => Log(LogLevel.Warn, ex, s, args);
-
-		public void Error(Exception ex, string s, params object[] args) => Log(LogLevel.Error, ex, s, args);
-
-		public void Fatal(Exception ex, string s, params object[] args) => Log(LogLevel.Fatal, ex, s, args);
-
-		private void Log<T>(LogLevel logLevel, Exception ex, T msg, object[] args)
+		internal void Log<T>(LogLevel logLevel, Exception ex, T msg, object[] args)
 		{
 			var state = _currentState.Value;
 			var time = DateTime.Now;
@@ -121,7 +73,7 @@ namespace Najlot.Log
 						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, parsedKeyValuePairs);
 					}
 
-					if (filterMiddleware.AllowThrough(destinationType, message))
+					if (filterMiddleware.AllowThrough(message))
 					{
 						queueMiddleware.QueueWriteMessage(message);
 					}

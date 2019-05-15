@@ -26,18 +26,11 @@ namespace Najlot.Log.Configuration.FileSource
 			try
 			{
 				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
-				var currentFilterMiddlewareFullType = logConfiguration.FilterMiddlewareType;
-
+				
 				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
 				if (currentExecutionMiddlewareType.Assembly != null)
 				{
 					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.GetName().Name;
-				}
-
-				var currentFilterMiddlewareFullTypeName = currentFilterMiddlewareFullType.FullName;
-				if (currentFilterMiddlewareFullType.Assembly != null)
-				{
-					currentFilterMiddlewareFullTypeName += ", " + currentFilterMiddlewareFullType.Assembly.GetName().Name;
 				}
 
 				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
@@ -49,8 +42,7 @@ namespace Najlot.Log.Configuration.FileSource
 						xmlSerializer.Serialize(xmlWriter, new FileConfiguration()
 						{
 							LogLevel = logConfiguration.LogLevel,
-							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName,
-							FilterMiddleware = currentFilterMiddlewareFullTypeName
+							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName
 						});
 
 						File.WriteAllText(path, stringWriter.ToString(), encoding);
@@ -143,12 +135,6 @@ namespace Najlot.Log.Configuration.FileSource
 				executionMiddlewareType != logConfiguration.ExecutionMiddlewareType)
 			{
 				logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
-			}
-
-			if (GetMiddleware(fileConfiguration.FilterMiddleware, out Type filterMiddlewareType) &&
-				filterMiddlewareType != logConfiguration.FilterMiddlewareType)
-			{
-				logAdminitrator.SetFilterMiddlewareByType(filterMiddlewareType);
 			}
 		}
 
