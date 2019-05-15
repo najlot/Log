@@ -15,7 +15,9 @@ namespace Najlot.Log.Tests
 			{
 				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
 				{
-					Assert.NotNull(mapper.GetName(type));
+					var name = mapper.GetName(type);
+					Assert.NotNull(name);
+					Assert.NotNull(mapper.GetType(name));
 				}
 			}
 		}

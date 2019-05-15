@@ -10,19 +10,34 @@ namespace Najlot.Log
 	{
 		public static LogConfigurationMapper Instance { get; } = new LogConfigurationMapper();
 
-		public Dictionary<string, Type> _stringToTypeMaping = new Dictionary<string, Type>();
-		public Dictionary<Type, string> _typeToStringMapping = new Dictionary<Type, string>();
+		private Dictionary<string, Type> _stringToTypeMaping;
+		private Dictionary<Type, string> _typeToStringMapping;
 
 		private LogConfigurationMapper()
 		{
-			AddToMapping(nameof(FormatMiddleware), typeof(FormatMiddleware));
-			AddToMapping(nameof(JsonFormatMiddleware), typeof(JsonFormatMiddleware));
-			AddToMapping(nameof(NoFilterMiddleware), typeof(NoFilterMiddleware));
-			AddToMapping(nameof(NoQueueMiddleware), typeof(NoQueueMiddleware));
-			AddToMapping(nameof(SyncExecutionMiddleware), typeof(SyncExecutionMiddleware));
-			AddToMapping(nameof(TaskExecutionMiddleware), typeof(TaskExecutionMiddleware));
-			AddToMapping(nameof(ConsoleLogDestination), typeof(ConsoleLogDestination));
-			AddToMapping(nameof(FileLogDestination), typeof(FileLogDestination));
+			_stringToTypeMaping = new Dictionary<string, Type>
+			{
+				{ nameof(FormatMiddleware), typeof(FormatMiddleware) },
+				{ nameof(JsonFormatMiddleware), typeof(JsonFormatMiddleware) },
+				{ nameof(NoFilterMiddleware), typeof(NoFilterMiddleware) },
+				{ nameof(NoQueueMiddleware), typeof(NoQueueMiddleware) },
+				{ nameof(SyncExecutionMiddleware), typeof(SyncExecutionMiddleware) },
+				{ nameof(TaskExecutionMiddleware), typeof(TaskExecutionMiddleware) },
+				{ nameof(ConsoleLogDestination), typeof(ConsoleLogDestination) },
+				{ nameof(FileLogDestination), typeof(FileLogDestination) }
+			};
+
+			_typeToStringMapping = new Dictionary<Type, string>
+			{
+				{ typeof(FormatMiddleware), nameof(FormatMiddleware) },
+				{ typeof(JsonFormatMiddleware), nameof(JsonFormatMiddleware) },
+				{ typeof(NoFilterMiddleware), nameof(NoFilterMiddleware) },
+				{ typeof(NoQueueMiddleware), nameof(NoQueueMiddleware) },
+				{ typeof(SyncExecutionMiddleware), nameof(SyncExecutionMiddleware) },
+				{ typeof(TaskExecutionMiddleware), nameof(TaskExecutionMiddleware) },
+				{ typeof(ConsoleLogDestination), nameof(ConsoleLogDestination) },
+				{ typeof(FileLogDestination), nameof(FileLogDestination) }
+			};
 		}
 
 		private void AddToMapping(string name, Type type)
