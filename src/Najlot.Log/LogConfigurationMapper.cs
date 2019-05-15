@@ -40,19 +40,6 @@ namespace Najlot.Log
 			};
 		}
 
-		private void AddToMapping(string name, Type type)
-		{
-			lock (_stringToTypeMaping)
-			{
-				_stringToTypeMaping[name] = type;
-			}
-
-			lock (_typeToStringMapping)
-			{
-				_typeToStringMapping[type] = name;
-			}
-		}
-
 		public void AddToMapping(Type type)
 		{
 			var attribute = type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), false).FirstOrDefault();
@@ -60,7 +47,16 @@ namespace Najlot.Log
 			if (attribute is LogConfigurationNameAttribute nameAttribute)
 			{
 				var name = nameAttribute.Name;
-				AddToMapping(name, type);
+
+				lock (_stringToTypeMaping)
+				{
+					_stringToTypeMaping[name] = type;
+				}
+
+				lock (_typeToStringMapping)
+				{
+					_typeToStringMapping[type] = name;
+				}
 			}
 		}
 
