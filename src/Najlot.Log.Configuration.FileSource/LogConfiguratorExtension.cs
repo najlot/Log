@@ -25,14 +25,8 @@ namespace Najlot.Log.Configuration.FileSource
 
 			try
 			{
-				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
-
-				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
-				if (currentExecutionMiddlewareType.Assembly != null)
-				{
-					currentExecutionMiddlewareFullTypeName += ", " + currentExecutionMiddlewareType.Assembly.GetName().Name;
-				}
-
+				var currentExecutionMiddlewareName = logConfiguration.ExecutionMiddlewareName;
+				
 				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
 
 				using (var stringWriter = new CustomStringWriter(encoding))
@@ -42,7 +36,7 @@ namespace Najlot.Log.Configuration.FileSource
 						xmlSerializer.Serialize(xmlWriter, new FileConfiguration()
 						{
 							LogLevel = logConfiguration.LogLevel,
-							ExecutionMiddleware = currentExecutionMiddlewareFullTypeName
+							ExecutionMiddleware = currentExecutionMiddlewareName
 						});
 
 						File.WriteAllText(path, stringWriter.ToString(), encoding);
@@ -129,32 +123,10 @@ namespace Najlot.Log.Configuration.FileSource
 
 			logAdminitrator.SetLogLevel(fileConfiguration.LogLevel);
 
-			logAdminitrator.GetLogConfiguration(out var logConfiguration);
-
-			if (GetMiddleware(fileConfiguration.ExecutionMiddleware, out Type executionMiddlewareType) &&
-				executionMiddlewareType != logConfiguration.ExecutionMiddlewareType)
+			if (fileConfiguration?.ExecutionMiddleware != null)
 			{
-				logAdminitrator.SetExecutionMiddlewareByType(executionMiddlewareType);
+				logAdminitrator.SetExecutionMiddlewareByName(fileConfiguration.ExecutionMiddleware);
 			}
-		}
-
-		private static bool GetMiddleware(string executionMiddleware, out Type type)
-		{
-			if (string.IsNullOrWhiteSpace(executionMiddleware))
-			{
-				type = null;
-				return false;
-			}
-
-			type = Type.GetType(executionMiddleware, false);
-
-			if (type == null)
-			{
-				Console.WriteLine($"Najlot.Log: New middleware of type '{executionMiddleware}' not found!");
-				return false;
-			}
-
-			return true;
 		}
 	}
 }
