@@ -41,7 +41,7 @@ namespace Najlot.Log.Tests
 			{
 				throw new Exception("No CD-ROM / cup holder avaible"); ;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				exc = ex;
 			}

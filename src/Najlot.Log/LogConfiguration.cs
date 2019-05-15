@@ -111,7 +111,7 @@ namespace Najlot.Log
 
 		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares()
 		{
-			lock(_formatMiddlewareTypes)
+			lock (_formatMiddlewareTypes)
 			{
 				return new Dictionary<Type, Type>(_formatMiddlewareTypes);
 			}

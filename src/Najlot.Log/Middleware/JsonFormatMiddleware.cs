@@ -50,7 +50,7 @@ namespace Najlot.Log.Middleware
 					case '\\':
 						sb.Append("\\\\");
 						break;
-					
+
 					default:
 						if (c < ' ')
 						{
@@ -115,7 +115,7 @@ namespace Najlot.Log.Middleware
 
 				SerializeArgument(sb, arg);
 			}
-			
+
 			sb.Append("]}");
 
 			return sb.ToString();

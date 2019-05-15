@@ -30,7 +30,7 @@ namespace Najlot.Log.Tests
 		{
 			LogAdminitrator
 				.CreateNew()
-				.GetQueueMiddlewareTypeForType(this.GetType(),out var queueMiddlewareType);
+				.GetQueueMiddlewareTypeForType(this.GetType(), out var queueMiddlewareType);
 
 			// Will throw if can not create
 			Assert.NotNull((IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType));

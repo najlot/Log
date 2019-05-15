@@ -26,7 +26,7 @@ namespace Najlot.Log.Configuration.FileSource
 			try
 			{
 				var currentExecutionMiddlewareType = logConfiguration.ExecutionMiddlewareType;
-				
+
 				var currentExecutionMiddlewareFullTypeName = currentExecutionMiddlewareType.FullName;
 				if (currentExecutionMiddlewareType.Assembly != null)
 				{

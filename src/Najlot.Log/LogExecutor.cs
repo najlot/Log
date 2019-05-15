@@ -45,7 +45,6 @@ namespace Najlot.Log
 
 			foreach (var entry in _loggerPool.GetLogDestinations())
 			{
-				var destinationType = entry.LogDestinationType;
 				var filterMiddleware = entry.FilterMiddleware;
 				var queueMiddleware = entry.QueueMiddleware;
 
