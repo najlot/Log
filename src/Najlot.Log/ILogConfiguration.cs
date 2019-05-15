@@ -18,7 +18,7 @@ namespace Najlot.Log
 		/// <summary>
 		/// Current execution middleware for all log destinations observing this configuration
 		/// </summary>
-		Type ExecutionMiddlewareType { get; }
+		Type ExecutionMiddlewareType { get; } // TODO log class name
 
 		/// <summary>
 		/// Gets a format middleware for a type of log destination
