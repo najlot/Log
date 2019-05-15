@@ -7,12 +7,11 @@ namespace Najlot.Log
 	/// Only classes with this attribute are allowed to be loaded.
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, Inherited = false)]
-	public sealed class LogClassNameAttribute : Attribute
+	public sealed class LogConfigurationNameAttribute : Attribute
 	{
 		public string Name { get; }
 
-		// TODO: name of this class may change
-		public LogClassNameAttribute(string name)
+		public LogConfigurationNameAttribute(string name)
 		{
 			Name = name;
 		}

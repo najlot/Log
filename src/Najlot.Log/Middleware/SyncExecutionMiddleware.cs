@@ -6,7 +6,7 @@ namespace Najlot.Log.Middleware
 	/// Executes everything syncronous.
 	/// Has the advantage, that the messages are immediately there and it hat nothing to flush.
 	/// </summary>
-	[LogClassName(nameof(SyncExecutionMiddleware))]
+	[LogConfigurationName(nameof(SyncExecutionMiddleware))]
 	public sealed class SyncExecutionMiddleware : IExecutionMiddleware
 	{
 		private readonly object _lock = new object();

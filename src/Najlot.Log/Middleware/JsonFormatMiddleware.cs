@@ -7,7 +7,7 @@ namespace Najlot.Log.Middleware
 	/// <summary>
 	/// Serialises LogMessage to a single line json string.
 	/// </summary>
-	[LogClassName(nameof(JsonFormatMiddleware))]
+	[LogConfigurationName(nameof(JsonFormatMiddleware))]
 	public class JsonFormatMiddleware : IFormatMiddleware
 	{
 		private void AppendJson(StringBuilder sb, string raw)

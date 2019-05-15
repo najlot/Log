@@ -7,7 +7,7 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Writes all messages to console.
 	/// </summary>
-	[LogClassName(nameof(ConsoleLogDestination))]
+	[LogConfigurationName(nameof(ConsoleLogDestination))]
 	public sealed class ConsoleLogDestination : ILogDestination
 	{
 		public readonly bool UseColors;

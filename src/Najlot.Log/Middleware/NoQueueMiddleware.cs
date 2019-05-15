@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Middleware
 {
-	[LogClassName(nameof(NoQueueMiddleware))]
+	[LogConfigurationName(nameof(NoQueueMiddleware))]
 	public sealed class NoQueueMiddleware : IQueueMiddleware
 	{
 		private readonly Queue<LogMessage> _queue = new Queue<LogMessage>();
