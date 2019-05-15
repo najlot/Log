@@ -75,6 +75,11 @@ namespace Najlot.Log
 
 		public Type GetType(string name)
 		{
+			if (name == null)
+			{
+				return null;
+			}
+
 			lock (_stringToTypeMaping)
 			{
 				if (_stringToTypeMaping.TryGetValue(name, out Type value))

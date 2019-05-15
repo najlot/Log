@@ -41,9 +41,18 @@ namespace Najlot.Log
 
 		private LogDestinationEntry CreateLogDestinationEntry<T>(T logDestination) where T : ILogDestination
 		{
-			_logConfiguration.GetFormatMiddlewareTypeForType(typeof(T), out var formatMiddlewareType);
-			_logConfiguration.GetQueueMiddlewareTypeForType(typeof(T), out var queueMiddlewareType);
-			_logConfiguration.GetFilterMiddlewareTypeForType(typeof(T), out var filterMiddlewareType);
+			var mapper = LogConfigurationMapper.Instance;
+
+			var destinationName = mapper.GetName(typeof(T));
+
+			_logConfiguration.GetFormatMiddlewareNameForName(destinationName, out var formatMiddlewareName);
+			_logConfiguration.GetQueueMiddlewareNameForName(destinationName, out var queueMiddlewareName);
+			_logConfiguration.GetFilterMiddlewareNameForName(destinationName, out var filterMiddlewareName);
+
+			var formatMiddlewareType = mapper.GetType(formatMiddlewareName);
+			var queueMiddlewareType = mapper.GetType(queueMiddlewareName);
+			var executionMiddlewareType = mapper.GetType(_logConfiguration.ExecutionMiddlewareName);
+			var filterMiddlewareType = mapper.GetType(filterMiddlewareName);
 
 			var formatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
 			var queueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
@@ -53,10 +62,10 @@ namespace Najlot.Log
 
 			return new LogDestinationEntry()
 			{
-				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(_logConfiguration.ExecutionMiddlewareType),
+				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType),
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType),
 				LogDestination = logDestination,
-				LogDestinationType = logDestination.GetType(),
+				LogDestinationName = destinationName,
 				FormatMiddleware = formatMiddleware,
 				QueueMiddleware = queueMiddleware
 			};

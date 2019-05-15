@@ -31,27 +31,34 @@ namespace Najlot.Log
 			}
 		}
 
-		private Type _executionMiddlewareType = typeof(SyncExecutionMiddleware);
+		private string _executionMiddlewareName = nameof(SyncExecutionMiddleware);
 
-		public Type ExecutionMiddlewareType
+		public string ExecutionMiddlewareName
 		{
 			get
 			{
-				return _executionMiddlewareType;
+				return _executionMiddlewareName;
 			}
 			set
 			{
+				var type = LogConfigurationMapper.Instance.GetType(value);
+
+				if (type == null)
+				{
+					return;
+				}
+
 				Type iExecutionMiddlewareType = typeof(IExecutionMiddleware);
 
-				if (value.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
+				if (type.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
 				{
 					Console.WriteLine("Najlot.Log: New execution middleware does not implement " + iExecutionMiddlewareType.Name);
 					return;
 				}
 
-				if (_executionMiddlewareType.FullName != value.FullName)
+				if (_executionMiddlewareName != value)
 				{
-					_executionMiddlewareType = value;
+					_executionMiddlewareName = value;
 					NotifyObservers();
 				}
 			}
@@ -95,42 +102,48 @@ namespace Najlot.Log
 
 		#region Format middleware
 
-		private readonly Dictionary<Type, Type> _formatMiddlewareTypes = new Dictionary<Type, Type>();
+		private readonly Dictionary<string, string> _formatMiddlewareNames = new Dictionary<string, string>();
 
-		public void GetFormatMiddlewareTypeForType(Type type, out Type middlewareType)
+		public void GetFormatMiddlewareNameForName(string name, out string middlewareName)
 		{
-			lock (_formatMiddlewareTypes)
+			lock (_formatMiddlewareNames)
 			{
-				if (!_formatMiddlewareTypes.TryGetValue(type, out middlewareType))
+				if (!_formatMiddlewareNames.TryGetValue(name, out middlewareName))
 				{
-					middlewareType = typeof(FormatMiddleware);
-					_formatMiddlewareTypes.Add(type, middlewareType);
+					middlewareName = nameof(FormatMiddleware);
+					_formatMiddlewareNames.Add(name, middlewareName);
 				}
 			}
 		}
 
-		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares()
+		public IReadOnlyCollection<KeyValuePair<string, string>> GetFormatMiddlewares()
 		{
-			lock (_formatMiddlewareTypes)
+			lock (_formatMiddlewareNames)
 			{
-				return new Dictionary<Type, Type>(_formatMiddlewareTypes);
+				return new Dictionary<string, string>(_formatMiddlewareNames);
 			}
 		}
 
-		public void SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
+		public void SetFormatMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
 		{
 			var middlewareType = typeof(TMiddleware);
+			var middlewareName = LogConfigurationMapper.Instance.GetName(middlewareType);
 
-			lock (_formatMiddlewareTypes)
+			if (middlewareName == null)
 			{
-				if (!_formatMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				return;
+			}
+
+			lock (_formatMiddlewareNames)
+			{
+				if (!_formatMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
 				{
-					_formatMiddlewareTypes.Add(type, middlewareType);
+					_formatMiddlewareNames.Add(name, middlewareName);
 					NotifyObservers();
 				}
-				else if (oldMiddlewareType != middlewareType)
+				else if (oldMiddlewareName != middlewareName)
 				{
-					_formatMiddlewareTypes[type] = middlewareType;
+					_formatMiddlewareNames[name] = middlewareName;
 					NotifyObservers();
 				}
 			}
@@ -140,42 +153,43 @@ namespace Najlot.Log
 
 		#region Queue middleware
 
-		private readonly Dictionary<Type, Type> _queueMiddlewareTypes = new Dictionary<Type, Type>();
+		private readonly Dictionary<string, string> _queueMiddlewareNames = new Dictionary<string, string>();
 
-		public void GetQueueMiddlewareTypeForType(Type type, out Type middlewareType)
+		public void GetQueueMiddlewareNameForName(string name, out string middlewareName)
 		{
-			lock (_queueMiddlewareTypes)
+			lock (_queueMiddlewareNames)
 			{
-				if (!_queueMiddlewareTypes.TryGetValue(type, out middlewareType))
+				if (!_queueMiddlewareNames.TryGetValue(name, out middlewareName))
 				{
-					middlewareType = typeof(NoQueueMiddleware);
-					_queueMiddlewareTypes.Add(type, middlewareType);
+					middlewareName = nameof(NoQueueMiddleware);
+					_queueMiddlewareNames.Add(name, middlewareName);
 				}
 			}
 		}
 
-		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetQueueMiddlewares()
+		public IReadOnlyCollection<KeyValuePair<string, string>> GetQueueMiddlewares()
 		{
-			lock (_queueMiddlewareTypes)
+			lock (_queueMiddlewareNames)
 			{
-				return new Dictionary<Type, Type>(_queueMiddlewareTypes);
+				return new Dictionary<string, string>(_queueMiddlewareNames);
 			}
 		}
 
-		public void SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new()
+		public void SetQueueMiddlewareForName<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
 		{
 			var middlewareType = typeof(TMiddleware);
+			var middlewareName = LogConfigurationMapper.Instance.GetName(middlewareType);
 
-			lock (_queueMiddlewareTypes)
+			lock (_queueMiddlewareNames)
 			{
-				if (!_queueMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				if (!_queueMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
 				{
-					_queueMiddlewareTypes.Add(type, middlewareType);
+					_queueMiddlewareNames.Add(name, middlewareName);
 					NotifyObservers();
 				}
-				else if (oldMiddlewareType != middlewareType)
+				else if (oldMiddlewareName != middlewareName)
 				{
-					_queueMiddlewareTypes[type] = middlewareType;
+					_queueMiddlewareNames[name] = middlewareName;
 					NotifyObservers();
 				}
 			}
@@ -185,42 +199,48 @@ namespace Najlot.Log
 
 		#region Filter middleware
 
-		private readonly Dictionary<Type, Type> _filterMiddlewareTypes = new Dictionary<Type, Type>();
+		private readonly Dictionary<string, string> _filterMiddlewareNames = new Dictionary<string, string>();
 
-		public void GetFilterMiddlewareTypeForType(Type type, out Type middlewareType)
+		public void GetFilterMiddlewareNameForName(string name, out string middlewareName)
 		{
-			lock (_filterMiddlewareTypes)
+			lock (_filterMiddlewareNames)
 			{
-				if (!_filterMiddlewareTypes.TryGetValue(type, out middlewareType))
+				if (!_filterMiddlewareNames.TryGetValue(name, out middlewareName))
 				{
-					middlewareType = typeof(NoFilterMiddleware);
-					_filterMiddlewareTypes.Add(type, middlewareType);
+					middlewareName = nameof(NoFilterMiddleware);
+					_filterMiddlewareNames.Add(name, middlewareName);
 				}
 			}
 		}
 
-		public IReadOnlyCollection<KeyValuePair<Type, Type>> GetFilterMiddlewares()
+		public IReadOnlyCollection<KeyValuePair<string, string>> GetFilterMiddlewares()
 		{
-			lock (_filterMiddlewareTypes)
+			lock (_filterMiddlewareNames)
 			{
-				return new Dictionary<Type, Type>(_filterMiddlewareTypes);
+				return new Dictionary<string, string>(_filterMiddlewareNames);
 			}
 		}
 
-		public void SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new()
+		public void SetFilterMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
 			var middlewareType = typeof(TMiddleware);
+			var middlewareName = LogConfigurationMapper.Instance.GetName(middlewareType);
 
-			lock (_filterMiddlewareTypes)
+			if (middlewareName == null)
 			{
-				if (!_filterMiddlewareTypes.TryGetValue(type, out var oldMiddlewareType))
+				return;
+			}
+
+			lock (_filterMiddlewareNames)
+			{
+				if (!_filterMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
 				{
-					_filterMiddlewareTypes.Add(type, middlewareType);
+					_filterMiddlewareNames.Add(name, middlewareName);
 					NotifyObservers();
 				}
-				else if (oldMiddlewareType != middlewareType)
+				else if (oldMiddlewareName != middlewareName)
 				{
-					_filterMiddlewareTypes[type] = middlewareType;
+					_filterMiddlewareNames[name] = middlewareName;
 					NotifyObservers();
 				}
 			}

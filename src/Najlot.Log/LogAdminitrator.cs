@@ -68,7 +68,9 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
 		{
-			return this.SetExecutionMiddlewareByType(typeof(TExecutionMiddleware));
+			var type = typeof(TExecutionMiddleware);
+			var name = LogConfigurationMapper.Instance.GetName(type);
+			return this.SetExecutionMiddlewareByName(name);
 		}
 
 		/// <summary>
@@ -76,50 +78,50 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="middlewareType">Type of the execution middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetExecutionMiddlewareByType(Type middlewareType)
+		public LogAdminitrator SetExecutionMiddlewareByName(string middlewareName)
 		{
-			if (middlewareType == null)
+			if (middlewareName == null)
 			{
-				Console.WriteLine("Najlot.Log: New execution middleware type is null.");
+				Console.WriteLine("Najlot.Log: New execution middleware name is null.");
 				return this;
 			}
 
 			this.Flush();
-			_logConfiguration.ExecutionMiddlewareType = middlewareType;
+			_logConfiguration.ExecutionMiddlewareName = middlewareName;
 			return this;
 		}
 
 		#region Format middleware
 		/// <summary>
-		/// Sets the type of the format middleware and notifies observing components
+		/// Sets the name of the format middleware and notifies observing components
 		/// </summary>
-		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
-		/// <param name="type">Target destination</param>
+		/// <nameparam name="TMiddleware">Name of the format middleware</nameparam>
+		/// <param name="name">Target destination</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new()
+		public LogAdminitrator SetFormatMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetFormatMiddlewareForType<TMiddleware>(type);
+			_logConfiguration.SetFormatMiddlewareForName<TMiddleware>(name);
 			return this;
 		}
 
 		/// <summary>
-		/// Gets the format middleware type for a destination
+		/// Gets the format middleware name for a destination
 		/// </summary>
-		/// <param name="type">Type of the destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
+		/// <param name="name">Name of the destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddlewareTypeForType(Type type, out Type middlewareType)
+		public LogAdminitrator GetFormatMiddlewareNameForName(string name, out string middlewareName)
 		{
-			_logConfiguration.GetFormatMiddlewareTypeForType(type, out middlewareType);
+			_logConfiguration.GetFormatMiddlewareNameForName(name, out middlewareName);
 			return this;
 		}
 
 		/// <summary>
-		/// Returns all destination types and their registered format middleware type
+		/// Returns all destination names and their registered format middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> formatMiddlewares)
+		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> formatMiddlewares)
 		{
 			formatMiddlewares = _logConfiguration.GetFormatMiddlewares();
 			return this;
@@ -128,34 +130,34 @@ namespace Najlot.Log
 
 		#region Queue middleware
 		/// <summary>
-		/// Sets the type of the queue middleware and notifies observing components
+		/// Sets the name of the queue middleware and notifies observing components
 		/// </summary>
-		/// <param name="middlewareType">Type of the queue middleware</param>
+		/// <param name="middlewareName">Name of the queue middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new()
+		public LogAdminitrator SetQueueMiddlewareForName<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetQueueMiddlewareForType<TMiddleware>(type);
+			_logConfiguration.SetQueueMiddlewareForName<TMiddleware>(name);
 			return this;
 		}
 
 		/// <summary>
-		/// Gets the queue middleware type for a destination
+		/// Gets the queue middleware name for a destination
 		/// </summary>
-		/// <param name="type">Type of the destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
+		/// <param name="name">Name of the destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetQueueMiddlewareTypeForType(Type type, out Type middlewareType)
+		public LogAdminitrator GetQueueMiddlewareNameForName(string name, out string middlewareName)
 		{
-			_logConfiguration.GetQueueMiddlewareTypeForType(type, out middlewareType);
+			_logConfiguration.GetQueueMiddlewareNameForName(name, out middlewareName);
 			return this;
 		}
 
 		/// <summary>
-		/// Returns all destination types and their registered queue middleware type
+		/// Returns all destination names and their registered queue middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetQueueMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> queueMiddlewares)
+		public LogAdminitrator GetQueueMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> queueMiddlewares)
 		{
 			queueMiddlewares = _logConfiguration.GetQueueMiddlewares();
 			return this;
@@ -164,34 +166,34 @@ namespace Najlot.Log
 
 		#region Filter middleware
 		/// <summary>
-		/// Sets the type of the filter middleware and notifies observing components
+		/// Sets the name of the filter middleware and notifies observing components
 		/// </summary>
-		/// <param name="middlewareType">Type of the filter middleware</param>
+		/// <param name="middlewareName">Name of the filter middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new()
+		public LogAdminitrator SetFilterMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetFilterMiddlewareForType<TMiddleware>(type);
+			_logConfiguration.SetFilterMiddlewareForName<TMiddleware>(name);
 			return this;
 		}
 
 		/// <summary>
-		/// Gets the filter middleware type for a destination
+		/// Gets the filter middleware name for a destination
 		/// </summary>
-		/// <param name="type">Type of the destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
+		/// <param name="name">Name of the destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFilterMiddlewareTypeForType(Type type, out Type middlewareType)
+		public LogAdminitrator GetFilterMiddlewareNameForName(string name, out string middlewareName)
 		{
-			_logConfiguration.GetFilterMiddlewareTypeForType(type, out middlewareType);
+			_logConfiguration.GetFilterMiddlewareNameForName(name, out middlewareName);
 			return this;
 		}
 
 		/// <summary>
-		/// Returns all destination types and their registered filter middleware type
+		/// Returns all destination names and their registered filter middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetFilterMiddlewares(out IReadOnlyCollection<KeyValuePair<Type, Type>> filterMiddlewares)
+		public LogAdminitrator GetFilterMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> filterMiddlewares)
 		{
 			filterMiddlewares = _logConfiguration.GetFilterMiddlewares();
 			return this;
@@ -259,7 +261,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="sourceType">Type to create a logger for</param>
 		/// <returns></returns>
-		public Logger GetLogger(Type sourceType) => GetLogger(sourceType.FullName);
+		public Logger GetLogger(Type sourceType) => _loggerPool.GetLogger(sourceType.FullName);
 
 		/// <summary>
 		/// Creates a logger for a category or retrieves it from the cache.

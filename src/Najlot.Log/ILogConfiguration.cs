@@ -18,67 +18,67 @@ namespace Najlot.Log
 		/// <summary>
 		/// Current execution middleware for all log destinations observing this configuration
 		/// </summary>
-		Type ExecutionMiddlewareType { get; } // TODO log class name
+		string ExecutionMiddlewareName { get; }
 
 		/// <summary>
-		/// Gets a format middleware for a type of log destination
+		/// Gets a format middleware for a name of log destination
 		/// </summary>
-		/// <param name="type">Type of the log destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
-		void GetFormatMiddlewareTypeForType(Type type, out Type middlewareType);
+		/// <param name="name">Name of the log destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
+		void GetFormatMiddlewareNameForName(string name, out string middlewareName);
 
 		/// <summary>
-		/// Returns all destination types and their registered format middleware type
-		/// </summary>
-		/// <returns></returns>
-		IReadOnlyCollection<KeyValuePair<Type, Type>> GetFormatMiddlewares();
-
-		/// <summary>
-		/// Sets a format middleware for a type of log destination
-		/// </summary>
-		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
-		/// <param name="type">Type of the log destination</param>
-		void SetFormatMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFormatMiddleware, new();
-
-		/// <summary>
-		/// Gets a queue middleware for a type of log destination
-		/// </summary>
-		/// <param name="type">Type of the log destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
-		void GetQueueMiddlewareTypeForType(Type type, out Type middlewareType);
-
-		/// <summary>
-		/// Returns all destination types and their registered queue middleware type
+		/// Returns all destination names and their registered format middleware name
 		/// </summary>
 		/// <returns></returns>
-		IReadOnlyCollection<KeyValuePair<Type, Type>> GetQueueMiddlewares();
+		IReadOnlyCollection<KeyValuePair<string, string>> GetFormatMiddlewares();
 
 		/// <summary>
-		/// Sets a queue middleware for a type of log destination
+		/// Sets a format middleware for a name of log destination
 		/// </summary>
-		/// <typeparam name="TMiddleware">Type of the queue middleware</typeparam>
-		/// <param name="type">Type of the log destination</param>
-		void SetQueueMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IQueueMiddleware, new();
+		/// <nameparam name="TMiddleware">Name of the format middleware</nameparam>
+		/// <param name="name">Name of the log destination</param>
+		void SetFormatMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new();
 
 		/// <summary>
-		/// Gets a filter middleware for a type of log destination
+		/// Gets a queue middleware for a name of log destination
 		/// </summary>
-		/// <param name="type">Type of the log destination</param>
-		/// <param name="middlewareType">Type of the middleware</param>
-		void GetFilterMiddlewareTypeForType(Type type, out Type middlewareType);
+		/// <param name="name">Name of the log destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
+		void GetQueueMiddlewareNameForName(string name, out string middlewareName);
 
 		/// <summary>
-		/// Returns all destination types and their registered filter middleware type
+		/// Returns all destination name and their registered queue middleware name
 		/// </summary>
 		/// <returns></returns>
-		IReadOnlyCollection<KeyValuePair<Type, Type>> GetFilterMiddlewares();
+		IReadOnlyCollection<KeyValuePair<string, string>> GetQueueMiddlewares();
 
 		/// <summary>
-		/// Sets a filter middleware for a type of log destination
+		/// Sets a queue middleware for a name of log destination
 		/// </summary>
-		/// <typeparam name="TMiddleware">Type of the filter middleware</typeparam>
-		/// <param name="type">Type of the log destination</param>
-		void SetFilterMiddlewareForType<TMiddleware>(Type type) where TMiddleware : IFilterMiddleware, new();
+		/// <nameparam name="TMiddleware">Name of the queue middleware</nameparam>
+		/// <param name="name">Name of the log destination</param>
+		void SetQueueMiddlewareForName<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new();
+
+		/// <summary>
+		/// Gets a filter middleware for a name of log destination
+		/// </summary>
+		/// <param name="name">Name of the log destination</param>
+		/// <param name="middlewareName">Name of the middleware</param>
+		void GetFilterMiddlewareNameForName(string name, out string middlewareName);
+
+		/// <summary>
+		/// Returns all destination names and their registered filter middleware name
+		/// </summary>
+		/// <returns></returns>
+		IReadOnlyCollection<KeyValuePair<string, string>> GetFilterMiddlewares();
+
+		/// <summary>
+		/// Sets a filter middleware for a name of log destination
+		/// </summary>
+		/// <nameparam name="TMiddleware">Name of the filter middleware</nameparam>
+		/// <param name="name">Name of the log destination</param>
+		void SetFilterMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new();
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur

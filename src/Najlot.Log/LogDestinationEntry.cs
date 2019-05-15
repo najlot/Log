@@ -8,7 +8,7 @@ namespace Najlot.Log
 	{
 		public ILogDestination LogDestination;
 
-		public Type LogDestinationType;
+		public string LogDestinationName;
 
 		public IFormatMiddleware FormatMiddleware;
 
@@ -20,29 +20,35 @@ namespace Najlot.Log
 
 		public void NotifyConfigurationChanged(ILogConfiguration configuration)
 		{
-			configuration.GetFormatMiddlewareTypeForType(LogDestinationType, out var formatMiddlewareType);
-			configuration.GetQueueMiddlewareTypeForType(LogDestinationType, out var queueMiddlewareType);
-			configuration.GetFilterMiddlewareTypeForType(LogDestinationType, out var filterMiddlewareType);
+			var mapper = LogConfigurationMapper.Instance;
 
-			if (ExecutionMiddleware.GetType() != configuration.ExecutionMiddlewareType)
+			configuration.GetFormatMiddlewareNameForName(LogDestinationName, out var formatMiddlewareName);
+			configuration.GetQueueMiddlewareNameForName(LogDestinationName, out var queueMiddlewareName);
+			configuration.GetFilterMiddlewareNameForName(LogDestinationName, out var filterMiddlewareName);
+
+			if (mapper.GetName(ExecutionMiddleware.GetType()) != configuration.ExecutionMiddlewareName)
 			{
-				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(configuration.ExecutionMiddlewareType);
+				var executionMiddlewareType = mapper.GetType(configuration.ExecutionMiddlewareName);
+				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType);
 			}
 
-			if (FilterMiddleware.GetType() != filterMiddlewareType)
+			if (mapper.GetName(FilterMiddleware.GetType()) != filterMiddlewareName)
 			{
+				var filterMiddlewareType = mapper.GetType(filterMiddlewareName);
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType);
 			}
 
-			if (QueueMiddleware.GetType() != queueMiddlewareType)
+			if (mapper.GetName(QueueMiddleware.GetType()) != queueMiddlewareName)
 			{
+				var queueMiddlewareType = mapper.GetType(queueMiddlewareName);
 				var priviousFormatMiddleware = QueueMiddleware.FormatMiddleware;
 				QueueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
 				QueueMiddleware.FormatMiddleware = priviousFormatMiddleware;
 			}
 
-			if (FormatMiddleware.GetType() != formatMiddlewareType)
+			if (mapper.GetName(FormatMiddleware.GetType()) != formatMiddlewareName)
 			{
+				var formatMiddlewareType = mapper.GetType(formatMiddlewareName);
 				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
 				QueueMiddleware.FormatMiddleware = FormatMiddleware;
 			}
