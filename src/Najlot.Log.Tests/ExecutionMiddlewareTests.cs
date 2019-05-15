@@ -407,7 +407,7 @@ namespace Najlot.Log.Tests
 
 			log.Warn("Normal");
 
-			logAdminitrator.SetExecutionMiddlewareByType(null);
+			logAdminitrator.SetExecutionMiddlewareByName(null);
 
 			log.Warn("After set to null");
 

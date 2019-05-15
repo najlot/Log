@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 		}
-
+		
 		[Fact]
 		public void ApplicationMustNotDieOnBadConfigurationPath()
 		{
@@ -68,7 +68,11 @@ namespace Najlot.Log.Tests
 				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			var taskExecutionMiddlewareType = typeof(TaskExecutionMiddleware);
+
+			var taskExecutionMiddlewareName = LogConfigurationMapper.Instance.GetName(taskExecutionMiddlewareType);
+
+			Assert.Equal(taskExecutionMiddlewareName, logConfiguration.ExecutionMiddlewareName);
 		}
 
 		[Fact]

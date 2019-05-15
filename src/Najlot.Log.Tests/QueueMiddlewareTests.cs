@@ -1,4 +1,5 @@
-﻿using Najlot.Log.Middleware;
+﻿using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
 using Xunit;
@@ -12,25 +13,33 @@ namespace Najlot.Log.Tests
 		{
 			var admin = LogAdminitrator.CreateNew();
 
-			admin.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogMessage));
-			admin.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(this.GetType());
-			admin.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(Logger));
+			var formatMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(FormatMiddleware));
+			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoFilterMiddleware));
+			var noQueueMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoQueueMiddleware));
 
-			admin.GetFormatMiddlewareTypeForType(typeof(LogMessage), out var formatMiddlewareForLogmessage);
-			admin.GetFormatMiddlewareTypeForType(this.GetType(), out var formatMiddlewareTypeForThis);
-			admin.GetFormatMiddlewareTypeForType(typeof(Logger), out var formatMiddlewareTypeForLogger);
+			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(formatMiddlewareName);
+			admin.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(noFilterMiddlewareName);
+			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(noQueueMiddlewareName);
 
-			Assert.Equal(typeof(FormatToAbcMiddleware), formatMiddlewareForLogmessage);
-			Assert.Equal(typeof(FormatToEmptyMiddleware), formatMiddlewareTypeForThis);
-			Assert.Equal(typeof(FormatToAbcMiddleware), formatMiddlewareTypeForLogger);
+			admin.GetFormatMiddlewareNameForName(formatMiddlewareName, out var formatMiddlewareNameActual);
+			admin.GetFormatMiddlewareNameForName(noFilterMiddlewareName, out var noFilterMiddlewareActual);
+			admin.GetFormatMiddlewareNameForName(noQueueMiddlewareName, out var noQueueMiddlewareNameActual);
+
+			Assert.Equal(formatMiddlewareName, formatMiddlewareNameActual);
+			Assert.Equal(noFilterMiddlewareName, noFilterMiddlewareActual);
+			Assert.Equal(noQueueMiddlewareName, noQueueMiddlewareNameActual);
 		}
 
 		[Fact]
 		public void ThereShouldBeADefaultQueueMiddleware()
 		{
+			var fileDestinationName = LogConfigurationMapper.Instance.GetName(typeof(FileLogDestination));
+
 			LogAdminitrator
 				.CreateNew()
-				.GetQueueMiddlewareTypeForType(this.GetType(), out var queueMiddlewareType);
+				.GetQueueMiddlewareNameForName(fileDestinationName, out var queueMiddlewareName);
+
+			var queueMiddlewareType = LogConfigurationMapper.Instance.GetType(queueMiddlewareName);
 
 			// Will throw if can not create
 			Assert.NotNull((IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType));

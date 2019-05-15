@@ -32,7 +32,7 @@ namespace Najlot.Log.Tests
 
 			var log = logAdmin.GetLogger(this.GetType());
 
-			logConfiguration.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
+			logConfiguration.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
 
 			log.Fatal("this message should not be used");
 
@@ -52,7 +52,7 @@ namespace Najlot.Log.Tests
 					strActual = str;
 				}));
 
-			logAdmin.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
+			logAdmin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
 
 			var log = logAdmin.GetLogger(this.GetType());
 
@@ -73,7 +73,7 @@ namespace Najlot.Log.Tests
 				{
 					strActual = str;
 				}))
-				.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
+				.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
 
 			var log = logAdmin.GetLogger(this.GetType());
 			log.Fatal("this message should not be used");
@@ -97,7 +97,7 @@ namespace Najlot.Log.Tests
 				{
 					strActual2 = str;
 				}))
-				.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
+				.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(LogDestinationFormatFunctionMock));
 
 			var log = logAdmin.GetLogger(this.GetType());
 			log.Fatal("this message should not be used");
@@ -111,13 +111,13 @@ namespace Najlot.Log.Tests
 		{
 			var admin = LogAdminitrator.CreateNew();
 
-			admin.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(LogMessage));
-			admin.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(this.GetType());
-			admin.SetFormatMiddlewareForType<FormatToAbcMiddleware>(typeof(Logger));
+			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(LogMessage));
+			admin.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(this.GetType());
+			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(typeof(Logger));
 
-			admin.GetFormatMiddlewareTypeForType(typeof(LogMessage), out var formatMiddlewareForLogmessage);
-			admin.GetFormatMiddlewareTypeForType(this.GetType(), out var formatMiddlewareTypeForThis);
-			admin.GetFormatMiddlewareTypeForType(typeof(Logger), out var formatMiddlewareTypeForLogger);
+			admin.GetFormatMiddlewareNameForName(typeof(LogMessage), out var formatMiddlewareForLogmessage);
+			admin.GetFormatMiddlewareNameForName(this.GetType(), out var formatMiddlewareTypeForThis);
+			admin.GetFormatMiddlewareNameForName(typeof(Logger), out var formatMiddlewareTypeForLogger);
 
 			Assert.Equal(typeof(FormatToAbcMiddleware), formatMiddlewareForLogmessage);
 			Assert.Equal(typeof(FormatToEmptyMiddleware), formatMiddlewareTypeForThis);
@@ -131,11 +131,11 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			logConfiguration.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(this.GetType());
-			logConfiguration.SetFormatMiddlewareForType<FormatToAbcMiddleware>(this.GetType());
-			logConfiguration.SetFormatMiddlewareForType<FormatTo123Middleware>(this.GetType());
+			logConfiguration.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(this.GetType());
+			logConfiguration.SetFormatMiddlewareForName<FormatToAbcMiddleware>(this.GetType());
+			logConfiguration.SetFormatMiddlewareForName<FormatTo123Middleware>(this.GetType());
 
-			logConfiguration.GetFormatMiddlewareTypeForType(this.GetType(), out var formatMiddlewareType);
+			logConfiguration.GetFormatMiddlewareNameForName(this.GetType(), out var formatMiddlewareType);
 
 			var formatMiddleware = Activator.CreateInstance(formatMiddlewareType) as IFormatMiddleware;
 
@@ -151,7 +151,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
-			logConfiguration.GetFormatMiddlewareTypeForType(
+			logConfiguration.GetFormatMiddlewareNameForName(
 				this.GetType(),
 				out var formatMiddlewareType);
 

@@ -64,12 +64,14 @@ namespace Najlot.Log.Tests
 				observerNotified = true;
 			}));
 
-			logConfiguration.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(typeof(ConfigurationChangedObserverMock));
+			var name = LogConfigurationMapper.Instance.GetName(typeof(ConfigurationChangedObserverMock));
+
+			logConfiguration.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(name);
 			Assert.True(observerNotified, "Observer was not notified on format function changed");
 
 			observerNotified = false;
 
-			logConfiguration.SetFormatMiddlewareForType<FormatToEmptyMiddleware>(typeof(ConfigurationChangedObserverMock));
+			logConfiguration.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(name);
 			Assert.False(observerNotified, "Observer was notified, but format funtion was the same");
 		}
 	}
