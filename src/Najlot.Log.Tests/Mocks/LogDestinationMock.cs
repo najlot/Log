@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
+	[LogConfigurationName(nameof(LogDestinationMock))]
 	public sealed class LogDestinationMock : ILogDestination
 	{
 		private readonly Action<LogMessage> _logAction;

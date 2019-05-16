@@ -8,6 +8,17 @@ namespace Najlot.Log.Tests
 {
 	public class FilterMiddlewareTests
 	{
+		public FilterMiddlewareTests()
+		{
+			foreach (var type in typeof(FilterMiddlewareTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void FilterMiddlewareCanBlockMessages()
 		{
@@ -21,7 +32,7 @@ namespace Najlot.Log.Tests
 			var log = LogAdminitrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination))
+				.SetFilterMiddlewareForName<DenyAllFilterMiddleware>(nameof(FileLogDestination))
 				.GetLogger("");
 
 			log.Fatal("TEST!");
@@ -42,7 +53,7 @@ namespace Najlot.Log.Tests
 			var logAdminitrator = LogAdminitrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination));
+				.SetFilterMiddlewareForName<DenyAllFilterMiddleware>(nameof(FileLogDestination));
 
 			var log = logAdminitrator.GetLogger("");
 
@@ -50,7 +61,7 @@ namespace Najlot.Log.Tests
 
 			Assert.False(File.Exists(fileName));
 
-			logAdminitrator.SetFilterMiddlewareForType<NoFilterMiddleware>(typeof(FileLogDestination));
+			logAdminitrator.SetFilterMiddlewareForName<NoFilterMiddleware>(nameof(FileLogDestination));
 
 			log.Fatal("TEST!");
 
@@ -73,7 +84,7 @@ namespace Najlot.Log.Tests
 				{
 					loggedToSecond = true;
 				}))
-				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(LogDestinationMock))
+				.SetFilterMiddlewareForName<DenyAllFilterMiddleware>(nameof(LogDestinationMock))
 				.GetLogger("");
 
 			log.Fatal("TEST!");
@@ -96,7 +107,7 @@ namespace Najlot.Log.Tests
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.AddFileLogDestination(fileName, keepFileOpen: false)
-				.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(FileLogDestination));
+				.SetFilterMiddlewareForName<DenyAllFilterMiddleware>(nameof(FileLogDestination));
 
 			var log = logAdminitrator.GetLogger("");
 
@@ -104,7 +115,7 @@ namespace Najlot.Log.Tests
 
 			Assert.False(File.Exists(fileName));
 
-			logAdminitrator.SetFilterMiddlewareForType<DenyAllFilterMiddleware>(typeof(string));
+			logAdminitrator.SetFilterMiddlewareForName<DenyAllFilterMiddleware>(nameof(System.String));
 
 			log.Debug("TEST 2!");
 

@@ -10,6 +10,17 @@ namespace Najlot.Log.Tests
 {
 	public class ExecutionMiddlewareTests
 	{
+		public ExecutionMiddlewareTests()
+		{
+			foreach (var type in typeof(ExecutionMiddlewareTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void ApplicationMustNotDieFromErrorsInDestinations()
 		{

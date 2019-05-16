@@ -6,6 +6,17 @@ namespace Najlot.Log.Tests
 {
 	public class DisposablesTest
 	{
+		public DisposablesTest()
+		{
+			foreach (var type in typeof(DisposablesTest).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void ConfigurationMustNotNotifyDisposedPrototypes()
 		{
@@ -42,7 +53,6 @@ namespace Najlot.Log.Tests
 				logAdminitrators.Add(
 					LogAdminitrator
 						.CreateNew()
-						.GetLogConfiguration(out var logConfiguration)
 						.AddCustomDestination(new LogDestinationMock(msg => { }))
 						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));
 			}
@@ -52,7 +62,7 @@ namespace Najlot.Log.Tests
 				var logger = logAdminitrator.GetLogger("1");
 				var logger2 = logAdminitrator.GetLogger("2");
 
-				// Check there are no exceptions when used wrong
+				// Check there are no exceptions
 				logAdminitrator.Dispose();
 			}
 		}

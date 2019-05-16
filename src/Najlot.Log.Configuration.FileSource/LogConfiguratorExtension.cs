@@ -52,7 +52,7 @@ namespace Najlot.Log.Configuration.FileSource
 		/// <summary>
 		/// Reads logconfiguration from an XML file
 		/// </summary>
-		/// <param name="logAdminitrator">LogConfigurator instance</param>
+		/// <param name="logAdminitrator">LogAdministrator instance</param>
 		/// <param name="path">Path to the XML file</param>
 		/// <param name="listenForChanges">Should the canges happened at runtime be reflected to the logger</param>
 		/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>

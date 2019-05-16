@@ -3,6 +3,7 @@ using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
+	[LogConfigurationName(nameof(AllowExceptionsExecutionMiddleware))]
 	public sealed class AllowExceptionsExecutionMiddleware : IExecutionMiddleware
 	{
 		public void Execute(Action execute)

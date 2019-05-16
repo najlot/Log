@@ -7,6 +7,17 @@ namespace Najlot.Log.Tests
 {
 	public class ExceptionLoggingTests
 	{
+		public ExceptionLoggingTests()
+		{
+			foreach (var type in typeof(ExceptionLoggingTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void ExceptionMustBeLogged()
 		{

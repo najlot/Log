@@ -10,6 +10,17 @@ namespace Najlot.Log.Tests
 {
 	public class ExtensionsLoggingTests
 	{
+		public ExtensionsLoggingTests()
+		{
+			foreach (var type in typeof(ExtensionsLoggingTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void IsEnabledMustReturnCorrectLogLevelEnabled()
 		{

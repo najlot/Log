@@ -9,6 +9,17 @@ namespace Najlot.Log.Tests
 {
 	public class FileConfigurationTests
 	{
+		public FileConfigurationTests()
+		{
+			foreach (var type in typeof(FileConfigurationTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void ApplicationMustNotDieOnBadConfigurationFile()
 		{
@@ -24,8 +35,7 @@ namespace Najlot.Log.Tests
 
 			LogAdminitrator
 				.CreateNew()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
+				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
 		}
 		
 		[Fact]
@@ -53,7 +63,7 @@ namespace Najlot.Log.Tests
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
 					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>Najlot.Log.Middleware.TaskExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+					"<ExecutionMiddleware>TaskExecutionMiddleware</ExecutionMiddleware>" +
 				"</NajlotLogConfiguration>";
 
 			if (File.Exists(configPath))
@@ -82,7 +92,7 @@ namespace Najlot.Log.Tests
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
 					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+					"<ExecutionMiddleware>SyncExecutionMiddleware</ExecutionMiddleware>" +
 				"</NajlotLogConfiguration>";
 
 			if (File.Exists(configPath))
@@ -127,13 +137,13 @@ namespace Najlot.Log.Tests
 			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
 					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>Najlot.Log.Middleware.TaskExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+					"<ExecutionMiddleware>TaskExecutionMiddleware</ExecutionMiddleware>" +
 				"</NajlotLogConfiguration>";
 
 			var newContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
 				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
 					"<LogLevel>Info</LogLevel>" +
-					"<ExecutionMiddleware>Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log</ExecutionMiddleware>" +
+					"<ExecutionMiddleware>SyncExecutionMiddleware</ExecutionMiddleware>" +
 				"</NajlotLogConfiguration>";
 
 			if (File.Exists(configPath))
@@ -151,7 +161,7 @@ namespace Najlot.Log.Tests
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
 
 			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
-			Assert.Equal(typeof(TaskExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			Assert.Equal(nameof(TaskExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
 
 			// Sometimes too fast, that the FileSystemListener is not ready
 			Thread.Sleep(100);
@@ -162,7 +172,7 @@ namespace Najlot.Log.Tests
 
 			while (stopwatch.ElapsedMilliseconds < 5000 &&
 				(logConfiguration.LogLevel == LogLevel.Error ||
-				typeof(TaskExecutionMiddleware).FullName == logConfiguration.ExecutionMiddlewareType.FullName))
+				nameof(TaskExecutionMiddleware) == logConfiguration.ExecutionMiddlewareName))
 			{
 				Thread.Sleep(10);
 			}
@@ -170,7 +180,7 @@ namespace Najlot.Log.Tests
 			stopwatch.Stop();
 
 			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
-			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
 
 			File.WriteAllText(configPath, newContent
 				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
@@ -186,10 +196,10 @@ namespace Najlot.Log.Tests
 			stopwatch.Stop();
 
 			Assert.Equal(LogLevel.Warn, logConfiguration.LogLevel);
-			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
 
 			File.WriteAllText(configPath, newContent
-				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware, Najlot.Log", "System.Guid")
+				.Replace("SyncExecutionMiddleware", "System.Guid")
 				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Error</LogLevel>"));
 
 			stopwatch = Stopwatch.StartNew();
@@ -202,10 +212,10 @@ namespace Najlot.Log.Tests
 			stopwatch.Stop();
 
 			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
-			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
 
 			File.WriteAllText(configPath, newContent
-				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
+				.Replace("SyncExecutionMiddleware", "BadExecutionMiddleware")
 				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Trace</LogLevel>"));
 
 			stopwatch = Stopwatch.StartNew();
@@ -218,7 +228,7 @@ namespace Najlot.Log.Tests
 			stopwatch.Stop();
 
 			Assert.Equal(LogLevel.Trace, logConfiguration.LogLevel);
-			Assert.Equal(typeof(SyncExecutionMiddleware).FullName, logConfiguration.ExecutionMiddlewareType.FullName);
+			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
 
 			File.Delete(configPath);
 

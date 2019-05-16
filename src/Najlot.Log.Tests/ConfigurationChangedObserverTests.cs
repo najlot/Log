@@ -6,6 +6,17 @@ namespace Najlot.Log.Tests
 {
 	public class ConfigurationObserverTests
 	{
+		public ConfigurationObserverTests()
+		{
+			foreach (var type in typeof(ConfigurationObserverTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void ConfigurationMustNotifyOnExecutionMiddlewareChanged()
 		{
@@ -67,12 +78,12 @@ namespace Najlot.Log.Tests
 			var name = LogConfigurationMapper.Instance.GetName(typeof(ConfigurationChangedObserverMock));
 
 			logConfiguration.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(name);
-			Assert.True(observerNotified, "Observer was not notified on format function changed");
+			Assert.True(observerNotified, "Observer was not notified on format middleware changed");
 
 			observerNotified = false;
 
 			logConfiguration.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(name);
-			Assert.False(observerNotified, "Observer was notified, but format funtion was the same");
+			Assert.False(observerNotified, "Observer was notified, but format middleware was the same");
 		}
 	}
 }

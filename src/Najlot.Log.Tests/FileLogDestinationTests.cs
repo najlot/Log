@@ -9,6 +9,17 @@ namespace Najlot.Log.Tests
 {
 	public class FileLogDestinationTests
 	{
+		public FileLogDestinationTests()
+		{
+			foreach (var type in typeof(FileLogDestinationTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void FileLoggerMustCleanUpFiles()
 		{

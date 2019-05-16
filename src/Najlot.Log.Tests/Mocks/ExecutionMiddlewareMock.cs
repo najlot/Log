@@ -3,9 +3,10 @@ using System;
 
 namespace Najlot.Log.Tests.Mocks
 {
+	[LogConfigurationName(nameof(ExecutionMiddlewareMock))]
 	public sealed class ExecutionMiddlewareMock : IExecutionMiddleware
 	{
-		private Action<Action> _action;
+		private readonly Action<Action> _action;
 
 		public ExecutionMiddlewareMock(Action<Action> action)
 		{

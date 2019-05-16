@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
+	[LogConfigurationName(nameof(LogDestinationFormatFunctionMock))]
 	public sealed class LogDestinationFormatFunctionMock : ILogDestination
 	{
 		private readonly Action<string> _logAction;

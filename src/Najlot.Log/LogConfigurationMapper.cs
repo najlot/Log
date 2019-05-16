@@ -10,8 +10,8 @@ namespace Najlot.Log
 	{
 		public static LogConfigurationMapper Instance { get; } = new LogConfigurationMapper();
 
-		private Dictionary<string, Type> _stringToTypeMaping;
-		private Dictionary<Type, string> _typeToStringMapping;
+		private readonly Dictionary<string, Type> _stringToTypeMaping;
+		private readonly Dictionary<Type, string> _typeToStringMapping;
 
 		private LogConfigurationMapper()
 		{
@@ -40,6 +40,11 @@ namespace Najlot.Log
 			};
 		}
 
+		public void AddToMapping<T>()
+		{
+			AddToMapping(typeof(T));
+		}
+
 		public void AddToMapping(Type type)
 		{
 			var attribute = type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), false).FirstOrDefault();
@@ -58,6 +63,11 @@ namespace Najlot.Log
 					_typeToStringMapping[type] = name;
 				}
 			}
+		}
+
+		public string GetName<T>()
+		{
+			return GetName(typeof(T));
 		}
 
 		public string GetName(Type type)

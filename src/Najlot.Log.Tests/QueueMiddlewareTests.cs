@@ -8,6 +8,17 @@ namespace Najlot.Log.Tests
 {
 	public class QueueMiddlewareTests
 	{
+		public QueueMiddlewareTests()
+		{
+			foreach (var type in typeof(QueueMiddlewareTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		[Fact]
 		public void QueueMiddlewareCanBeSetAndGetForMultipleTypes()
 		{
@@ -17,17 +28,17 @@ namespace Najlot.Log.Tests
 			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoFilterMiddleware));
 			var noQueueMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoQueueMiddleware));
 
-			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(formatMiddlewareName);
-			admin.SetFormatMiddlewareForName<FormatToEmptyMiddleware>(noFilterMiddlewareName);
-			admin.SetFormatMiddlewareForName<FormatToAbcMiddleware>(noQueueMiddlewareName);
+			admin.SetQueueMiddlewareForName<NoQueueMiddleware>(formatMiddlewareName);
+			admin.SetQueueMiddlewareForName<QueueMiddlewareMock>(noFilterMiddlewareName);
+			admin.SetQueueMiddlewareForName<NoQueueMiddleware>(noQueueMiddlewareName);
 
-			admin.GetFormatMiddlewareNameForName(formatMiddlewareName, out var formatMiddlewareNameActual);
-			admin.GetFormatMiddlewareNameForName(noFilterMiddlewareName, out var noFilterMiddlewareActual);
-			admin.GetFormatMiddlewareNameForName(noQueueMiddlewareName, out var noQueueMiddlewareNameActual);
+			admin.GetQueueMiddlewareNameForName(formatMiddlewareName, out var formatMiddlewareNameActual);
+			admin.GetQueueMiddlewareNameForName(noFilterMiddlewareName, out var noFilterMiddlewareActual);
+			admin.GetQueueMiddlewareNameForName(noQueueMiddlewareName, out var noQueueMiddlewareNameActual);
 
-			Assert.Equal(formatMiddlewareName, formatMiddlewareNameActual);
-			Assert.Equal(noFilterMiddlewareName, noFilterMiddlewareActual);
-			Assert.Equal(noQueueMiddlewareName, noQueueMiddlewareNameActual);
+			Assert.Equal(nameof(NoQueueMiddleware), formatMiddlewareNameActual);
+			Assert.Equal(nameof(QueueMiddlewareMock), noFilterMiddlewareActual);
+			Assert.Equal(nameof(NoQueueMiddleware), noQueueMiddlewareNameActual);
 		}
 
 		[Fact]

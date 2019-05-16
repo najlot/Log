@@ -6,6 +6,17 @@ namespace Najlot.Log.Tests
 {
 	public class LogLevelTests
 	{
+		public LogLevelTests()
+		{
+			foreach (var type in typeof(LogLevelTests).Assembly.GetTypes())
+			{
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				{
+					LogConfigurationMapper.Instance.AddToMapping(type);
+				}
+			}
+		}
+
 		private readonly LogLevel[] logLevels = {
 				LogLevel.Trace,
 				LogLevel.Debug,
