@@ -26,7 +26,7 @@ namespace Najlot.Log.Configuration.FileSource
 			try
 			{
 				var currentExecutionMiddlewareName = logConfiguration.ExecutionMiddlewareName;
-				
+
 				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
 
 				using (var stringWriter = new CustomStringWriter(encoding))
@@ -125,7 +125,7 @@ namespace Najlot.Log.Configuration.FileSource
 
 			if (fileConfiguration?.ExecutionMiddleware != null)
 			{
-				logAdminitrator.SetExecutionMiddlewareByName(fileConfiguration.ExecutionMiddleware);
+				logAdminitrator.SetExecutionMiddleware(fileConfiguration.ExecutionMiddleware);
 			}
 		}
 	}

@@ -68,9 +68,8 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
 		{
-			var type = typeof(TExecutionMiddleware);
-			var name = LogConfigurationMapper.Instance.GetName(type);
-			return this.SetExecutionMiddlewareByName(name);
+			var name = LogConfigurationMapper.Instance.GetName<TExecutionMiddleware>();
+			return this.SetExecutionMiddleware(name);
 		}
 
 		/// <summary>
@@ -78,7 +77,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="middlewareType">Type of the execution middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetExecutionMiddlewareByName(string middlewareName)
+		public LogAdminitrator SetExecutionMiddleware(string middlewareName)
 		{
 			if (middlewareName == null)
 			{
@@ -98,10 +97,10 @@ namespace Najlot.Log
 		/// <nameparam name="TMiddleware">Name of the format middleware</nameparam>
 		/// <param name="name">Target destination</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFormatMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
+		public LogAdminitrator SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetFormatMiddlewareForName<TMiddleware>(name);
+			_logConfiguration.SetFormatMiddleware<TMiddleware>(name);
 			return this;
 		}
 
@@ -111,9 +110,9 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddlewareNameForName(string name, out string middlewareName)
+		public LogAdminitrator GetFormatMiddleware(string name, out string middlewareName)
 		{
-			_logConfiguration.GetFormatMiddlewareNameForName(name, out middlewareName);
+			middlewareName = _logConfiguration.GetFormatMiddlewareName(name);
 			return this;
 		}
 
@@ -134,10 +133,10 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="middlewareName">Name of the queue middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetQueueMiddlewareForName<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
+		public LogAdminitrator SetQueueMiddleware<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetQueueMiddlewareForName<TMiddleware>(name);
+			_logConfiguration.SetQueueMiddleware<TMiddleware>(name);
 			return this;
 		}
 
@@ -147,9 +146,9 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetQueueMiddlewareNameForName(string name, out string middlewareName)
+		public LogAdminitrator GetQueueMiddlewareName(string name, out string middlewareName)
 		{
-			_logConfiguration.GetQueueMiddlewareNameForName(name, out middlewareName);
+			middlewareName = _logConfiguration.GetQueueMiddlewareName(name);
 			return this;
 		}
 
@@ -168,12 +167,12 @@ namespace Najlot.Log
 		/// <summary>
 		/// Sets the name of the filter middleware and notifies observing components
 		/// </summary>
-		/// <param name="middlewareName">Name of the filter middleware</param>
+		/// <param name="name">Name of the target destination</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
+		public LogAdminitrator SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
 			this.Flush();
-			_logConfiguration.SetFilterMiddlewareForName<TMiddleware>(name);
+			_logConfiguration.SetFilterMiddleware<TMiddleware>(name);
 			return this;
 		}
 
@@ -183,9 +182,9 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFilterMiddlewareNameForName(string name, out string middlewareName)
+		public LogAdminitrator GetFilterMiddlewareName(string name, out string middlewareName)
 		{
-			_logConfiguration.GetFilterMiddlewareNameForName(name, out middlewareName);
+			middlewareName = _logConfiguration.GetFilterMiddlewareName(name);
 			return this;
 		}
 

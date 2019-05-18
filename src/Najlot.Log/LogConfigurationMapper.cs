@@ -65,6 +65,11 @@ namespace Najlot.Log
 			}
 		}
 
+		public string GetName(object obj)
+		{
+			return GetName(obj.GetType());
+		}
+
 		public string GetName<T>()
 		{
 			return GetName(typeof(T));

@@ -22,23 +22,23 @@ namespace Najlot.Log
 		{
 			var mapper = LogConfigurationMapper.Instance;
 
-			configuration.GetFormatMiddlewareNameForName(LogDestinationName, out var formatMiddlewareName);
-			configuration.GetQueueMiddlewareNameForName(LogDestinationName, out var queueMiddlewareName);
-			configuration.GetFilterMiddlewareNameForName(LogDestinationName, out var filterMiddlewareName);
+			var formatMiddlewareName = configuration.GetFormatMiddlewareName(LogDestinationName);
+			var queueMiddlewareName = configuration.GetQueueMiddlewareName(LogDestinationName);
+			var filterMiddlewareName = configuration.GetFilterMiddlewareName(LogDestinationName);
 
-			if (mapper.GetName(ExecutionMiddleware.GetType()) != configuration.ExecutionMiddlewareName)
+			if (mapper.GetName(ExecutionMiddleware) != configuration.ExecutionMiddlewareName)
 			{
 				var executionMiddlewareType = mapper.GetType(configuration.ExecutionMiddlewareName);
 				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType);
 			}
 
-			if (mapper.GetName(FilterMiddleware.GetType()) != filterMiddlewareName)
+			if (mapper.GetName(FilterMiddleware) != filterMiddlewareName)
 			{
 				var filterMiddlewareType = mapper.GetType(filterMiddlewareName);
 				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType);
 			}
 
-			if (mapper.GetName(QueueMiddleware.GetType()) != queueMiddlewareName)
+			if (mapper.GetName(QueueMiddleware) != queueMiddlewareName)
 			{
 				var queueMiddlewareType = mapper.GetType(queueMiddlewareName);
 				var priviousFormatMiddleware = QueueMiddleware.FormatMiddleware;
@@ -46,7 +46,7 @@ namespace Najlot.Log
 				QueueMiddleware.FormatMiddleware = priviousFormatMiddleware;
 			}
 
-			if (mapper.GetName(FormatMiddleware.GetType()) != formatMiddlewareName)
+			if (mapper.GetName(FormatMiddleware) != formatMiddlewareName)
 			{
 				var formatMiddlewareType = mapper.GetType(formatMiddlewareName);
 				FormatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);

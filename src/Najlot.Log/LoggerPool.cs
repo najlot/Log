@@ -45,9 +45,9 @@ namespace Najlot.Log
 
 			var destinationName = mapper.GetName(logDestination.GetType());
 
-			_logConfiguration.GetFormatMiddlewareNameForName(destinationName, out var formatMiddlewareName);
-			_logConfiguration.GetQueueMiddlewareNameForName(destinationName, out var queueMiddlewareName);
-			_logConfiguration.GetFilterMiddlewareNameForName(destinationName, out var filterMiddlewareName);
+			var formatMiddlewareName = _logConfiguration.GetFormatMiddlewareName(destinationName);
+			var queueMiddlewareName = _logConfiguration.GetQueueMiddlewareName(destinationName);
+			var filterMiddlewareName = _logConfiguration.GetFilterMiddlewareName(destinationName);
 
 			var formatMiddlewareType = mapper.GetType(formatMiddlewareName);
 			var queueMiddlewareType = mapper.GetType(queueMiddlewareName);

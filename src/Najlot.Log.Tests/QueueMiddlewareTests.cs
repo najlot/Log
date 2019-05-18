@@ -24,17 +24,17 @@ namespace Najlot.Log.Tests
 		{
 			var admin = LogAdminitrator.CreateNew();
 
-			var formatMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(FormatMiddleware));
-			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoFilterMiddleware));
-			var noQueueMiddlewareName = LogConfigurationMapper.Instance.GetName(typeof(NoQueueMiddleware));
+			var formatMiddlewareName = LogConfigurationMapper.Instance.GetName<FormatMiddleware>();
+			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName<NoFilterMiddleware>();
+			var noQueueMiddlewareName = LogConfigurationMapper.Instance.GetName<NoQueueMiddleware>();
 
-			admin.SetQueueMiddlewareForName<NoQueueMiddleware>(formatMiddlewareName);
-			admin.SetQueueMiddlewareForName<QueueMiddlewareMock>(noFilterMiddlewareName);
-			admin.SetQueueMiddlewareForName<NoQueueMiddleware>(noQueueMiddlewareName);
+			admin.SetQueueMiddleware<NoQueueMiddleware>(formatMiddlewareName);
+			admin.SetQueueMiddleware<QueueMiddlewareMock>(noFilterMiddlewareName);
+			admin.SetQueueMiddleware<NoQueueMiddleware>(noQueueMiddlewareName);
 
-			admin.GetQueueMiddlewareNameForName(formatMiddlewareName, out var formatMiddlewareNameActual);
-			admin.GetQueueMiddlewareNameForName(noFilterMiddlewareName, out var noFilterMiddlewareActual);
-			admin.GetQueueMiddlewareNameForName(noQueueMiddlewareName, out var noQueueMiddlewareNameActual);
+			admin.GetQueueMiddlewareName(formatMiddlewareName, out var formatMiddlewareNameActual);
+			admin.GetQueueMiddlewareName(noFilterMiddlewareName, out var noFilterMiddlewareActual);
+			admin.GetQueueMiddlewareName(noQueueMiddlewareName, out var noQueueMiddlewareNameActual);
 
 			Assert.Equal(nameof(NoQueueMiddleware), formatMiddlewareNameActual);
 			Assert.Equal(nameof(QueueMiddlewareMock), noFilterMiddlewareActual);
@@ -48,7 +48,7 @@ namespace Najlot.Log.Tests
 
 			LogAdminitrator
 				.CreateNew()
-				.GetQueueMiddlewareNameForName(fileDestinationName, out var queueMiddlewareName);
+				.GetQueueMiddlewareName(fileDestinationName, out var queueMiddlewareName);
 
 			var queueMiddlewareType = LogConfigurationMapper.Instance.GetType(queueMiddlewareName);
 

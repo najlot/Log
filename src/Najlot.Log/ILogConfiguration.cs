@@ -25,7 +25,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="name">Name of the log destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
-		void GetFormatMiddlewareNameForName(string name, out string middlewareName);
+		string GetFormatMiddlewareName(string name);
 
 		/// <summary>
 		/// Returns all destination names and their registered format middleware name
@@ -38,14 +38,14 @@ namespace Najlot.Log
 		/// </summary>
 		/// <nameparam name="TMiddleware">Name of the format middleware</nameparam>
 		/// <param name="name">Name of the log destination</param>
-		void SetFormatMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new();
+		void SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new();
 
 		/// <summary>
 		/// Gets a queue middleware for a name of log destination
 		/// </summary>
 		/// <param name="name">Name of the log destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
-		void GetQueueMiddlewareNameForName(string name, out string middlewareName);
+		string GetQueueMiddlewareName(string name);
 
 		/// <summary>
 		/// Returns all destination name and their registered queue middleware name
@@ -58,14 +58,14 @@ namespace Najlot.Log
 		/// </summary>
 		/// <nameparam name="TMiddleware">Name of the queue middleware</nameparam>
 		/// <param name="name">Name of the log destination</param>
-		void SetQueueMiddlewareForName<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new();
+		void SetQueueMiddleware<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new();
 
 		/// <summary>
 		/// Gets a filter middleware for a name of log destination
 		/// </summary>
 		/// <param name="name">Name of the log destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
-		void GetFilterMiddlewareNameForName(string name, out string middlewareName);
+		string GetFilterMiddlewareName(string name);
 
 		/// <summary>
 		/// Returns all destination names and their registered filter middleware name
@@ -78,7 +78,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <nameparam name="TMiddleware">Name of the filter middleware</nameparam>
 		/// <param name="name">Name of the log destination</param>
-		void SetFilterMiddlewareForName<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new();
+		void SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new();
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur
