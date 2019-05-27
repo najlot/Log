@@ -119,16 +119,17 @@ namespace Najlot.Log
 		/// <returns></returns>
 		internal Logger GetLogger(string category)
 		{
-			Logger logger;
-
-			lock (_loggerCache)
+			if (!_loggerCache.TryGetValue(category, out Logger logger))
 			{
-				if (!_loggerCache.TryGetValue(category, out logger))
+				lock (_loggerCache)
 				{
-					var logExecutor = new LogExecutor(category, this);
-					logger = new Logger(logExecutor, _logConfiguration);
-					_loggerCache.Add(category, logger);
-					_logConfiguration.AttachObserver(logger);
+					if (!_loggerCache.TryGetValue(category, out logger))
+					{
+						var logExecutor = new LogExecutor(category, this);
+						logger = new Logger(logExecutor, _logConfiguration);
+						_loggerCache.Add(category, logger);
+						_logConfiguration.AttachObserver(logger);
+					}
 				}
 			}
 
