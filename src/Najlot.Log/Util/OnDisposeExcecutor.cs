@@ -4,7 +4,7 @@ namespace Najlot.Log.Util
 {
 	internal sealed class OnDisposeExcecutor : IDisposable
 	{
-		private Action _action;
+		private readonly Action _action;
 
 		public OnDisposeExcecutor(Action action)
 		{
