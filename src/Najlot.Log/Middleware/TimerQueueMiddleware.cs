@@ -1,4 +1,5 @@
 ﻿using Najlot.Log.Destinations;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -24,32 +25,42 @@ namespace Najlot.Log.Middleware
 				{
 					if (_timer == null)
 					{
-						_timer = new Timer(Flush, _queue, 1000, Timeout.Infinite);
+						_timer = new Timer(TimerFlush, null, 1000, Timeout.Infinite);
 					}
 				}
 			}
 		}
 
-		private void Flush(object state)
+		private void TimerFlush(object state)
+		{
+			try
+			{
+				Flush();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(nameof(TimerQueueMiddleware) + ex);
+			}
+		}
+
+		public void Flush()
 		{
 			lock (_timerLock)
 			{
+				var queue = _queue;
 				_queue = new Queue<LogMessage>();
 
-				if (state is Queue<LogMessage> queue)
+				if (queue.Count > 0)
 				{
-					if (queue.Count == 0)
-					{
-						return;
-					}
+					Destination.Log(queue.ToArray(), FormatMiddleware);
+				}
 
-					Destination.Log(queue, FormatMiddleware);
-					_timer = new Timer(Flush, _queue, 1000, Timeout.Infinite);
+				if (_queue.Count > 0)
+				{
+					_timer = new Timer(TimerFlush, null, 1000, Timeout.Infinite);
 				}
 			}
 		}
-
-		public void Flush() => Flush(_queue);
 
 		public void Dispose() => Flush();
 	}

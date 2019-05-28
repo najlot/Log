@@ -13,35 +13,10 @@ namespace Najlot.Log
 			int argId = 0;
 			int startIndex = -1;
 			int endIndex;
-			bool skip;
-
+			
 			do
 			{
-				do
-				{
-					skip = false;
-
-					if (startIndex >= message.Length)
-					{
-						startIndex = -1;
-						break;
-					}
-
-					startIndex = message.IndexOf('{', startIndex + 1);
-
-					if (startIndex == message.Length - 1)
-					{
-						startIndex = -1;
-						break;
-					}
-
-					if (message[startIndex + 1] == '{')
-					{
-						skip = true;
-						startIndex += 1;
-					}
-				}
-				while (skip);
+				FindParseStartIndex(message, ref startIndex);
 
 				endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
 
@@ -72,6 +47,29 @@ namespace Najlot.Log
 			return arguments;
 		}
 
+		private static void FindParseStartIndex(string message, ref int startIndex)
+		{
+			if (startIndex >= message.Length)
+			{
+				startIndex = -1;
+				return;
+			}
+
+			startIndex = message.IndexOf('{', startIndex + 1);
+
+			if (startIndex == message.Length - 1)
+			{
+				startIndex = -1;
+				return;
+			}
+
+			if (message[startIndex + 1] == '{')
+			{
+				startIndex += 1;
+				FindParseStartIndex(message, ref startIndex);
+			}
+		}
+
 		public static string InsertArguments(string message, IReadOnlyList<KeyValuePair<string, object>> arguments)
 		{
 			if (arguments.Count == 0 || string.IsNullOrWhiteSpace(message))
@@ -81,41 +79,11 @@ namespace Najlot.Log
 
 			int startIndex = -1;
 			int endIndex;
-			bool skip;
 			var argList = new List<KeyValuePair<string, object>>(arguments);
 
 			do
 			{
-				do
-				{
-					skip = false;
-
-					if (startIndex >= message.Length)
-					{
-						startIndex = -1;
-						break;
-					}
-
-					startIndex = message.IndexOf('{', startIndex + 1);
-
-					if (startIndex == -1)
-					{
-						break;
-					}
-
-					if (startIndex == message.Length - 1)
-					{
-						startIndex = -1;
-						break;
-					}
-
-					if (message[startIndex + 1] == '{')
-					{
-						skip = true;
-						message = message.Remove(startIndex, 1);
-					}
-				}
-				while (skip);
+				FindInsertStartIndex(ref message, ref startIndex);
 
 				endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
 
@@ -149,7 +117,36 @@ namespace Najlot.Log
 				}
 			}
 			while (endIndex != -1);
+
 			return message;
+		}
+
+		private static void FindInsertStartIndex(ref string message, ref int startIndex)
+		{
+			if (startIndex >= message.Length)
+			{
+				startIndex = -1;
+				return;
+			}
+
+			startIndex = message.IndexOf('{', startIndex + 1);
+
+			if (startIndex == -1)
+			{
+				return;
+			}
+
+			if (startIndex == message.Length - 1)
+			{
+				startIndex = -1;
+				return;
+			}
+
+			if (message[startIndex + 1] == '{')
+			{
+				message = message.Remove(startIndex, 1);
+				FindInsertStartIndex(ref message, ref startIndex);
+			}
 		}
 	}
 }
