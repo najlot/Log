@@ -13,8 +13,10 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void MiddlewareMustProduceValidJson()
 		{
+			DateTime dateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00");
+
 			var message = new LogMessage(
-				DateTime.Parse("2019-05-12T18:02:50.6571583+02:00"),
+				dateTime,
 				LogLevel.Info,
 				typeof(LogMessage).FullName,
 				null,
@@ -27,7 +29,7 @@ namespace Najlot.Log.Tests
 				}
 			);
 
-			var expected = "{\"DateTime\":\"2019-05-12T18:02:50.6571583+02:00\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":,\"BaseMessage\":\"some stuff happened {count:D3} times,\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":10},{\"Key\":\"count\",\"Value\":10}]}";
+			var expected = "{\"DateTime\":\"" + dateTime.ToString("o") + "\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":,\"BaseMessage\":\"some stuff happened {count:D3} times,\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":10},{\"Key\":\"count\",\"Value\":10}]}";
 			var actual = _middleware.Format(message);
 			Assert.Equal(expected, actual);
 		}
@@ -35,7 +37,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ExceptionMustBeLogged()
 		{
-			Exception exc = null;
+			Exception exc;
 
 			try
 			{
