@@ -43,7 +43,7 @@ namespace Najlot.Log
 		{
 			var mapper = LogConfigurationMapper.Instance;
 
-			var destinationName = mapper.GetName(logDestination.GetType());
+			var destinationName = mapper.GetName(logDestination);
 
 			var formatMiddlewareName = _logConfiguration.GetFormatMiddlewareName(destinationName);
 			var queueMiddlewareName = _logConfiguration.GetQueueMiddlewareName(destinationName);

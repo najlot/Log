@@ -44,6 +44,7 @@ namespace Najlot.Log
 				var priviousFormatMiddleware = QueueMiddleware.FormatMiddleware;
 				QueueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
 				QueueMiddleware.FormatMiddleware = priviousFormatMiddleware;
+				QueueMiddleware.Destination = LogDestination;
 			}
 
 			if (mapper.GetName(FormatMiddleware) != formatMiddlewareName)
