@@ -38,6 +38,11 @@ namespace Najlot.Log.Middleware
 
 				if (state is Queue<LogMessage> queue)
 				{
+					if (queue.Count == 0)
+					{
+						return;
+					}
+
 					Destination.Log(queue, FormatMiddleware);
 					_timer = new Timer(Flush, _queue, 1000, Timeout.Infinite);
 				}
