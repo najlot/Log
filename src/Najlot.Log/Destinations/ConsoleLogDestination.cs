@@ -13,6 +13,7 @@ namespace Najlot.Log.Destinations
 	{
 		public readonly bool UseColors;
 		public readonly ConsoleColor DefaultColor;
+		private readonly string _newLine = Environment.NewLine;
 
 		public ConsoleLogDestination(bool useColors)
 		{
@@ -69,11 +70,12 @@ namespace Najlot.Log.Destinations
 					SetColor(message.LogLevel);
 
 					sb.Clear();
-					sb.Append(formatMiddleware.Format(message));
 				}
+
+				sb.Append(formatMiddleware.Format(message) + _newLine);
 			}
 
-			Console.Out.WriteLine(sb.ToString());
+			Console.Out.Write(sb.ToString());
 
 			Console.ForegroundColor = DefaultColor;
 		}
