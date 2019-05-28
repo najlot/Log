@@ -49,7 +49,7 @@ namespace Najlot.Log.Tests
 
 		[Fact]
 		public void QueueMiddlewareShouldWriteAutomatically()
-		{ 
+		{
 			var count = 0;
 
 			using (var administrator = LogAdminitrator.CreateNew()
@@ -69,7 +69,7 @@ namespace Najlot.Log.Tests
 
 				Assert.Equal(0, count);
 
-				Thread.Sleep(1050);
+				Thread.Sleep(1250);
 
 				Assert.Equal(5, count);
 			}

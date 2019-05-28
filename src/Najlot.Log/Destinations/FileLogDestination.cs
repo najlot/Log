@@ -48,19 +48,16 @@ namespace Najlot.Log.Destinations
 
 		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			foreach (var message in messages)
-			{
-				Log(message, formatMiddleware);
-			}
+			Log(messages, formatMiddleware, true);
 		}
 
-		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
+		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware, bool logRetry)
 		{
-			var path = GetPath();
 			bool cleanUp = false;
+			var path = GetPath();
 
 			// Ensure directory is created when the path changes,
-			// but try to create when DirectoryNotFoundException occurs
+			// but try to create when DirectoryNotFoundException occurs.
 			// The directory could be deleted by the user in the meantime...
 			try
 			{
@@ -76,13 +73,20 @@ namespace Najlot.Log.Destinations
 					}
 				}
 
+				var sb = new StringBuilder();
+
+				foreach (var message in messages)
+				{
+					sb.Append(formatMiddleware.Format(message) + NewLine);
+				}
+
 				if (KeepFileOpen)
 				{
-					Write(formatMiddleware.Format(message) + NewLine);
+					Write(sb.ToString());
 				}
 				else
 				{
-					File.AppendAllText(path, formatMiddleware.Format(message) + NewLine, _encoding);
+					File.AppendAllText(path, sb.ToString(), _encoding);
 				}
 
 				if (cleanUp) CleanUpOldFiles(path);
@@ -90,6 +94,11 @@ namespace Najlot.Log.Destinations
 			catch (DirectoryNotFoundException)
 			{
 				EnsureDirectoryExists(path);
+
+				if (logRetry)
+				{
+					Log(messages, formatMiddleware, false);
+				}
 			}
 		}
 

@@ -1,6 +1,7 @@
 ﻿using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Najlot.Log.Destinations
 {
@@ -30,49 +31,80 @@ namespace Najlot.Log.Destinations
 
 		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			foreach (var message in messages)
+			if (UseColors)
 			{
-				Log(message, formatMiddleware);
+				LogWithColors(messages, formatMiddleware);
+			}
+			else
+			{
+				var sb = new StringBuilder();
+
+				foreach (var message in messages)
+				{
+					sb.Append(formatMiddleware.Format(message));
+				}
+
+				Console.Out.WriteLine(sb.ToString());
 			}
 		}
 
-		public void Log(LogMessage message, IFormatMiddleware formatMiddleware)
+		private void LogWithColors(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
 		{
-			if (UseColors)
+			var previousLogLevel = LogLevel.None;
+			bool first = true;
+			var sb = new StringBuilder();
+
+			foreach (var message in messages)
 			{
-				switch (message.LogLevel)
+				if (first)
 				{
-					case LogLevel.Trace:
-						Console.ForegroundColor = ConsoleColor.DarkGray;
-						break;
+					first = false;
+					previousLogLevel = message.LogLevel;
+					SetColor(previousLogLevel);
+				}
+				else if (previousLogLevel != message.LogLevel)
+				{
+					Console.Out.WriteLine(sb.ToString());
+					previousLogLevel = message.LogLevel;
+					SetColor(message.LogLevel);
 
-					case LogLevel.Debug:
-						Console.ForegroundColor = ConsoleColor.Gray;
-						break;
-
-					case LogLevel.Info:
-						Console.ForegroundColor = ConsoleColor.White;
-						break;
-
-					case LogLevel.Warn:
-						Console.ForegroundColor = ConsoleColor.Yellow;
-						break;
-
-					case LogLevel.Error:
-						Console.ForegroundColor = ConsoleColor.Red;
-						break;
-
-					case LogLevel.Fatal:
-						Console.ForegroundColor = ConsoleColor.DarkRed;
-						break;
+					sb.Clear();
+					sb.Append(formatMiddleware.Format(message));
 				}
 			}
 
-			Console.Out.WriteLine(formatMiddleware.Format(message));
+			Console.Out.WriteLine(sb.ToString());
 
-			if (UseColors)
+			Console.ForegroundColor = DefaultColor;
+		}
+
+		private void SetColor(LogLevel logLevel)
+		{
+			switch (logLevel)
 			{
-				Console.ForegroundColor = DefaultColor;
+				case LogLevel.Trace:
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+					break;
+
+				case LogLevel.Debug:
+					Console.ForegroundColor = ConsoleColor.Gray;
+					break;
+
+				case LogLevel.Info:
+					Console.ForegroundColor = ConsoleColor.White;
+					break;
+
+				case LogLevel.Warn:
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					break;
+
+				case LogLevel.Error:
+					Console.ForegroundColor = ConsoleColor.Red;
+					break;
+
+				case LogLevel.Fatal:
+					Console.ForegroundColor = ConsoleColor.DarkRed;
+					break;
 			}
 		}
 	}
