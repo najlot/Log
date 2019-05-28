@@ -87,38 +87,46 @@ namespace Najlot.Log
 
 				endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
 
-				if (endIndex != -1)
+				if (endIndex == -1)
 				{
-					var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
-					var splittedKey = key.Split(':');
-					var keyWithoutFormat = splittedKey[0];
-
-					int index = argList.FindIndex(0, p => p.Key == keyWithoutFormat);
-
-					if (index > -1)
-					{
-						string valueString;
-						var value = argList[index].Value;
-
-						if (splittedKey.Length > 1 && value is IFormattable formattable)
-						{
-							var format = string.Join(":", splittedKey.Skip(1));
-							valueString = formattable.ToString(format, null);
-						}
-						else
-						{
-							valueString = (value == null ? "" : value.ToString());
-						}
-
-						message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
-					}
-
-					startIndex = endIndex + 1;
+					return message;
 				}
+
+				var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
+				var splittedKey = key.Split(':');
+				var keyWithoutFormat = splittedKey[0];
+
+				int index = argList.FindIndex(0, p => p.Key == keyWithoutFormat);
+
+				if (index > -1)
+				{
+					var value = argList[index].Value;
+					var valueString = ConvertValueToString(splittedKey, value);
+					message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
+				}
+
+				startIndex = endIndex + 1;
 			}
 			while (endIndex != -1);
 
 			return message;
+		}
+
+		private static string ConvertValueToString(string[] splittedKey, object value)
+		{
+			string valueString;
+
+			if (splittedKey.Length > 1 && value is IFormattable formattable)
+			{
+				var format = string.Join(":", splittedKey.Skip(1));
+				valueString = formattable.ToString(format, null);
+			}
+			else
+			{
+				valueString = value == null ? "" : value.ToString();
+			}
+
+			return valueString;
 		}
 
 		private static void FindInsertStartIndex(ref string message, ref int startIndex)
