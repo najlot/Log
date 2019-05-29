@@ -84,6 +84,7 @@ Console.Read();
 LogAdminitrator.Instance.Flush();
 
 // Middleware used to format the output for console.
+[LogConfigurationName(nameof(ConsoleFormatMiddleware))]
 public class ConsoleFormatMiddleware : IFormatMiddleware
 {
 	public string Format(LogMessage message)
@@ -93,6 +94,7 @@ public class ConsoleFormatMiddleware : IFormatMiddleware
 }
 
 // Custom destination that writes to System.Diagnostics.Debug.
+[LogConfigurationName(nameof(DebugDestination))]
 public class DebugDestination : ILogDestination
 {
 	public void Dispose()
