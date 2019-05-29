@@ -58,6 +58,8 @@ namespace Najlot.Log.Middleware
 					Destination.Log(queue.ToArray(), FormatMiddleware);
 				}
 
+				_timer = null;
+
 				if (_queue.Count > 0)
 				{
 					_timer = new Timer(TimerFlush, null, 1000, Timeout.Infinite);
