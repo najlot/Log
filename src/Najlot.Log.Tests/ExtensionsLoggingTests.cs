@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿// Licensed under the MIT License. 
+// See LICENSE file in the project root for full license information.
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Najlot.Log.Extensions.Logging;
 using Najlot.Log.Middleware;

@@ -1,4 +1,7 @@
-﻿using Najlot.Log.Configuration.FileSource;
+﻿// Licensed under the MIT License. 
+// See LICENSE file in the project root for full license information.
+
+using Najlot.Log.Configuration.FileSource;
 using Najlot.Log.Middleware;
 using System.Diagnostics;
 using System.IO;

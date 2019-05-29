@@ -5,7 +5,7 @@
     <Authors>Najlot</Authors>
     <Company>-</Company>
     <PackageProjectUrl>https://github.com/najlot/Log</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/najlot/Log/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
     <Product>Najlot.Log</Product>
     <Copyright>Najlot</Copyright>
@@ -15,6 +15,14 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Simple and yet powerful logging library with performance and extensibility in mind.</Description>
     <Version>3.0.0</Version>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

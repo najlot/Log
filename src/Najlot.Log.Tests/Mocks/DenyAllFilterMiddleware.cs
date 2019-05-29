@@ -1,5 +1,7 @@
-﻿using Najlot.Log.Middleware;
-using System;
+﻿// Licensed under the MIT License. 
+// See LICENSE file in the project root for full license information.
+
+using Najlot.Log.Middleware;
 
 namespace Najlot.Log.Tests.Mocks
 {

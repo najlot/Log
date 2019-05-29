@@ -1,7 +1,9 @@
-﻿using Najlot.Log.Middleware;
+﻿// Licensed under the MIT License. 
+// See LICENSE file in the project root for full license information.
+
+using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Xunit;
 
 namespace Najlot.Log.Tests

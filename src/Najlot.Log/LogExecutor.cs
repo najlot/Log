@@ -1,4 +1,7 @@
-﻿using Najlot.Log.Util;
+﻿// Licensed under the MIT License. 
+// See LICENSE file in the project root for full license information.
+
+using Najlot.Log.Util;
 using System;
 using System.Collections.Generic;
 using System.Threading;
