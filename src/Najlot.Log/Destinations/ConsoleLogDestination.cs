@@ -42,10 +42,10 @@ namespace Najlot.Log.Destinations
 
 				foreach (var message in messages)
 				{
-					sb.Append(formatMiddleware.Format(message));
+					sb.Append(formatMiddleware.Format(message) + _newLine);
 				}
 
-				Console.Out.WriteLine(sb.ToString());
+				Console.Out.Write(sb.ToString());
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace Najlot.Log.Destinations
 				}
 				else if (previousLogLevel != message.LogLevel)
 				{
-					Console.Out.WriteLine(sb.ToString());
+					Console.Out.Write(sb.ToString());
 					previousLogLevel = message.LogLevel;
 					SetColor(message.LogLevel);
 
