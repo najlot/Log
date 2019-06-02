@@ -29,7 +29,7 @@ namespace Najlot.Log
 					var splittedKey = key.Split(':');
 					var keyWithoutFormat = splittedKey[0];
 
-					startIndex = endIndex + 1;
+					startIndex = endIndex;
 
 					if (arguments.FindIndex(0, p => p.Key == keyWithoutFormat) > -1)
 					{
@@ -106,9 +106,8 @@ namespace Najlot.Log
 					var value = argList[index].Value;
 					var valueString = ConvertValueToString(splittedKey, value);
 					message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
+					startIndex += valueString.Length - 1;
 				}
-
-				startIndex = endIndex + 1;
 			}
 			while (endIndex != -1);
 

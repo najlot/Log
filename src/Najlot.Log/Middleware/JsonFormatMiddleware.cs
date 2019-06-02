@@ -73,8 +73,19 @@ namespace Najlot.Log.Middleware
 			sb.Append("{\"Key\":\"");
 			AppendJson(sb, arg.Key.ToString());
 			sb.Append("\",\"Value\":");
-			AppendJson(sb, arg.Value?.ToString());
-			sb.Append('}');
+
+			if (arg.Value == null)
+			{
+				sb.Append("null");
+			}
+			else
+			{
+				sb.Append('\"');
+				AppendJson(sb, arg.Value.ToString());
+				sb.Append('\"');
+			}
+
+			sb.Append("}");
 		}
 
 		public string Format(LogMessage message)
@@ -88,10 +99,21 @@ namespace Najlot.Log.Middleware
 			sb.Append(",\"Category\":\"");
 			AppendJson(sb, message.Category);
 			sb.Append("\",\"State\":");
-			AppendJson(sb, message.State?.ToString());
+
+			if(message.State == null)
+			{
+				sb.Append("null");
+			}
+			else
+			{
+				sb.Append('\"');
+				AppendJson(sb, message.State.ToString());
+				sb.Append('\"');
+			}
+
 			sb.Append(",\"BaseMessage\":\"");
 			AppendJson(sb, message.Message);
-			sb.Append(",\"Message\":\"");
+			sb.Append("\",\"Message\":\"");
 			AppendJson(sb, LogArgumentsParser.InsertArguments(message.Message, message.Arguments));
 			sb.Append("\",\"Exception\":");
 

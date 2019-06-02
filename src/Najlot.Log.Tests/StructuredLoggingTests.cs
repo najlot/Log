@@ -116,6 +116,11 @@ namespace Najlot.Log.Tests
 				log.Info("Three digits {num:D3} and five {num:D5}", 50);
 				index = output.IndexOf("Three digits 050 and five 00050");
 				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("Three and five digits {num:D3}{num2:D5}", 50, 60);
+				index = output.IndexOf("Three and five digits 05000060");
+				Assert.True(index != -1, output);
 			}
 		}
 
