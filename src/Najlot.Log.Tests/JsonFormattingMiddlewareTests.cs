@@ -31,7 +31,7 @@ namespace Najlot.Log.Tests
 				}
 			);
 
-			var expected = "{\"DateTime\":\"" + dateTime.ToString("o") + "\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":,\"BaseMessage\":\"some stuff happened {count:D3} times,\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":10},{\"Key\":\"count\",\"Value\":10}]}";
+			var expected = "{\"DateTime\":\"" + dateTime.ToString("o") + "\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":null,\"BaseMessage\":\"some stuff happened {count:D3} times\",\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":\"10\"},{\"Key\":\"count\",\"Value\":\"10\"}]}";
 			var actual = _middleware.Format(message);
 			Assert.Equal(expected, actual);
 		}
