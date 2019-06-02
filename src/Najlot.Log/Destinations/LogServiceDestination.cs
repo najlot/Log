@@ -23,12 +23,9 @@ namespace Najlot.Log.Destinations
 		{
 			var uriString = "";
 
-			if (uri.Length > 5)
+			if (uri.Length > 5 && uri.Substring(0, 4).ToLower() == "http")
 			{
-				if (uri.Substring(0, 4).ToLower() == "http")
-				{
-					uriString = uri;
-				}
+				uriString = uri;
 			}
 
 			if (uriString == "")
@@ -61,7 +58,7 @@ namespace Najlot.Log.Destinations
 
 				if (!result.IsSuccessStatusCode)
 				{
-					throw new Exception(result.ReasonPhrase);
+					Console.Out.WriteLine(result.ReasonPhrase);
 				}
 			}
 		}
