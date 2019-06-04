@@ -18,9 +18,14 @@ namespace Najlot.Log.Destinations
 	internal sealed class LogServiceDestination : ILogDestination
 	{
 		private readonly HttpClient _client;
+		private readonly string _username;
+		private readonly string _password;
 
-		public LogServiceDestination(string uri, string token)
+		public LogServiceDestination(string uri, string username, string password)
 		{
+			_username = username;
+			_password = password;
+
 			var uriString = "";
 
 			if (uri.Length > 5 && uri.Substring(0, 4).ToLower() == "http")
@@ -30,7 +35,7 @@ namespace Najlot.Log.Destinations
 
 			if (uriString == "")
 			{
-				uriString = $"http://{uri}";
+				uriString = $"https://{uri}";
 			}
 
 			_client = new HttpClient()
@@ -38,10 +43,28 @@ namespace Najlot.Log.Destinations
 				BaseAddress = new Uri(uriString)
 			};
 
-			_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization", "Bearer " + token);
+			TryLogin();
+		}
 
+		private bool TryLogin()
+		{
 			_client.DefaultRequestHeaders.Accept.Clear();
 			_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+			var formContent = new FormUrlEncodedContent(new[]
+			{
+				new KeyValuePair<string, string>("username", _username),
+				new KeyValuePair<string, string>("password", _password),
+			});
+
+			var result = _client.PostAsync("api/Login", formContent).Result;
+
+			if (!result.IsSuccessStatusCode)
+			{
+				LogErrorHandler.Instance.Handle(result.ReasonPhrase);
+			}
+
+			return result.IsSuccessStatusCode;
 		}
 
 		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
@@ -54,11 +77,20 @@ namespace Najlot.Log.Destinations
 				messages = messages.Skip(10000);
 
 				var requestString = "[" + string.Join(",", messageStrings) + "]";
-				var result = _client.PutAsync("api/LogMessage", new StringContent(requestString, Encoding.UTF8, "application/json")).Result;
+				var content = new StringContent(requestString, Encoding.UTF8, "application/json");
+				var result = _client.PutAsync("api/LogMessage", content).Result;
 
 				if (!result.IsSuccessStatusCode)
 				{
-					Console.Out.WriteLine(result.ReasonPhrase);
+					if (TryLogin())
+					{
+						result = _client.PutAsync("api/LogMessage", content).Result;
+					}
+
+					if (!result.IsSuccessStatusCode)
+					{
+						LogErrorHandler.Instance.Handle(result.ReasonPhrase);
+					}
 				}
 			}
 		}

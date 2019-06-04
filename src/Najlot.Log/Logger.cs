@@ -20,7 +20,7 @@ namespace Najlot.Log
 		private bool LogError = false;
 		private bool LogFatal = false;
 
-		private static readonly object[] _emptyArgs = new object[0];
+		private static readonly object[] _emptyArgs = Array.Empty<object>();
 
 		internal Logger(LogExecutor logExecutor, ILogConfiguration logConfiguration)
 		{

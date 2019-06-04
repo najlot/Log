@@ -33,7 +33,7 @@ namespace Najlot.Log
 		private readonly string _category;
 		private readonly LoggerPool _loggerPool;
 		private static readonly object[] _emptyArgs = new object[0];
-		private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyKeyValueList = new List<KeyValuePair<string, object>>();
+		private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyKeyValueList = Array.Empty<KeyValuePair<string, object>>();
 
 		public LogExecutor(string category, LoggerPool loggerPool)
 		{
@@ -53,31 +53,38 @@ namespace Najlot.Log
 
 				entry.ExecutionMiddleware.Execute(() =>
 				{
-					LogMessage message;
+					try
+					{
+						LogMessage message;
 
-					args = args ?? _emptyArgs;
+						args = args ?? _emptyArgs;
 
-					if (msg == null)
-					{
-						message = new LogMessage(time, logLevel, _category, state, "", ex, _emptyKeyValueList);
-					}
-					else if (args.Length == 0)
-					{
-						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, _emptyKeyValueList);
-					}
-					else if (args.Length == 1 && args[0] is IReadOnlyList<KeyValuePair<string, object>> pair)
-					{
-						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, pair);
-					}
-					else
-					{
-						var parsedKeyValuePairs = LogArgumentsParser.ParseArguments(msg.ToString(), args);
-						message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, parsedKeyValuePairs);
-					}
+						if (msg == null)
+						{
+							message = new LogMessage(time, logLevel, _category, state, "", ex, _emptyKeyValueList);
+						}
+						else if (args.Length == 0)
+						{
+							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, _emptyKeyValueList);
+						}
+						else if (args.Length == 1 && args[0] is IReadOnlyList<KeyValuePair<string, object>> pair)
+						{
+							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, pair);
+						}
+						else
+						{
+							var parsedKeyValuePairs = LogArgumentsParser.ParseArguments(msg.ToString(), args);
+							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, parsedKeyValuePairs);
+						}
 
-					if (filterMiddleware.AllowThrough(message))
+						if (filterMiddleware.AllowThrough(message))
+						{
+							queueMiddleware.QueueWriteMessage(message);
+						}
+					}
+					catch (Exception logEx)
 					{
-						queueMiddleware.QueueWriteMessage(message);
+						LogErrorHandler.Instance.Handle("Error writing a log message", logEx);
 					}
 				});
 			}

@@ -42,7 +42,8 @@ namespace Najlot.Log.Middleware
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(nameof(TimerQueueMiddleware) + ex);
+				_timer = null;
+				LogErrorHandler.Instance.Handle("Error flushing log messages", ex);
 			}
 		}
 

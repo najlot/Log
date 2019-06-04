@@ -12,9 +12,7 @@ namespace Najlot.Log
 	{
 		public static LogConfiguration Instance { get; } = new LogConfiguration();
 
-		internal LogConfiguration()
-		{
-		}
+		internal LogConfiguration(){}
 
 		private LogLevel _logLevel = LogLevel.Debug;
 
@@ -44,18 +42,23 @@ namespace Najlot.Log
 			}
 			set
 			{
+				if (string.IsNullOrEmpty(value))
+				{
+					LogErrorHandler.Instance.Handle("New execution middleware name is null or empty");
+					return;
+				}
+
 				var type = LogConfigurationMapper.Instance.GetType(value);
 
 				if (type == null)
 				{
+					LogErrorHandler.Instance.Handle(value + " is not registered");
 					return;
 				}
 
-				Type iExecutionMiddlewareType = typeof(IExecutionMiddleware);
-
-				if (type.GetInterfaces().FirstOrDefault(x => x == iExecutionMiddlewareType) == null)
+				if (!typeof(IExecutionMiddleware).IsAssignableFrom(type))
 				{
-					Console.WriteLine("Najlot.Log: New execution middleware does not implement " + iExecutionMiddlewareType.Name);
+					LogErrorHandler.Instance.Handle(type.FullName + " does not implement IExecutionMiddleware");
 					return;
 				}
 
@@ -135,8 +138,15 @@ namespace Najlot.Log
 		{
 			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
 
-			if (middlewareName == null)
+			if (string.IsNullOrEmpty(middlewareName))
 			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
+				return;
+			}
+
+			if (!typeof(IFormatMiddleware).IsAssignableFrom(typeof(TMiddleware)))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IFormatMiddleware");
 				return;
 			}
 
@@ -189,6 +199,18 @@ namespace Najlot.Log
 		{
 			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
 
+			if (string.IsNullOrEmpty(middlewareName))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
+				return;
+			}
+
+			if (!typeof(IQueueMiddleware).IsAssignableFrom(typeof(TMiddleware)))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IQueueMiddleware");
+				return;
+			}
+
 			lock (_queueMiddlewareNames)
 			{
 				if (!_queueMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
@@ -236,11 +258,17 @@ namespace Najlot.Log
 
 		public void SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
-			var middlewareType = typeof(TMiddleware);
-			var middlewareName = LogConfigurationMapper.Instance.GetName(middlewareType);
+			var middlewareName = LogConfigurationMapper.Instance.GetName(typeof(TMiddleware));
 
-			if (middlewareName == null)
+			if (string.IsNullOrEmpty(middlewareName))
 			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
+				return;
+			}
+
+			if (!typeof(IFilterMiddleware).IsAssignableFrom(typeof(TMiddleware)))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IQueueMiddleware");
 				return;
 			}
 

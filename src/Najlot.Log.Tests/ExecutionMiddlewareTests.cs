@@ -367,6 +367,138 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
+		public void ChannelQueueMiddlewareMustLogAllMessages()
+		{
+			int executionsExpected = 10;
+			int executionsActual = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetQueueMiddleware<ChannelQueueMiddleware, LogDestinationMock>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Flush();
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Dispose();
+
+			Assert.Equal(executionsExpected, executionsActual);
+		}
+
+		[Fact]
+		public void ConcurrentQueueMiddlewareMustLogAllMessages()
+		{
+			int executionsExpected = 10;
+			int executionsActual = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetQueueMiddleware<ConcurrentQueueMiddleware, LogDestinationMock>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Flush();
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Dispose();
+
+			Assert.Equal(executionsExpected, executionsActual);
+		}
+
+		[Fact]
+		public void QueueExecutionMiddlewareMustLogAllMessages()
+		{
+			int executionsExpected = 10;
+			int executionsActual = 0;
+
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetExecutionMiddleware<QueueExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Flush();
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Dispose();
+
+			Assert.Equal(executionsExpected, executionsActual);
+		}
+
+		[Fact]
+		public void ChannelExecutionMiddlewareMustLogAllMessages()
+		{
+			int executionsExpected = 10;
+			int executionsActual = 0;
+			
+			var logAdminitrator = LogAdminitrator
+				.CreateNew()
+				.SetExecutionMiddleware<ChannelExecutionMiddleware>()
+				.AddCustomDestination(new LogDestinationMock(msg =>
+				{
+					executionsActual++;
+				}));
+
+			var log = logAdminitrator.GetLogger(this.GetType());
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Flush();
+
+			for (int i = 0; i < executionsExpected / 2; i++)
+			{
+				log.Info(i.ToString());
+			}
+
+			logAdminitrator.Dispose();
+
+			Assert.Equal(executionsExpected, executionsActual);
+		}
+
+		[Fact]
 		public void TaskExecutionMiddlewareMustRestartTask()
 		{
 			int executionsExpected = 10;

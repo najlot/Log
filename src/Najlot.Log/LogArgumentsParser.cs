@@ -11,12 +11,17 @@ namespace Najlot.Log
 	{
 		public static IReadOnlyList<KeyValuePair<string, object>> ParseArguments(string message, object[] args)
 		{
+			if (args.Length == 0 || string.IsNullOrWhiteSpace(message))
+			{
+				return new KeyValuePair<string, object>[0];
+			}
+
 			var arguments = new List<KeyValuePair<string, object>>();
 
 			int argId = 0;
 			int startIndex = -1;
 			int endIndex;
-			
+
 			do
 			{
 				FindParseStartIndex(message, ref startIndex);
@@ -82,7 +87,7 @@ namespace Najlot.Log
 
 			int startIndex = -1;
 			int endIndex;
-			var argList = new List<KeyValuePair<string, object>>(arguments);
+			var argList = arguments.ToArray();
 
 			do
 			{
@@ -99,7 +104,7 @@ namespace Najlot.Log
 				var splittedKey = key.Split(':');
 				var keyWithoutFormat = splittedKey[0];
 
-				int index = argList.FindIndex(0, p => p.Key == keyWithoutFormat);
+				int index = Array.FindIndex(argList, p => p.Key == keyWithoutFormat);
 
 				if (index > -1)
 				{

@@ -29,7 +29,11 @@ namespace Najlot.Log
 				{ nameof(TaskExecutionMiddleware), typeof(TaskExecutionMiddleware) },
 				{ nameof(ConsoleLogDestination), typeof(ConsoleLogDestination) },
 				{ nameof(FileLogDestination), typeof(FileLogDestination) },
-				{ nameof(LogServiceDestination), typeof(LogServiceDestination) }
+				{ nameof(LogServiceDestination), typeof(LogServiceDestination) },
+				{ nameof(ChannelExecutionMiddleware), typeof(ChannelExecutionMiddleware) },
+				{ nameof(ChannelQueueMiddleware), typeof(ChannelQueueMiddleware) },
+				{ nameof(QueueExecutionMiddleware), typeof(QueueExecutionMiddleware) },
+				{ nameof(ConcurrentQueueMiddleware), typeof(ConcurrentQueueMiddleware) },
 			};
 
 			_typeToStringMapping = new Dictionary<Type, string>
@@ -43,7 +47,11 @@ namespace Najlot.Log
 				{ typeof(TaskExecutionMiddleware), nameof(TaskExecutionMiddleware) },
 				{ typeof(ConsoleLogDestination), nameof(ConsoleLogDestination) },
 				{ typeof(FileLogDestination), nameof(FileLogDestination) },
-				{ typeof(LogServiceDestination), nameof(LogServiceDestination) }
+				{ typeof(LogServiceDestination), nameof(LogServiceDestination) },
+				{ typeof(ChannelExecutionMiddleware), nameof(ChannelExecutionMiddleware) },
+				{ typeof(ChannelQueueMiddleware), nameof(ChannelQueueMiddleware) },
+				{ typeof(QueueExecutionMiddleware), nameof(QueueExecutionMiddleware) },
+				{ typeof(ConcurrentQueueMiddleware), nameof(ConcurrentQueueMiddleware) },
 			};
 		}
 

@@ -100,7 +100,7 @@ namespace Najlot.Log.Middleware
 			AppendJson(sb, message.Category);
 			sb.Append("\",\"State\":");
 
-			if(message.State == null)
+			if (message.State == null)
 			{
 				sb.Append("null");
 			}

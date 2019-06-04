@@ -80,7 +80,8 @@ namespace Najlot.Log.Destinations
 
 				foreach (var message in messages)
 				{
-					sb.Append(formatMiddleware.Format(message) + NewLine);
+					sb.Append(formatMiddleware.Format(message));
+					sb.Append(NewLine);
 				}
 
 				if (KeepFileOpen)
@@ -144,13 +145,7 @@ namespace Najlot.Log.Destinations
 			}
 			catch (Exception ex)
 			{
-				Console.Write("Najlot.Log.Destinations.FileLogDestination (CleanUpOldFiles): ");
-
-				while (ex != null)
-				{
-					Console.WriteLine($"{ex}");
-					ex = ex.InnerException;
-				}
+				LogErrorHandler.Instance.Handle("Error cleaning up old files in FileLogDestination", ex);
 			}
 		}
 

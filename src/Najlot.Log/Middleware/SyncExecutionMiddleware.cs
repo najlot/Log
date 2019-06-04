@@ -16,25 +16,12 @@ namespace Najlot.Log.Middleware
 
 		public void Execute(Action execute)
 		{
-			try
-			{
-				lock (_lock) execute();
-			}
-			catch (Exception ex)
-			{
-				Console.Write("Najlot.Log.Middleware.SyncExecutionMiddleware: ");
-
-				while (ex != null)
-				{
-					Console.WriteLine(ex);
-					ex = ex.InnerException;
-				}
-			}
+			lock (_lock) execute();
 		}
 
 		public void Dispose()
 		{
-			Flush();
+			// As the actions are executed directly, there is nothing to dispose.
 		}
 
 		public void Flush()

@@ -60,20 +60,7 @@ namespace Najlot.Log.Middleware
 		{
 			while (ActionsToExecute.TryDequeue(out Action action))
 			{
-				try
-				{
-					action();
-				}
-				catch (Exception ex)
-				{
-					Console.Write("Najlot.Log.Middleware.TaskExecutionMiddleware: ");
-
-					while (ex != null)
-					{
-						Console.WriteLine(ex);
-						ex = ex.InnerException;
-					}
-				}
+				action();
 			}
 
 			_dequeueTaskRuns = false;

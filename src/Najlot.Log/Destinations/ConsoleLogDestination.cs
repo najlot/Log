@@ -45,7 +45,8 @@ namespace Najlot.Log.Destinations
 
 				foreach (var message in messages)
 				{
-					sb.Append(formatMiddleware.Format(message) + _newLine);
+					sb.Append(formatMiddleware.Format(message));
+					sb.Append(_newLine);
 				}
 
 				Console.Out.Write(sb.ToString());
@@ -75,7 +76,8 @@ namespace Najlot.Log.Destinations
 					sb.Clear();
 				}
 
-				sb.Append(formatMiddleware.Format(message) + _newLine);
+				sb.Append(formatMiddleware.Format(message));
+				sb.Append(_newLine);
 			}
 
 			Console.Out.Write(sb.ToString());

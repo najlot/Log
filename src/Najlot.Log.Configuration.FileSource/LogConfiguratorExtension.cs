@@ -48,7 +48,7 @@ namespace Najlot.Log.Configuration.FileSource
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("Najlot.Log: " + ex);
+				LogErrorHandler.Instance.Handle("Error writing xml configuration file", ex);
 			}
 		}
 
@@ -98,7 +98,7 @@ namespace Najlot.Log.Configuration.FileSource
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine("Najlot.Log: " + ex);
+							LogErrorHandler.Instance.Handle("Error reading xml configuration file", ex);
 						}
 					};
 
@@ -108,7 +108,7 @@ namespace Najlot.Log.Configuration.FileSource
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("Najlot.Log: " + ex);
+				LogErrorHandler.Instance.Handle("Error reading xml configuration file", ex);
 			}
 
 			return logAdminitrator;

@@ -32,7 +32,10 @@ namespace Najlot.Log
 			if (mapper.GetName(ExecutionMiddleware) != configuration.ExecutionMiddlewareName)
 			{
 				var executionMiddlewareType = mapper.GetType(configuration.ExecutionMiddlewareName);
-				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType);
+				var newMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType);
+
+				ExecutionMiddleware.Dispose();
+				ExecutionMiddleware = newMiddleware;
 			}
 
 			if (mapper.GetName(FilterMiddleware) != filterMiddlewareName)
@@ -45,7 +48,10 @@ namespace Najlot.Log
 			{
 				var queueMiddlewareType = mapper.GetType(queueMiddlewareName);
 				var priviousFormatMiddleware = QueueMiddleware.FormatMiddleware;
-				QueueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
+				var newMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
+
+				QueueMiddleware.Dispose();
+				QueueMiddleware = newMiddleware;
 				QueueMiddleware.FormatMiddleware = priviousFormatMiddleware;
 				QueueMiddleware.Destination = LogDestination;
 			}

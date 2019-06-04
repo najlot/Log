@@ -72,6 +72,13 @@ namespace Najlot.Log
 		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
 		{
 			var name = LogConfigurationMapper.Instance.GetName<TExecutionMiddleware>();
+
+			if (string.IsNullOrEmpty(name))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TExecutionMiddleware).FullName + " is not registered");
+				return this;
+			}
+
 			return this.SetExecutionMiddleware(name);
 		}
 
@@ -82,12 +89,6 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetExecutionMiddleware(string middlewareName)
 		{
-			if (middlewareName == null)
-			{
-				Console.WriteLine("Najlot.Log: New execution middleware name is null.");
-				return this;
-			}
-
 			this.Flush();
 			_logConfiguration.ExecutionMiddlewareName = middlewareName;
 			return this;
@@ -97,11 +98,32 @@ namespace Najlot.Log
 		/// <summary>
 		/// Sets the name of the format middleware and notifies observing components
 		/// </summary>
-		/// <nameparam name="TMiddleware">Name of the format middleware</nameparam>
+		/// <nameparam name="TMiddleware">Type of the format middleware</nameparam>
 		/// <param name="name">Target destination</param>
 		/// <returns></returns>
 		public LogAdminitrator SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
 		{
+			this.Flush();
+			_logConfiguration.SetFormatMiddleware<TMiddleware>(name);
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the name of the format middleware and notifies observing components
+		/// </summary>
+		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
+		/// <typeparam name="TDestination">Type of the destination</typeparam>
+		/// <returns></returns>
+		public LogAdminitrator SetFormatMiddleware<TMiddleware, TDestination>() where TMiddleware : IFormatMiddleware, new()
+		{
+			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
+
+			if (string.IsNullOrEmpty(name))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TDestination).FullName + " is not registered");
+				return this;
+			}
+
 			this.Flush();
 			_logConfiguration.SetFormatMiddleware<TMiddleware>(name);
 			return this;
@@ -144,6 +166,27 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
+		/// Sets the name of the queue middleware and notifies observing components
+		/// </summary>
+		/// <typeparam name="TMiddleware">Type of the middleware</typeparam>
+		/// <typeparam name="TDestination">Type of the destination</typeparam>
+		/// <returns></returns>
+		public LogAdminitrator SetQueueMiddleware<TMiddleware, TDestination>() where TMiddleware : IQueueMiddleware, new()
+		{
+			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
+
+			if (string.IsNullOrEmpty(name))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TDestination).FullName + " is not registered");
+				return this;
+			}
+
+			this.Flush();
+			_logConfiguration.SetQueueMiddleware<TMiddleware>(name);
+			return this;
+		}
+
+		/// <summary>
 		/// Gets the queue middleware name for a destination
 		/// </summary>
 		/// <param name="name">Name of the destination</param>
@@ -174,6 +217,27 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdminitrator SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
+			this.Flush();
+			_logConfiguration.SetFilterMiddleware<TMiddleware>(name);
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the name of the filter middleware and notifies observing components
+		/// </summary>
+		/// <typeparam name="TMiddleware">Type of the middleware</typeparam>
+		/// <typeparam name="TDestination">Type of the destination</typeparam>
+		/// <returns></returns>
+		public LogAdminitrator SetFilterMiddleware<TMiddleware, TDestination>() where TMiddleware : IFilterMiddleware, new()
+		{
+			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
+
+			if (string.IsNullOrEmpty(name))
+			{
+				LogErrorHandler.Instance.Handle(typeof(TDestination).FullName + " is not registered");
+				return this;
+			}
+
 			this.Flush();
 			_logConfiguration.SetFilterMiddleware<TMiddleware>(name);
 			return this;
@@ -273,16 +337,9 @@ namespace Najlot.Log
 		public Logger GetLogger(string category) => _loggerPool.GetLogger(category);
 
 		/// <summary>
-		/// Tells to flush the execution-middleware
+		/// Flushes to underlying destinations
 		/// </summary>
-		public void Flush()
-		{
-			foreach (var destination in _loggerPool.GetLogDestinations())
-			{
-				destination.ExecutionMiddleware.Flush();
-				destination.QueueMiddleware.Flush();
-			}
-		}
+		public void Flush() => _loggerPool.Flush();
 
 		#region IDisposable Support
 
