@@ -8,7 +8,7 @@ using System.Threading.Channels;
 namespace Najlot.Log.Middleware
 {
 	[LogConfigurationName(nameof(ChannelExecutionMiddleware))]
-	public class ChannelExecutionMiddleware : IExecutionMiddleware
+	public sealed class ChannelExecutionMiddleware : IExecutionMiddleware
 	{
 		private readonly ChannelWriter<Action> writer;
 		private readonly ChannelReader<Action> reader;

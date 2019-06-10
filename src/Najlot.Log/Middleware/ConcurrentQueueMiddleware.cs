@@ -10,7 +10,7 @@ using Najlot.Log.Destinations;
 namespace Najlot.Log.Middleware
 {
 	[LogConfigurationName(nameof(ConcurrentQueueMiddleware))]
-	public class ConcurrentQueueMiddleware : IQueueMiddleware
+	public sealed class ConcurrentQueueMiddleware : IQueueMiddleware
 	{
 		private readonly ConcurrentQueue<LogMessage> messages = new ConcurrentQueue<LogMessage>();
 		private bool cancelationRequested = false;
@@ -62,7 +62,7 @@ namespace Najlot.Log.Middleware
 			}
 		}
 
-		public void QueueWriteMessage(LogMessage execute) => messages.Enqueue(execute);
+		public void QueueWriteMessage(LogMessage message) => messages.Enqueue(message);
 
 		public void Flush()
 		{

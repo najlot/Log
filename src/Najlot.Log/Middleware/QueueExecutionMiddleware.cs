@@ -8,7 +8,7 @@ using System.Threading;
 namespace Najlot.Log.Middleware
 {
 	[LogConfigurationName(nameof(QueueExecutionMiddleware))]
-	public class QueueExecutionMiddleware : IExecutionMiddleware
+	public sealed class QueueExecutionMiddleware : IExecutionMiddleware
 	{
 		private readonly ConcurrentQueue<Action> messages = new ConcurrentQueue<Action>();
 

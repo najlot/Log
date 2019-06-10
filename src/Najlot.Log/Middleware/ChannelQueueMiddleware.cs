@@ -10,7 +10,7 @@ using System.Threading.Channels;
 namespace Najlot.Log.Middleware
 {
 	[LogConfigurationName(nameof(ChannelQueueMiddleware))]
-	public class ChannelQueueMiddleware : IQueueMiddleware
+	public sealed class ChannelQueueMiddleware : IQueueMiddleware
 	{
 		public ILogDestination Destination { get; set; }
 		public IFormatMiddleware FormatMiddleware { get; set; }
