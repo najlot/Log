@@ -22,7 +22,6 @@ namespace Najlot.Log
 		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
 		private readonly List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
 		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
-		private bool _hasLogdestinationsAdded = false;
 		private bool _hasLogdestinationsPending = false;
 
 		internal LoggerPool(ILogConfiguration logConfiguration)
@@ -38,7 +37,6 @@ namespace Najlot.Log
 
 			lock (_pendingLogDestinations) _pendingLogDestinations.Add(entry);
 
-			_hasLogdestinationsAdded = true;
 			_hasLogdestinationsPending = true;
 		}
 
@@ -76,14 +74,6 @@ namespace Najlot.Log
 
 		internal IEnumerable<LogDestinationEntry> GetLogDestinations()
 		{
-			if (!_hasLogdestinationsAdded)
-			{
-				return new List<LogDestinationEntry>()
-				{
-					CreateLogDestinationEntry(new ConsoleLogDestination(false))
-				};
-			}
-
 			if (_hasLogdestinationsPending)
 			{
 				lock (_pendingLogDestinations)
