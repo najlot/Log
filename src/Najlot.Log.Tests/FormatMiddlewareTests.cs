@@ -67,8 +67,7 @@ namespace Najlot.Log.Tests
 					strActual = str;
 				}));
 
-			var name = LogConfigurationMapper.Instance.GetName<LogDestinationFormatFunctionMock>();
-			logAdmin.SetFormatMiddleware<FormatToAbcMiddleware>(name);
+			logAdmin.SetFormatMiddleware<FormatToAbcMiddleware, LogDestinationFormatFunctionMock>();
 
 			var log = logAdmin.GetLogger(this.GetType());
 
