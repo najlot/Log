@@ -13,12 +13,12 @@ namespace Najlot.Log
 	{
 		private readonly LogExecutor _logExecutor;
 
-		private bool LogTrace = false;
-		private bool LogDebug = false;
-		private bool LogInfo = false;
-		private bool LogWarn = false;
-		private bool LogError = false;
-		private bool LogFatal = false;
+		private volatile bool LogTrace = false;
+		private volatile bool LogDebug = false;
+		private volatile bool LogInfo = false;
+		private volatile bool LogWarn = false;
+		private volatile bool LogError = false;
+		private volatile bool LogFatal = false;
 
 		private static readonly object[] _emptyArgs = Array.Empty<object>();
 
@@ -33,7 +33,7 @@ namespace Najlot.Log
 
 		public bool IsEnabled(LogLevel logLevel) => logLevel >= _logLevel;
 
-		private LogLevel _logLevel;
+		private volatile LogLevel _logLevel;
 		private readonly ILogConfiguration _logConfiguration;
 
 		private void SetupLogLevel(LogLevel logLevel)

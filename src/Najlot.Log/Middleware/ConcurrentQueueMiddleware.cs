@@ -13,7 +13,7 @@ namespace Najlot.Log.Middleware
 	public sealed class ConcurrentQueueMiddleware : IQueueMiddleware
 	{
 		private readonly ConcurrentQueue<LogMessage> messages = new ConcurrentQueue<LogMessage>();
-		private bool cancelationRequested = false;
+		private volatile bool cancelationRequested = false;
 		private Thread thread;
 
 		public ILogDestination Destination { get; set; }

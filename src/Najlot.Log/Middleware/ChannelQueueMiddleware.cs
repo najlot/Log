@@ -18,7 +18,7 @@ namespace Najlot.Log.Middleware
 		private readonly ChannelWriter<LogMessage> writer;
 		private readonly ChannelReader<LogMessage> reader;
 
-		private bool cancelationRequested = false;
+		private volatile bool cancelationRequested = false;
 
 		private Thread thread;
 
