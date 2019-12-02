@@ -5,27 +5,27 @@
 ### Getting started:
 You can start with just two lines of code:
 ```csharp
-var log = LogAdminitrator.Instance.AddConsoleLogDestination().GetLogger(typeof(Program));
+var log = LogAdministrator.Instance.AddConsoleLogDestination().GetLogger(typeof(Program));
 log.Info("Hello, World");
 ```
 
 You can set the logging level on initialization and may change it later:
 ```csharp
-LogAdminitrator.Instance
+LogAdministrator.Instance
 	.AddConsoleLogDestination(useColors: true)
 	.SetLogLevel(LogLevel.Trace);
 
-var log = LogAdminitrator.Instance.GetLogger(typeof(Program));
+var log = LogAdministrator.Instance.GetLogger(typeof(Program));
 
 log.Info("Hello, World!");
 
-LogAdminitrator.Instance.SetLogLevel(LogLevel.Warn);
+LogAdministrator.Instance.SetLogLevel(LogLevel.Warn);
 log.Info("This message will not be logged.");
 ```
 
 You tell the logger to log asynchronous (Putting the writing in a Task):
 ```csharp
-LogAdminitrator.Instance
+LogAdministrator.Instance
 	.SetExecutionMiddleware<TaskExecutionMiddleware>()
 	.AddConsoleLogDestination(useColors: true)
 	.AddFileLogDestination("log.txt");
@@ -33,7 +33,7 @@ LogAdminitrator.Instance
 
 When you need something, then there is an example of a lot of things that are implemented:
 ```csharp
-LogAdminitrator.Instance
+LogAdministrator.Instance
 	// Using synchronous or asynchronous middleware.
 	// You can not use both. The last one gets applied.
 	//.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -59,7 +59,7 @@ LogAdminitrator.Instance
 		writeExampleIfSourceDoesNotExists: true);
 
 // Take specific logger.
-Logger log = LogAdminitrator.Instance.GetLogger(typeof(Program));
+Logger log = LogAdministrator.Instance.GetLogger(typeof(Program));
 
 // Begin a scope of work
 using (log.BeginScope("start up"))
@@ -81,7 +81,7 @@ log.Info("Press any key.");
 
 Console.Read();
 
-LogAdminitrator.Instance.Flush();
+LogAdministrator.Instance.Flush();
 
 // Middleware used to format the output for console.
 [LogConfigurationName(nameof(ConsoleFormatMiddleware))]
