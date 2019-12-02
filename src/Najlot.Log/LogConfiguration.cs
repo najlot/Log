@@ -2,9 +2,7 @@
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Middleware;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Najlot.Log
 {
