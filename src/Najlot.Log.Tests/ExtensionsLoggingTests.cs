@@ -29,7 +29,7 @@ namespace Najlot.Log.Tests
 		{
 			using (var loggerFactory = new LoggerFactory())
 			{
-				LogAdminitrator logAdminitrator = null;
+				LogAdministrator logAdminitrator = null;
 
 				loggerFactory.AddNajlotLog((adminitrator) =>
 				{
@@ -178,7 +178,7 @@ namespace Najlot.Log.Tests
 
 			var services = new ServiceCollection();
 
-			LogAdminitrator logAdminitrator = null;
+			LogAdministrator logAdminitrator = null;
 
 			services.AddLogging(loggerBuilder =>
 			{

@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 		{
 			Assert.Throws<ArgumentNullException>(() =>
 			{
-				LogAdminitrator.CreateNew().AddCustomDestination(null);
+				LogAdministrator.CreateNew().AddCustomDestination(null);
 			});
 		}
 
@@ -37,7 +37,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "Abc";
 			var strActual = "";
 
-			var logAdmin = LogAdminitrator
+			var logAdmin = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(str =>
 				{
@@ -60,7 +60,7 @@ namespace Najlot.Log.Tests
 			var strExpected = "Abc";
 			var strActual = "";
 
-			var logAdmin = LogAdminitrator
+			var logAdmin = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(str =>
 				{
@@ -84,7 +84,7 @@ namespace Najlot.Log.Tests
 
 			var name = LogConfigurationMapper.Instance.GetName<LogDestinationFormatFunctionMock>();
 
-			var logAdmin = LogAdminitrator
+			var logAdmin = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(str =>
 				{
@@ -106,7 +106,7 @@ namespace Najlot.Log.Tests
 
 			var name = LogConfigurationMapper.Instance.GetName<LogDestinationFormatFunctionMock>();
 
-			var logAdmin = LogAdminitrator
+			var logAdmin = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationFormatFunctionMock(str =>
 				{
@@ -128,7 +128,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void FormatMiddlewareCanBeSetAndGetForMultipleTypes()
 		{
-			var admin = LogAdminitrator.CreateNew();
+			var admin = LogAdministrator.CreateNew();
 
 			var formatMiddlewareName = LogConfigurationMapper.Instance.GetName<FormatMiddleware>();
 			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName<NoFilterMiddleware>();
@@ -150,7 +150,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LastFormatMiddlewareCanBeRetrievedAfterMultipleSet()
 		{
-			var admin = LogAdminitrator.CreateNew();
+			var admin = LogAdministrator.CreateNew();
 
 			var fileLogDestinationName = LogConfigurationMapper.Instance.GetName<FileLogDestination>();
 
@@ -173,7 +173,7 @@ namespace Najlot.Log.Tests
 		{
 			var fileDestinationName = LogConfigurationMapper.Instance.GetName<FileLogDestination>();
 
-			LogAdminitrator
+			LogAdministrator
 				.CreateNew()
 				.GetFormatMiddleware(fileDestinationName, out var formatMiddlewareName);
 

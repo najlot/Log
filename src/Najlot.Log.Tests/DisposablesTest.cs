@@ -25,7 +25,7 @@ namespace Najlot.Log.Tests
 		{
 			var observerNotified = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out var logConfiguration);
@@ -49,12 +49,12 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LogConfiguratorMustBeDisposable()
 		{
-			var logAdminitrators = new List<LogAdminitrator>();
+			var logAdminitrators = new List<LogAdministrator>();
 
 			for (int i = 0; i < 1000; i++)
 			{
 				logAdminitrators.Add(
-					LogAdminitrator
+					LogAdministrator
 						.CreateNew()
 						.AddCustomDestination(new LogDestinationMock(msg => { }))
 						.AddCustomDestination(new SecondLogDestinationMock(msg => { })));

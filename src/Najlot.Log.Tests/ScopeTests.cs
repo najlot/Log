@@ -1,9 +1,10 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -26,7 +27,7 @@ namespace Najlot.Log.Tests
 		{
 			object state = null;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -64,7 +65,7 @@ namespace Najlot.Log.Tests
 		{
 			bool scopesAreNotCorrect = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
@@ -107,7 +108,7 @@ namespace Najlot.Log.Tests
 			object state = null;
 			var scope = "testing scopes";
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -139,7 +140,7 @@ namespace Najlot.Log.Tests
 
 			var scope = "testing scopes";
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -173,7 +174,7 @@ namespace Najlot.Log.Tests
 		{
 			bool error = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -191,20 +192,11 @@ namespace Najlot.Log.Tests
 
 				using (log.BeginScope(Environment.CurrentManagedThreadId))
 				{
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
-					log.Info("");
+					for (int i = 0; i < 20; i++) log.Info("");
 				}
 			}
 
-			System.Threading.Tasks.Parallel.Invoke(
+			Parallel.Invoke(
 				action, action, action, action, action, action, action, action,
 				action, action, action, action, action, action, action, action,
 				action, action, action, action, action, action, action, action);
@@ -219,7 +211,7 @@ namespace Najlot.Log.Tests
 		{
 			bool error = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -238,20 +230,11 @@ namespace Najlot.Log.Tests
 
 				using (log.BeginScope(Environment.CurrentManagedThreadId))
 				{
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
-					log.Info(Environment.CurrentManagedThreadId);
+					for (int i = 0; i < 20; i++) log.Info(Environment.CurrentManagedThreadId);
 				}
 			}
 
-			System.Threading.Tasks.Parallel.Invoke(
+			Parallel.Invoke(
 				action, action, action, action, action, action, action, action,
 				action, action, action, action, action, action, action, action,
 				action, action, action, action, action, action, action, action);

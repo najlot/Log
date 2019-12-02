@@ -35,7 +35,7 @@ namespace Najlot.Log.Tests
 
 			int i = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -82,7 +82,7 @@ namespace Najlot.Log.Tests
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -114,7 +114,7 @@ namespace Najlot.Log.Tests
 				Directory.Delete(dir, true);
 			}
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -158,7 +158,7 @@ namespace Najlot.Log.Tests
 
 			bool logged = false;
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -205,7 +205,7 @@ namespace Najlot.Log.Tests
 			var contentThis = "logForThis . Info";
 			var contentPool = "logForPool.Warn";
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 		{
 			var count = 0;
 
-			using (var administrator = LogAdminitrator.CreateNew()
+			using (var administrator = LogAdministrator.CreateNew()
 				.AddCustomDestination(new LogDestinationEnumerableMock(messages =>
 				{
 					count = messages.Count();
@@ -55,7 +55,7 @@ namespace Najlot.Log.Tests
 		{
 			var count = 0;
 
-			using (var administrator = LogAdminitrator.CreateNew()
+			using (var administrator = LogAdministrator.CreateNew()
 				.AddCustomDestination(new LogDestinationEnumerableMock(messages =>
 				{
 					count = messages.Count();

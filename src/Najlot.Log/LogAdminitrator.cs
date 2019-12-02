@@ -8,10 +8,18 @@ using System.Collections.Generic;
 
 namespace Najlot.Log
 {
+	[Obsolete("Plase use " + nameof(LogAdministrator) + " instead!")]
+	public class LogAdminitrator : LogAdministrator
+	{
+		internal LogAdminitrator(LogConfiguration logConfiguration, LoggerPool loggerPool) : base(logConfiguration, loggerPool)
+		{
+		}
+	}
+
 	/// <summary>
 	/// Class to help the user to configure log destinations, execution middleware, log level etc.
 	/// </summary>
-	public class LogAdminitrator : IDisposable
+	public class LogAdministrator : IDisposable
 	{
 		private LogConfiguration _logConfiguration;
 		private LoggerPool _loggerPool;
@@ -21,9 +29,9 @@ namespace Najlot.Log
 		/// that has static resistered configuration and pool.
 		/// </summary>
 		/// <returns></returns>
-		public static LogAdminitrator Instance { get; } = new LogAdminitrator(LogConfiguration.Instance, LoggerPool.Instance);
+		public static LogAdministrator Instance { get; } = new LogAdministrator(LogConfiguration.Instance, LoggerPool.Instance);
 
-		internal LogAdminitrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
+		internal LogAdministrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
 		{
 			_logConfiguration = logConfiguration;
 			_loggerPool = loggerPool;
@@ -34,12 +42,12 @@ namespace Najlot.Log
 		/// has own configuration and pool.
 		/// </summary>
 		/// <returns></returns>
-		public static LogAdminitrator CreateNew()
+		public static LogAdministrator CreateNew()
 		{
 			var logConfiguration = new LogConfiguration();
 			var loggerPool = new LoggerPool(logConfiguration);
 
-			return new LogAdminitrator(logConfiguration, loggerPool);
+			return new LogAdministrator(logConfiguration, loggerPool);
 		}
 
 		/// <summary>
@@ -47,7 +55,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="logConfiguration">ILogConfiguration instance</param>
 		/// <returns></returns>
-		public LogAdminitrator GetLogConfiguration(out ILogConfiguration logConfiguration)
+		public LogAdministrator GetLogConfiguration(out ILogConfiguration logConfiguration)
 		{
 			logConfiguration = _logConfiguration;
 			return this;
@@ -58,7 +66,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="logLevel"></param>
 		/// <returns></returns>
-		public LogAdminitrator SetLogLevel(LogLevel logLevel)
+		public LogAdministrator SetLogLevel(LogLevel logLevel)
 		{
 			_logConfiguration.LogLevel = logLevel;
 			return this;
@@ -69,7 +77,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <typeparam name="TExecutionMiddleware"></typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
+		public LogAdministrator SetExecutionMiddleware<TExecutionMiddleware>() where TExecutionMiddleware : IExecutionMiddleware, new()
 		{
 			var name = LogConfigurationMapper.Instance.GetName<TExecutionMiddleware>();
 
@@ -87,7 +95,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="middlewareType">Type of the execution middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetExecutionMiddleware(string middlewareName)
+		public LogAdministrator SetExecutionMiddleware(string middlewareName)
 		{
 			this.Flush();
 			_logConfiguration.ExecutionMiddlewareName = middlewareName;
@@ -101,7 +109,7 @@ namespace Najlot.Log
 		/// <nameparam name="TMiddleware">Type of the format middleware</nameparam>
 		/// <param name="name">Target destination</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
+		public LogAdministrator SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
 		{
 			this.Flush();
 			_logConfiguration.SetFormatMiddleware<TMiddleware>(name);
@@ -114,7 +122,7 @@ namespace Najlot.Log
 		/// <typeparam name="TMiddleware">Type of the format middleware</typeparam>
 		/// <typeparam name="TDestination">Type of the destination</typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetFormatMiddleware<TMiddleware, TDestination>() where TMiddleware : IFormatMiddleware, new()
+		public LogAdministrator SetFormatMiddleware<TMiddleware, TDestination>() where TMiddleware : IFormatMiddleware, new()
 		{
 			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
 
@@ -135,7 +143,7 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddleware(string name, out string middlewareName)
+		public LogAdministrator GetFormatMiddleware(string name, out string middlewareName)
 		{
 			middlewareName = _logConfiguration.GetFormatMiddlewareName(name);
 			return this;
@@ -145,7 +153,7 @@ namespace Najlot.Log
 		/// Returns all destination names and their registered format middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> formatMiddlewares)
+		public LogAdministrator GetFormatMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> formatMiddlewares)
 		{
 			formatMiddlewares = _logConfiguration.GetFormatMiddlewares();
 			return this;
@@ -158,7 +166,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="middlewareName">Name of the queue middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator SetQueueMiddleware<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
+		public LogAdministrator SetQueueMiddleware<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
 		{
 			this.Flush();
 			_logConfiguration.SetQueueMiddleware<TMiddleware>(name);
@@ -171,7 +179,7 @@ namespace Najlot.Log
 		/// <typeparam name="TMiddleware">Type of the middleware</typeparam>
 		/// <typeparam name="TDestination">Type of the destination</typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetQueueMiddleware<TMiddleware, TDestination>() where TMiddleware : IQueueMiddleware, new()
+		public LogAdministrator SetQueueMiddleware<TMiddleware, TDestination>() where TMiddleware : IQueueMiddleware, new()
 		{
 			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
 
@@ -192,7 +200,7 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetQueueMiddlewareName(string name, out string middlewareName)
+		public LogAdministrator GetQueueMiddlewareName(string name, out string middlewareName)
 		{
 			middlewareName = _logConfiguration.GetQueueMiddlewareName(name);
 			return this;
@@ -202,7 +210,7 @@ namespace Najlot.Log
 		/// Returns all destination names and their registered queue middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetQueueMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> queueMiddlewares)
+		public LogAdministrator GetQueueMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> queueMiddlewares)
 		{
 			queueMiddlewares = _logConfiguration.GetQueueMiddlewares();
 			return this;
@@ -215,7 +223,7 @@ namespace Najlot.Log
 		/// </summary>
 		/// <param name="name">Name of the target destination</param>
 		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
+		public LogAdministrator SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
 		{
 			this.Flush();
 			_logConfiguration.SetFilterMiddleware<TMiddleware>(name);
@@ -228,7 +236,7 @@ namespace Najlot.Log
 		/// <typeparam name="TMiddleware">Type of the middleware</typeparam>
 		/// <typeparam name="TDestination">Type of the destination</typeparam>
 		/// <returns></returns>
-		public LogAdminitrator SetFilterMiddleware<TMiddleware, TDestination>() where TMiddleware : IFilterMiddleware, new()
+		public LogAdministrator SetFilterMiddleware<TMiddleware, TDestination>() where TMiddleware : IFilterMiddleware, new()
 		{
 			var name = LogConfigurationMapper.Instance.GetName<TDestination>();
 
@@ -249,7 +257,7 @@ namespace Najlot.Log
 		/// <param name="name">Name of the destination</param>
 		/// <param name="middlewareName">Name of the middleware</param>
 		/// <returns></returns>
-		public LogAdminitrator GetFilterMiddlewareName(string name, out string middlewareName)
+		public LogAdministrator GetFilterMiddlewareName(string name, out string middlewareName)
 		{
 			middlewareName = _logConfiguration.GetFilterMiddlewareName(name);
 			return this;
@@ -259,7 +267,7 @@ namespace Najlot.Log
 		/// Returns all destination names and their registered filter middleware name
 		/// </summary>
 		/// <returns></returns>
-		public LogAdminitrator GetFilterMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> filterMiddlewares)
+		public LogAdministrator GetFilterMiddlewares(out IReadOnlyCollection<KeyValuePair<string, string>> filterMiddlewares)
 		{
 			filterMiddlewares = _logConfiguration.GetFilterMiddlewares();
 			return this;
@@ -273,7 +281,7 @@ namespace Najlot.Log
 		/// <param name="logDestination">Instance of the new destination</param>
 		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogAdminitrator AddCustomDestination(ILogDestination logDestination)
+		public LogAdministrator AddCustomDestination(ILogDestination logDestination)
 		{
 			if (logDestination == null)
 			{
@@ -292,7 +300,7 @@ namespace Najlot.Log
 		/// <param name="formatFunction"></param>
 		/// <param name="useColors"></param>
 		/// <returns></returns>
-		public LogAdminitrator AddConsoleLogDestination(bool useColors = false)
+		public LogAdministrator AddConsoleLogDestination(bool useColors = false)
 		{
 			var logDestination = new ConsoleLogDestination(useColors);
 			return AddCustomDestination(logDestination);
@@ -305,7 +313,7 @@ namespace Najlot.Log
 		/// <param name="maxFiles">Max count of files.</param>
 		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
+		public LogAdministrator AddFileLogDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
 		{
 			var logDestination = new FileLogDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
 			return AddCustomDestination(logDestination);
@@ -317,7 +325,7 @@ namespace Najlot.Log
 		/// <param name="fileName">Path to the file</param>
 		/// <param name="formatFunction">Function to customize the output</param>
 		/// <returns></returns>
-		public LogAdminitrator AddFileLogDestination(string fileName, bool keepFileOpen = true)
+		public LogAdministrator AddFileLogDestination(string fileName, bool keepFileOpen = true)
 		{
 			return AddFileLogDestination(() => fileName, keepFileOpen: keepFileOpen);
 		}

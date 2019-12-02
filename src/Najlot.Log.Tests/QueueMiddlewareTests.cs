@@ -25,7 +25,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void QueueMiddlewareCanBeSetAndGetForMultipleTypes()
 		{
-			var admin = LogAdminitrator.CreateNew();
+			var admin = LogAdministrator.CreateNew();
 
 			var formatMiddlewareName = LogConfigurationMapper.Instance.GetName<FormatMiddleware>();
 			var noFilterMiddlewareName = LogConfigurationMapper.Instance.GetName<NoFilterMiddleware>();
@@ -49,7 +49,7 @@ namespace Najlot.Log.Tests
 		{
 			var fileDestinationName = LogConfigurationMapper.Instance.GetName(typeof(FileLogDestination));
 
-			LogAdminitrator
+			LogAdministrator
 				.CreateNew()
 				.GetQueueMiddlewareName(fileDestinationName, out var queueMiddlewareName);
 

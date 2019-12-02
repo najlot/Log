@@ -8,10 +8,10 @@ namespace Najlot.Log.Extensions.Logging
 	[ProviderAlias("Najlot.Log")]
 	public sealed class NajlotLogProvider : ILoggerProvider
 	{
-		private LogAdminitrator _logAdminitrator;
+		private LogAdministrator _logAdminitrator;
 		private bool _disposed = false;
 
-		public NajlotLogProvider(LogAdminitrator logConfigurator)
+		public NajlotLogProvider(LogAdministrator logConfigurator)
 		{
 			_logAdminitrator = logConfigurator;
 		}

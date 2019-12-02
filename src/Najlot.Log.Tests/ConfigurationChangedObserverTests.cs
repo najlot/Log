@@ -25,7 +25,7 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.SetLogLevel(LogLevel.Debug)
@@ -47,7 +47,7 @@ namespace Najlot.Log.Tests
 		{
 			var observerNotified = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);
@@ -68,7 +68,7 @@ namespace Najlot.Log.Tests
 		{
 			bool observerNotified = false;
 
-			var configurator = LogAdminitrator
+			var configurator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.GetLogConfiguration(out ILogConfiguration logConfiguration);

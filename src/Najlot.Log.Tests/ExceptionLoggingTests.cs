@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 			var logged = false;
 			bool fail = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -87,7 +87,7 @@ namespace Najlot.Log.Tests
 			bool loggedToSecond = false;
 			bool fail = false;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

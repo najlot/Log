@@ -32,7 +32,7 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			var log = LogAdminitrator
+			var log = LogAdministrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
 				.SetFilterMiddleware<DenyAllFilterMiddleware>(nameof(FileLogDestination))
@@ -53,7 +53,7 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddFileLogDestination(fileName, keepFileOpen: false)
 				.SetFilterMiddleware<DenyAllFilterMiddleware>(nameof(FileLogDestination));
@@ -77,7 +77,7 @@ namespace Najlot.Log.Tests
 			bool loggedToFirst = false;
 			bool loggedToSecond = false;
 
-			var log = LogAdminitrator
+			var log = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
@@ -106,7 +106,7 @@ namespace Najlot.Log.Tests
 				File.Delete(fileName);
 			}
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.AddFileLogDestination(fileName, keepFileOpen: false)

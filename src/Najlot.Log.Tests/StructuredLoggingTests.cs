@@ -28,7 +28,7 @@ namespace Najlot.Log.Tests
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
@@ -97,7 +97,7 @@ namespace Najlot.Log.Tests
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
@@ -131,7 +131,7 @@ namespace Najlot.Log.Tests
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
@@ -177,7 +177,7 @@ namespace Najlot.Log.Tests
 		{
 			var middleware = new FormatMiddleware();
 
-			using (var logAdminitrator = LogAdminitrator
+			using (var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Trace)
 				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()

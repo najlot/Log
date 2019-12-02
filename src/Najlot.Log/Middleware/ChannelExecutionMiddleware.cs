@@ -1,4 +1,4 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using System;
@@ -23,7 +23,11 @@ namespace Najlot.Log.Middleware
 			writer = channel.Writer;
 			reader = channel.Reader;
 
-			thread = new Thread(ThreadAction);
+			thread = new Thread(ThreadAction)
+			{
+				IsBackground = true
+			};
+
 			thread.Start(reader);
 		}
 
@@ -66,7 +70,11 @@ namespace Najlot.Log.Middleware
 			thread.Join();
 
 			cancelationRequested = false;
-			thread = new Thread(ThreadAction);
+			thread = new Thread(ThreadAction)
+			{
+				IsBackground = true
+			};
+
 			thread.Start(reader);
 		}
 

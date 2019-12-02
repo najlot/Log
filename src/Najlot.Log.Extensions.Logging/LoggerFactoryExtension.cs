@@ -8,14 +8,14 @@ namespace Najlot.Log.Extensions.Logging
 {
 	public static class LoggingBuilderExtension
 	{
-		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogAdminitrator> configure)
+		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, Action<LogAdministrator> configure)
 		{
-			var admin = LogAdminitrator.CreateNew();
+			var admin = LogAdministrator.CreateNew();
 			configure(admin);
 			return builder.AddNajlotLog(admin);
 		}
 
-		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogAdminitrator logConfigurator)
+		public static ILoggingBuilder AddNajlotLog(this ILoggingBuilder builder, LogAdministrator logConfigurator)
 		{
 			builder.AddProvider(new NajlotLogProvider(logConfigurator));
 			return builder;
@@ -24,14 +24,14 @@ namespace Najlot.Log.Extensions.Logging
 
 	public static class LoggerFactoryExtension
 	{
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, Action<LogAdminitrator> configure)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, Action<LogAdministrator> configure)
 		{
-			var admin = LogAdminitrator.CreateNew();
+			var admin = LogAdministrator.CreateNew();
 			configure(admin);
 			return loggerFactory.AddNajlotLog(admin);
 		}
 
-		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdminitrator logAdministrator)
+		public static ILoggerFactory AddNajlotLog(this ILoggerFactory loggerFactory, LogAdministrator logAdministrator)
 		{
 			loggerFactory.AddProvider(new NajlotLogProvider(logAdministrator));
 			return loggerFactory;

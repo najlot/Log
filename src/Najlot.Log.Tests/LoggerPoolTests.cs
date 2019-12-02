@@ -23,7 +23,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LoggerPoolMustCacheEntries()
 		{
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddConsoleLogDestination()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -31,10 +31,10 @@ namespace Najlot.Log.Tests
 				}));
 
 			var logForThis1 = logAdminitrator.GetLogger(this.GetType());
-			var logForPool1 = logAdminitrator.GetLogger(typeof(LogAdminitrator));
+			var logForPool1 = logAdminitrator.GetLogger(typeof(LogAdministrator));
 
 			var logForThis2 = logAdminitrator.GetLogger(this.GetType());
-			var logForPool2 = logAdminitrator.GetLogger(typeof(LogAdminitrator));
+			var logForPool2 = logAdminitrator.GetLogger(typeof(LogAdministrator));
 
 			Assert.StrictEqual(logForThis1, logForThis2);
 			Assert.StrictEqual(logForPool1, logForPool2);
@@ -49,7 +49,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Info)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
@@ -61,7 +61,7 @@ namespace Najlot.Log.Tests
 				}));
 
 			var thisType = this.GetType();
-			var logAdminitratorType = typeof(LogAdminitrator);
+			var logAdminitratorType = typeof(LogAdministrator);
 
 			var logForThis = logAdminitrator.GetLogger(thisType);
 			var logForPool = logAdminitrator.GetLogger(logAdminitratorType);
@@ -96,7 +96,7 @@ namespace Najlot.Log.Tests
 			bool gotLogMessage = false;
 			string category = null;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetLogLevel(LogLevel.Debug)
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()

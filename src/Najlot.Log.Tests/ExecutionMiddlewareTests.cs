@@ -27,7 +27,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ApplicationMustNotDieFromErrorsInDestinations()
 		{
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.GetLogConfiguration(out var logConfiguration)
@@ -57,7 +57,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<SyncExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -84,7 +84,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -115,7 +115,7 @@ namespace Najlot.Log.Tests
 			long executionsDone = 0;
 			long executionsLogged = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<TaskExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -144,7 +144,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
@@ -190,7 +190,7 @@ namespace Najlot.Log.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
@@ -215,7 +215,7 @@ namespace Najlot.Log.Tests
 			var logMessageExpected = "test log message";
 			var logMessageActual = "";
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -240,7 +240,7 @@ namespace Najlot.Log.Tests
 			bool loggerGotAction = false;
 			var logMessageActual = "";
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -274,7 +274,7 @@ namespace Najlot.Log.Tests
 			List<string> messages = new List<string>();
 			var manualResetEventSlim = new ManualResetEventSlim(false);
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -315,7 +315,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void TaskExecutionMiddlewareMustMustNotBreakOnException()
 		{
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
@@ -336,7 +336,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.GetLogConfiguration(out ILogConfiguration logConfiguration)
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -372,7 +372,7 @@ namespace Najlot.Log.Tests
 			int executionsExpected = 10;
 			int executionsActual = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetQueueMiddleware<ChannelQueueMiddleware, LogDestinationMock>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -405,7 +405,7 @@ namespace Najlot.Log.Tests
 			int executionsExpected = 10;
 			int executionsActual = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetQueueMiddleware<ConcurrentQueueMiddleware, LogDestinationMock>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -438,7 +438,7 @@ namespace Najlot.Log.Tests
 			int executionsExpected = 10;
 			int executionsActual = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<QueueExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -471,7 +471,7 @@ namespace Najlot.Log.Tests
 			int executionsExpected = 10;
 			int executionsActual = 0;
 			
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.SetExecutionMiddleware<ChannelExecutionMiddleware>()
 				.AddCustomDestination(new LogDestinationMock(msg =>
@@ -505,7 +505,7 @@ namespace Najlot.Log.Tests
 			int executionsActual = 0;
 			List<string> messages = new List<string>();
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
@@ -542,7 +542,7 @@ namespace Najlot.Log.Tests
 		{
 			int executionsActual = 0;
 
-			var logAdminitrator = LogAdminitrator
+			var logAdminitrator = LogAdministrator
 				.CreateNew()
 				.AddCustomDestination(new LogDestinationMock(msg =>
 				{
