@@ -14,7 +14,7 @@
     <PackageIconUrl>https://github.com/najlot/Log/blob/master/images/icon.png?raw=true</PackageIconUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Simple and yet powerful logging library with performance and extensibility in mind.</Description>
-    <Version>3.1.3</Version>
+    <Version>4.0.0-alpha-1</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
@@ -23,10 +23,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Threading.Channels" Version="4.5.0" />
   </ItemGroup>
 
 </Project>

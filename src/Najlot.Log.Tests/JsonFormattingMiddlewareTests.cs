@@ -1,7 +1,8 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Middleware;
+using Najlot.Log.Tests.Mocks;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -10,67 +11,91 @@ namespace Najlot.Log.Tests
 {
 	public class JsonFormattingMiddlewareTests
 	{
-		private readonly JsonFormatMiddleware _middleware = new JsonFormatMiddleware();
-
 		[Fact]
 		public void MiddlewareMustProduceValidJson()
 		{
-			DateTime dateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00");
+			var actual = "";
+			using (var formatMiddleware = new JsonFormatMiddleware())
+			{
+				formatMiddleware.NextMiddleware = new MiddlewareMock(msg =>
+				{
+					actual = msg.Message;
+				});
 
-			var message = new LogMessage(
-				dateTime,
-				LogLevel.Info,
-				typeof(LogMessage).FullName,
-				null,
-				"some stuff happened {count:D3} times",
-				null,
-				new List<KeyValuePair<string, object>>
+				DateTime dateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00");
+
+				var message = new LogMessage
+				{
+					DateTime = dateTime,
+					LogLevel = LogLevel.Info,
+					Category = typeof(LogMessage).FullName,
+					State = null,
+					RawMessage = "some stuff happened {count:D3} times",
+					Exception = null,
+					RawArguments = Array.Empty<object>(),
+					Arguments = new List<KeyValuePair<string, object>>
 				{
 					new KeyValuePair<string, object>("count", 10),
 					new KeyValuePair<string, object>("count", 10)
-				}
-			);
+				},
+					ExceptionIsValid = false
+				};
 
-			var expected = "{\"DateTime\":\"" + dateTime.ToString("o") + "\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":null,\"BaseMessage\":\"some stuff happened {count:D3} times\",\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":\"10\"},{\"Key\":\"count\",\"Value\":\"10\"}]}";
-			var actual = _middleware.Format(message);
-			Assert.Equal(expected, actual);
+				formatMiddleware.Execute(new[] { message });
+
+				var expected = "{\"DateTime\":\"" + dateTime.ToString("o") + "\",\"LogLevel\":2,\"Category\":\"Najlot.Log.LogMessage\",\"State\":null,\"RawMessage\":\"some stuff happened {count:D3} times\",\"Message\":\"some stuff happened 010 times\",\"Exception\":null,\"ExceptionIsValid\":false,\"Arguments\":[{\"Key\":\"count\",\"Value\":\"10\"},{\"Key\":\"count\",\"Value\":\"10\"}]}";
+
+				Assert.Equal(expected, actual);
+			}
 		}
 
 		[Fact]
 		public void ExceptionMustBeLogged()
 		{
+			var actual = "";
 			Exception exc;
 
-			try
+			using (var formatMiddleware = new JsonFormatMiddleware())
 			{
-				throw new Exception("No CD-ROM / cup holder avaible"); ;
-			}
-			catch (Exception ex)
-			{
-				exc = ex;
-			}
+				formatMiddleware.NextMiddleware = new MiddlewareMock(msg =>
+				{
+					actual = msg.Message;
+				});
 
-			var message = new LogMessage(
-				DateTime.Parse("2019-05-12T18:02:50.6571583+02:00"),
-				LogLevel.Info,
-				typeof(LogMessage).FullName,
-				null,
-				"some stuff happened {count:D3} times",
-				exc,
-				new List<KeyValuePair<string, object>>
+				try
+				{
+					throw new Exception("No CD-ROM / cup holder avaible"); ;
+				}
+				catch (Exception ex)
+				{
+					exc = ex;
+				}
+
+				var message = new LogMessage
+				{
+					DateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00"),
+					LogLevel = LogLevel.Info,
+					Category = typeof(LogMessage).FullName,
+					State = null,
+					RawMessage = "some stuff happened {count:D3} times",
+					Exception = exc,
+					RawArguments = Array.Empty<object>(),
+					Arguments = new List<KeyValuePair<string, object>>
 				{
 					new KeyValuePair<string, object>("count", 10),
 					new KeyValuePair<string, object>("count", 10)
-				}
-			);
+				},
+					ExceptionIsValid = true
+				};
 
-			var actual = _middleware.Format(message);
+				formatMiddleware.Execute(new[] { message });
 
-			var expectedToFind = "No CD-ROM / cup holder avaible";
-			Assert.True(actual.IndexOf(expectedToFind) != -1);
+				var expectedToFind = "No CD-ROM / cup holder avaible";
+				Assert.True(actual.IndexOf(expectedToFind) != -1);
 
-			expectedToFind = "\"ExceptionIsValid\":true";
-			Assert.True(actual.IndexOf(expectedToFind) != -1);
+				expectedToFind = "\"ExceptionIsValid\":true";
+				Assert.True(actual.IndexOf(expectedToFind) != -1);
+			}
 		}
 	}
 }

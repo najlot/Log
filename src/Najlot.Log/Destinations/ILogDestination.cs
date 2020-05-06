@@ -1,7 +1,6 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +15,6 @@ namespace Najlot.Log.Destinations
 		/// Tells the destination to log the messages
 		/// </summary>
 		/// <param name="messages">Messages to be logged</param>
-		/// <param name="formatMiddleware">Middleware to be used for formatting</param>
-		void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware);
+		void Log(IEnumerable<LogMessage> messages);
 	}
 }

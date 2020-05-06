@@ -1,4 +1,4 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Destinations;
@@ -46,30 +46,23 @@ namespace Najlot.Log
 
 			var destinationName = mapper.GetName(logDestination);
 
-			var formatMiddlewareName = _logConfiguration.GetFormatMiddlewareName(destinationName);
-			var queueMiddlewareName = _logConfiguration.GetQueueMiddlewareName(destinationName);
-			var filterMiddlewareName = _logConfiguration.GetFilterMiddlewareName(destinationName);
-
-			var formatMiddlewareType = mapper.GetType(formatMiddlewareName);
-			var queueMiddlewareType = mapper.GetType(queueMiddlewareName);
-			var executionMiddlewareType = mapper.GetType(_logConfiguration.ExecutionMiddlewareName);
-			var filterMiddlewareType = mapper.GetType(filterMiddlewareName);
-
-			var formatMiddleware = (IFormatMiddleware)Activator.CreateInstance(formatMiddlewareType);
-			var queueMiddleware = (IQueueMiddleware)Activator.CreateInstance(queueMiddlewareType);
-
-			queueMiddleware.FormatMiddleware = formatMiddleware;
-			queueMiddleware.Destination = logDestination;
-
-			return new LogDestinationEntry()
+			var entry = new LogDestinationEntry()
 			{
-				ExecutionMiddleware = (IExecutionMiddleware)Activator.CreateInstance(executionMiddlewareType),
-				FilterMiddleware = (IFilterMiddleware)Activator.CreateInstance(filterMiddlewareType),
 				LogDestination = logDestination,
 				LogDestinationName = destinationName,
-				FormatMiddleware = formatMiddleware,
-				QueueMiddleware = queueMiddleware
 			};
+
+			var collectMiddlewareName = _logConfiguration.GetCollectMiddlewareName(destinationName);
+			var middlewareNames = _logConfiguration.GetMiddlewareNames(destinationName);
+
+			entry.NotifyCollectMiddlewareChanged(destinationName, collectMiddlewareName);
+
+			foreach (var name in middlewareNames)
+			{
+				entry.NotifyMiddlewareAdded(destinationName, name);
+			}
+
+			return entry;
 		}
 
 		internal IEnumerable<LogDestinationEntry> GetLogDestinations()
@@ -98,10 +91,17 @@ namespace Najlot.Log
 
 		internal void Flush()
 		{
-			foreach (var destination in GetLogDestinations())
+			foreach (var entry in GetLogDestinations())
 			{
-				destination.ExecutionMiddleware.Flush();
-				destination.QueueMiddleware.Flush();
+				entry.CollectMiddleware.Flush();
+
+				IMiddleware middleware = entry.CollectMiddleware.NextMiddleware;
+
+				while (middleware != null)
+				{
+					middleware.Flush();
+					middleware = middleware.NextMiddleware;
+				}
 			}
 		}
 
@@ -149,11 +149,9 @@ namespace Najlot.Log
 
 					_loggerCache.Clear();
 
-					foreach (var destination in _logDestinations)
+					foreach (var destination in GetLogDestinations())
 					{
-						destination.ExecutionMiddleware.Dispose();
-						destination.QueueMiddleware.Dispose();
-						destination.LogDestination.Dispose();
+						destination.Dispose();
 					}
 
 					_logDestinations.Clear();

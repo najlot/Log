@@ -9,7 +9,7 @@ namespace Najlot.Log
 	/// Class to be used for logging.
 	/// Can bundle multiple log destinations and decides whether the message should be logged
 	/// </summary>
-	public sealed class Logger : ILogger, IConfigurationObserver
+	public sealed class Logger : ILogger, ILogLevelObserver
 	{
 		private readonly LogExecutor _logExecutor;
 
@@ -212,11 +212,11 @@ namespace Najlot.Log
 
 		public void Flush() => _logExecutor.Flush();
 
-		public void NotifyConfigurationChanged(ILogConfiguration configuration)
+		public void NotifyLogLevelChanged(LogLevel logLevel)
 		{
-			if (_logLevel != configuration.LogLevel)
+			if (_logLevel != logLevel)
 			{
-				SetupLogLevel(configuration.LogLevel);
+				SetupLogLevel(logLevel);
 			}
 		}
 

@@ -1,7 +1,6 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Najlot.Log", "Najlot.Log\Najlot.Log.csproj", "{CA422FE2-F096-402A-860A-C61A65AB1B8F}"
 EndProject
@@ -39,5 +38,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {25185ACD-756A-40D2-B315-D556E252E182}
+	EndGlobalSection
+	GlobalSection(AvalonStudioProperties) = preSolution
+		StartupItem = {30AD432E-8FF9-4741-B755-357574B280B5}
 	EndGlobalSection
 EndGlobal

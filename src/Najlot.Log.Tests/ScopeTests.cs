@@ -1,9 +1,9 @@
 ﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -13,7 +13,7 @@ namespace Najlot.Log.Tests
 	{
 		public ScopeTests()
 		{
-			foreach (var type in typeof(ScopeTests).Assembly.GetTypes())
+			foreach (var type in GetType().Assembly.GetTypes())
 			{
 				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
 				{
@@ -25,148 +25,45 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NestedScopesMustBeLogged()
 		{
+			bool scopesAreCorrect = true;
 			object state = null;
 
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
+			using (var logAdminitrator = LogAdministrator.CreateNew())
+			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock((msg) =>
 				{
+					if (!scopesAreCorrect) return;
 					state = msg.State;
+					scopesAreCorrect = msg.RawMessage == state?.ToString();
 				}));
 
-			var log = logAdminitrator.GetLogger(this.GetType());
+				var log = logAdminitrator.GetLogger(GetType());
 
-			using (log.BeginScope("scope 1"))
-			{
-				log.Warn("using first scope");
-				Assert.Equal("scope 1", (string)state);
-
-				using (log.BeginScope("scope 2"))
+				using (log.BeginScope("scope 1"))
 				{
-					log.Info("using second scope");
-					Assert.Equal("scope 2", (string)state);
-					log.Info("... two times");
-					Assert.Equal("scope 2", (string)state);
-				}
+					log.Info("scope 1");
 
-				log.Info("... two times");
-				Assert.Equal("scope 1", (string)state);
-			}
-
-			log.Warn("scope must be null now");
-
-			Assert.Null(state);
-		}
-
-		[Fact]
-		public void NestedScopesMustBeLoggedAsync()
-		{
-			bool scopesAreNotCorrect = false;
-
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<TaskExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					if (scopesAreNotCorrect) return;
-					scopesAreNotCorrect = msg.Message != (string)msg.State;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			using (log.BeginScope("scope 1"))
-			{
-				log.Warn("scope 1");
-
-				using (log.BeginScope("scope 2"))
-				{
-					log.Info("scope 2");
-					log.Info("scope 2");
-
-					using (log.BeginScope("scope 3"))
+					using (log.BeginScope("scope 2"))
 					{
-						log.Info("scope 3");
+						log.Info("scope 2");
+						log.Info("scope 2");
+
+						using (log.BeginScope("scope 3"))
+						{
+							log.Info("scope 3");
+						}
+
+						log.Info("scope 2");
 					}
 
-					log.Info("scope 2");
+					log.Info("scope 1");
 				}
 
-				log.Info("scope 1");
+				Assert.True(scopesAreCorrect, "scopes are not correct");
+
+				log.Info("out of scope");
+				Assert.Null(state);
 			}
-
-			log.Flush();
-
-			Assert.False(scopesAreNotCorrect, "scopes are not correct");
-		}
-
-		[Fact]
-		public void ScopeMustBeLogged()
-		{
-			object state = null;
-			var scope = "testing scopes";
-
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.GetLogConfiguration(out ILogConfiguration logConfiguration)
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					state = msg.State;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			using (log.BeginScope(scope))
-			{
-				log.Warn("setting scope");
-			}
-
-			Assert.Equal(scope, (string)state);
-
-			log.Warn("scope must be null now");
-
-			Assert.Null(state);
-		}
-
-		[Fact]
-		public void ScopeMustBeLoggedToMultiple()
-		{
-			object state = null;
-			object secondState = null;
-
-			var scope = "testing scopes";
-
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					state = msg.State;
-				}))
-				.AddCustomDestination(new SecondLogDestinationMock(msg =>
-				{
-					secondState = msg.State;
-				}));
-
-			var log = logAdminitrator.GetLogger(this.GetType());
-
-			using (log.BeginScope(scope))
-			{
-				log.Warn("setting scope");
-			}
-
-			Assert.Equal(scope, (string)state);
-			Assert.Equal(scope, (string)secondState);
-
-			log.Warn("scope must be null now");
-
-			Assert.Null(state);
-			Assert.Null(secondState);
 		}
 
 		[Fact]
@@ -174,34 +71,30 @@ namespace Najlot.Log.Tests
 		{
 			bool error = false;
 
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					if (Environment.CurrentManagedThreadId != (int)msg.State)
-					{
-						error = true;
-					}
-				}));
-
-			void action()
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
-				var log = logAdminitrator.GetLogger("test");
+				logAdminitrator.SetLogLevel(LogLevel.Info)
+					.AddCustomDestination(new LogDestinationMock((msg) =>
+					{
+						if (Environment.CurrentManagedThreadId != (int)msg.State)
+						{
+							error = true;
+						}
+					}));
 
-				using (log.BeginScope(Environment.CurrentManagedThreadId))
+				void action()
 				{
-					for (int i = 0; i < 20; i++) log.Info("");
+					var log = logAdminitrator.GetLogger("test");
+
+					using (log.BeginScope(Environment.CurrentManagedThreadId))
+					{
+						for (int i = 0; i < 10; i++) log.Info("");
+					}
 				}
+
+				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => action).ToArray();
+				Parallel.Invoke(actions);
 			}
-
-			Parallel.Invoke(
-				action, action, action, action, action, action, action, action,
-				action, action, action, action, action, action, action, action,
-				action, action, action, action, action, action, action, action);
-
-			logAdminitrator.Dispose();
 
 			Assert.False(error);
 		}
@@ -211,35 +104,34 @@ namespace Najlot.Log.Tests
 		{
 			bool error = false;
 
-			var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock((msg) =>
-				{
-					// state must be the same thread id the message comes from
-					if (msg.Message != msg.State.ToString())
-					{
-						error = true;
-					}
-				}));
-
-			void action()
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
-				var log = logAdminitrator.GetLogger("test");
+				logAdminitrator.SetLogLevel(LogLevel.Info)
+					.AddCustomDestination(new LogDestinationMock((msg) =>
+					{
+						// state must be the same thread id the message comes from
+						if (msg.RawMessage != msg.State.ToString())
+						{
+							error = true;
+						}
+					}));
 
-				using (log.BeginScope(Environment.CurrentManagedThreadId))
+				void action()
 				{
-					for (int i = 0; i < 20; i++) log.Info(Environment.CurrentManagedThreadId);
+					Task.Factory.StartNew(() =>
+					{
+						var log = logAdminitrator.GetLogger("test");
+
+						using (log.BeginScope(Environment.CurrentManagedThreadId))
+						{
+							for (int i = 0; i < 10; i++) log.Info(Environment.CurrentManagedThreadId);
+						}
+					}).Wait();
 				}
+
+				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => action).ToArray();
+				Parallel.Invoke(actions);
 			}
-
-			Parallel.Invoke(
-				action, action, action, action, action, action, action, action,
-				action, action, action, action, action, action, action, action,
-				action, action, action, action, action, action, action, action);
-
-			logAdminitrator.Dispose();
 
 			Assert.False(error);
 		}

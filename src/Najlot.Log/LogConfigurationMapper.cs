@@ -1,4 +1,4 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Destinations;
@@ -22,34 +22,20 @@ namespace Najlot.Log
 			{
 				{ nameof(FormatMiddleware), typeof(FormatMiddleware) },
 				{ nameof(JsonFormatMiddleware), typeof(JsonFormatMiddleware) },
-				{ nameof(NoFilterMiddleware), typeof(NoFilterMiddleware) },
-				{ nameof(NoQueueMiddleware), typeof(NoQueueMiddleware) },
-				{ nameof(TimerQueueMiddleware), typeof(TimerQueueMiddleware) },
-				{ nameof(SyncExecutionMiddleware), typeof(SyncExecutionMiddleware) },
-				{ nameof(TaskExecutionMiddleware), typeof(TaskExecutionMiddleware) },
-				{ nameof(ConsoleLogDestination), typeof(ConsoleLogDestination) },
-				{ nameof(FileLogDestination), typeof(FileLogDestination) },
-				{ nameof(ChannelExecutionMiddleware), typeof(ChannelExecutionMiddleware) },
-				{ nameof(ChannelQueueMiddleware), typeof(ChannelQueueMiddleware) },
-				{ nameof(QueueExecutionMiddleware), typeof(QueueExecutionMiddleware) },
-				{ nameof(ConcurrentQueueMiddleware), typeof(ConcurrentQueueMiddleware) },
+				{ nameof(SyncCollectMiddleware), typeof(SyncCollectMiddleware) },
+				{ nameof(ConsoleDestination), typeof(ConsoleDestination) },
+				{ nameof(FileDestination), typeof(FileDestination) },
+				{ nameof(ConcurrentCollectMiddleware), typeof(ConcurrentCollectMiddleware) },
 			};
 
 			_typeToStringMapping = new Dictionary<Type, string>
 			{
 				{ typeof(FormatMiddleware), nameof(FormatMiddleware) },
 				{ typeof(JsonFormatMiddleware), nameof(JsonFormatMiddleware) },
-				{ typeof(NoFilterMiddleware), nameof(NoFilterMiddleware) },
-				{ typeof(NoQueueMiddleware), nameof(NoQueueMiddleware) },
-				{ typeof(TimerQueueMiddleware), nameof(TimerQueueMiddleware) },
-				{ typeof(SyncExecutionMiddleware), nameof(SyncExecutionMiddleware) },
-				{ typeof(TaskExecutionMiddleware), nameof(TaskExecutionMiddleware) },
-				{ typeof(ConsoleLogDestination), nameof(ConsoleLogDestination) },
-				{ typeof(FileLogDestination), nameof(FileLogDestination) },
-				{ typeof(ChannelExecutionMiddleware), nameof(ChannelExecutionMiddleware) },
-				{ typeof(ChannelQueueMiddleware), nameof(ChannelQueueMiddleware) },
-				{ typeof(QueueExecutionMiddleware), nameof(QueueExecutionMiddleware) },
-				{ typeof(ConcurrentQueueMiddleware), nameof(ConcurrentQueueMiddleware) },
+				{ typeof(SyncCollectMiddleware), nameof(SyncCollectMiddleware) },
+				{ typeof(ConsoleDestination), nameof(ConsoleDestination) },
+				{ typeof(FileDestination), nameof(FileDestination) },
+				{ typeof(ConcurrentCollectMiddleware), nameof(ConcurrentCollectMiddleware) },
 			};
 		}
 
@@ -60,7 +46,7 @@ namespace Najlot.Log
 
 		public void AddToMapping(Type type)
 		{
-			var attribute = type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), false).FirstOrDefault();
+			var attribute = type?.GetCustomAttributes(typeof(LogConfigurationNameAttribute), false).FirstOrDefault();
 
 			if (attribute is LogConfigurationNameAttribute nameAttribute)
 			{
@@ -78,9 +64,9 @@ namespace Najlot.Log
 			}
 		}
 
-		public string GetName(object obj)
+		public string GetName(object from)
 		{
-			return GetName(obj.GetType());
+			return GetName(from?.GetType());
 		}
 
 		public string GetName<T>()
@@ -90,6 +76,8 @@ namespace Najlot.Log
 
 		public string GetName(Type type)
 		{
+			if (type == null) return null;
+
 			lock (_typeToStringMapping)
 			{
 				if (_typeToStringMapping.TryGetValue(type, out string value))

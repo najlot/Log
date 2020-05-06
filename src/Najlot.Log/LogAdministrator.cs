@@ -1,0 +1,203 @@
+﻿// Licensed under the MIT License.
+// See LICENSE file in the project root for full license information.
+
+using Najlot.Log.Destinations;
+using Najlot.Log.Middleware;
+using System;
+
+namespace Najlot.Log
+{
+	/// <summary>
+	/// Class to help the user to configure log destinations, execution middleware, log level etc.
+	/// </summary>
+	public class LogAdministrator : IDisposable
+	{
+		private LogConfiguration _logConfiguration;
+		private LoggerPool _loggerPool;
+
+		/// <summary>
+		/// Returns an static registered instance of a LogConfigurator
+		/// that has static resistered configuration and pool.
+		/// </summary>
+		/// <returns></returns>
+		public static LogAdministrator Instance { get; } = new LogAdministrator(LogConfiguration.Instance, LoggerPool.Instance);
+
+		internal LogAdministrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
+		{
+			_logConfiguration = logConfiguration;
+			_loggerPool = loggerPool;
+		}
+
+		/// <summary>
+		/// Creates a new LogConfigurator that is not static registered and
+		/// has own configuration and pool.
+		/// </summary>
+		/// <returns></returns>
+		public static LogAdministrator CreateNew()
+		{
+			var logConfiguration = new LogConfiguration();
+			var loggerPool = new LoggerPool(logConfiguration);
+
+			return new LogAdministrator(logConfiguration, loggerPool);
+		}
+
+		/// <summary>
+		/// Retrieves a configuration created by this LogConfigurator.
+		/// </summary>
+		/// <param name="logConfiguration">ILogConfiguration instance</param>
+		/// <returns></returns>
+		public LogAdministrator GetLogConfiguration(out ILogConfiguration logConfiguration)
+		{
+			logConfiguration = _logConfiguration;
+			return this;
+		}
+
+		public LogAdministrator AddMiddleware<TMiddleware, TDestination>()
+			where TMiddleware : IMiddleware
+			where TDestination : ILogDestination
+		{
+			_logConfiguration.AddMiddleware<TMiddleware, TDestination>();
+			return this;
+		}
+
+		public LogAdministrator SetCollectMiddleware<TMiddleware, TDestination>()
+			where TMiddleware : ICollectMiddleware
+			where TDestination : ILogDestination
+		{
+			_logConfiguration.SetCollectMiddleware<TMiddleware, TDestination>();
+			return this;
+		}
+
+		/// <summary>
+		/// Sets the LogLevel of the LogConfiguration.
+		/// </summary>
+		/// <param name="logLevel"></param>
+		/// <returns></returns>
+		public LogAdministrator SetLogLevel(LogLevel logLevel)
+		{
+			_logConfiguration.LogLevel = logLevel;
+			return this;
+		}
+
+		/// <summary>
+		/// Adds a custom destination.
+		/// All destinations will be used when creating a logger from a LoggerPool.
+		/// </summary>
+		/// <param name="logDestination">Instance of the new destination</param>
+		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
+		/// <returns></returns>
+		public LogAdministrator AddCustomDestination(ILogDestination logDestination)
+		{
+			if (logDestination == null)
+			{
+				throw new ArgumentNullException(nameof(logDestination));
+			}
+
+			_loggerPool.AddLogDestination(logDestination);
+
+			return this;
+		}
+
+		/// <summary>
+		/// Adds a destination that writes to the console.
+		/// All destinations will be used when creating a logger from a LoggerPool.
+		/// </summary>
+		/// <param name="formatFunction"></param>
+		/// <param name="useColors"></param>
+		/// <returns></returns>
+		public LogAdministrator AddConsoleLogDestination(bool useColors = false)
+		{
+			var logDestination = new ConsoleDestination(useColors);
+			return AddCustomDestination(logDestination);
+		}
+
+		/// Adds a FileLogDestination that calculates the path
+		/// </summary>
+		/// <param name="getFileName">Function to calculate the path</param>
+		/// <param name="formatFunction">Function to customize the output</param>
+		/// <param name="maxFiles">Max count of files.</param>
+		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
+		/// <returns></returns>
+		public LogAdministrator AddFileLogDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
+		{
+			var logDestination = new FileDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
+			return AddCustomDestination(logDestination);
+		}
+
+		public LogAdministrator SetCollectMiddleware(string destinationName, string collectMiddlewareName)
+		{
+			_logConfiguration.SetCollectMiddleware(destinationName, collectMiddlewareName);
+			return this;
+		}
+
+		public LogAdministrator AddMiddleware(string destinationName, string middlewareName)
+		{
+			_logConfiguration.AddMiddleware(destinationName, middlewareName);
+			return this;
+		}
+
+		public LogAdministrator ClearMiddlewares(string destinationName)
+		{
+			_logConfiguration.ClearMiddlewares(destinationName);
+			return this;
+		}
+
+		/// <summary>
+		/// Adds a FileLogDestination that uses a constant path
+		/// </summary>
+		/// <param name="fileName">Path to the file</param>
+		/// <param name="formatFunction">Function to customize the output</param>
+		/// <returns></returns>
+		public LogAdministrator AddFileLogDestination(string fileName, bool keepFileOpen = true)
+		{
+			return AddFileLogDestination(() => fileName, keepFileOpen: keepFileOpen);
+		}
+
+		/// <summary>
+		/// Creates a logger for a type or retrieves it from the cache.
+		/// </summary>
+		/// <param name="sourceType">Type to create a logger for</param>
+		/// <returns></returns>
+		public Logger GetLogger(Type sourceType) => _loggerPool.GetLogger(sourceType?.FullName);
+
+		/// <summary>
+		/// Creates a logger for a category or retrieves it from the cache.
+		/// </summary>
+		/// <param name="category">Category to create a logger for</param>
+		/// <returns></returns>
+		public Logger GetLogger(string category) => _loggerPool.GetLogger(category);
+
+		/// <summary>
+		/// Flushes to underlying destinations
+		/// </summary>
+		public void Flush() => _loggerPool.Flush();
+
+		#region IDisposable Support
+
+		private bool _disposedValue = false; // To detect redundant calls
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!_disposedValue)
+			{
+				_disposedValue = true;
+
+				if (disposing)
+				{
+					_loggerPool.Dispose();
+				}
+
+				_loggerPool = null;
+				_logConfiguration = null;
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		#endregion IDisposable Support
+	}
+}

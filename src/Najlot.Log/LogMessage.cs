@@ -1,4 +1,4 @@
-// Licensed under the MIT License. 
+// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,60 +14,51 @@ namespace Najlot.Log
 		/// <summary>
 		/// Timestamp the logging was requested
 		/// </summary>
-		public DateTime DateTime { get; }
+		public DateTime DateTime { get; set; }
 
 		/// <summary>
 		/// Logging level logging was requested with
 		/// </summary>
-		public LogLevel LogLevel { get; }
+		public LogLevel LogLevel { get; set; }
 
 		/// <summary>
 		/// Category the logger was requested for
 		/// </summary>
-		public string Category { get; }
+		public string Category { get; set; }
 
 		/// <summary>
 		/// State set with BeginScope
 		/// </summary>
-		public object State { get; }
+		public object State { get; set; }
 
 		/// <summary>
 		/// The instance that was given to the request
 		/// </summary>
-		public string Message { get; }
+		public string RawMessage { get; set; }
+
+		/// <summary>
+		/// Message formatted by a formating middleware
+		/// </summary>
+		public string Message { get; set; }
 
 		/// <summary>
 		/// Exception, if got any, otherwise null. Check ExceptionIsValid
 		/// </summary>
-		public Exception Exception { get; }
+		public Exception Exception { get; set; }
 
 		/// <summary>
 		/// Specifying whether the exception is null or not
 		/// </summary>
-		public bool ExceptionIsValid { get; }
+		public bool ExceptionIsValid { get; set; }
+
+		/// <summary>
+		/// Unparsed arguments received through one of the Trace / Debug / Info / Warn / Error / Fatal functions
+		/// </summary>
+		public IReadOnlyList<object> RawArguments { get; set; }
 
 		/// <summary>
 		/// Arguments received through one of the Trace / Debug / Info / Warn / Error / Fatal functions
 		/// </summary>
-		public IReadOnlyList<KeyValuePair<string, object>> Arguments { get; }
-
-		public LogMessage(DateTime dateTime,
-			LogLevel logLevel,
-			string category,
-			object state,
-			string message,
-			Exception ex,
-			IReadOnlyList<KeyValuePair<string, object>> args)
-		{
-			DateTime = dateTime;
-			LogLevel = logLevel;
-			Category = category;
-			State = state;
-			Message = message;
-			Exception = ex;
-			Arguments = args;
-
-			ExceptionIsValid = ex != null;
-		}
+		public IReadOnlyList<KeyValuePair<string, object>> Arguments { get; set; }
 	}
 }

@@ -1,7 +1,6 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System;
 using Xunit;
@@ -24,19 +23,13 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void StructuredLoggingMustParseCorrect()
 		{
-			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					output = middleware.Format(msg);
-				})))
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock(msg => output = msg.Message));
+
 				var log = logAdminitrator.GetLogger("default");
 
 				log.Info("User {User} logon from {IP}", "admin", "127.0.0.1");
@@ -65,7 +58,7 @@ namespace Najlot.Log.Tests
 
 				output = "";
 				log.Info("User {User} logon from {ip}", "admin");
-				index = output.IndexOf("User admin logon from {ip}");
+				index = output.IndexOf("User admin logon from ");
 				Assert.True(index != -1, output);
 
 				output = "";
@@ -87,25 +80,29 @@ namespace Najlot.Log.Tests
 				log.Info("ip: {ip} {", "127.0.0.1");
 				index = output.IndexOf("ip: 127.0.0.1 {");
 				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("", 1, 2, 3);
+				index = output.IndexOf(LogLevel.Info.ToString().ToUpper());
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("{{", 1, 2, 3);
+				index = output.IndexOf(LogLevel.Info.ToString().ToUpper());
+				Assert.True(index != -1, output);
 			}
 		}
 
 		[Fact]
 		public void StructuredLoggingMustFormatCorrect()
 		{
-			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					output = middleware.Format(msg);
-				})))
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock(msg => output = msg.Message));
+
 				var log = logAdminitrator.GetLogger("default");
 
 				log.Info("Number of users: {users:D3}", 50);
@@ -127,19 +124,13 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NullShouldBeLoggedAsEmpty()
 		{
-			var middleware = new FormatMiddleware();
 			string output = "";
 			int index = -1;
 
-			using (var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					output = middleware.Format(msg);
-				})))
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock(msg => output = msg.Message));
+
 				var log = logAdminitrator.GetLogger("default");
 
 				// null as args -> nothing will be parsed
@@ -173,24 +164,73 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void NullMessageShouldNotMakeExceptions()
+		public void NullMessageShouldNotThrowExceptions()
 		{
-			var middleware = new FormatMiddleware();
-
-			using (var logAdminitrator = LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Trace)
-				.SetExecutionMiddleware<AllowExceptionsExecutionMiddleware>()
-				.AddCustomDestination(new LogDestinationMock(msg =>
-				{
-					var output = middleware.Format(msg);
-				})))
+			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock(msg => _ = msg.Message));
+
 				var log = logAdminitrator.GetLogger("default");
 
 				// log null variables must not produce exceptions
 				log.Info(null);
 				log.Info(default(string), 0);
+			}
+		}
+
+		[Fact]
+		public void CachingShouldNotBreakFollowing()
+		{
+			string output;
+			int index;
+
+			using (var logAdminitrator = LogAdministrator.CreateNew())
+			{
+				logAdminitrator.AddCustomDestination(new LogDestinationMock(msg => output = msg.Message));
+
+				var log = logAdminitrator.GetLogger("default");
+
+				log.Info("User {user_id} writes Order {order_id} into DB.");
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.", "U123");
+				index = output.IndexOf("User U123 writes Order  into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.", "U123", 5243);
+				index = output.IndexOf("User U123 writes Order 5243 into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.", null, null);
+				index = output.IndexOf("User  writes Order  into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.", "U123");
+				index = output.IndexOf("User U123 writes Order  into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.");
+				index = output.IndexOf("User {user_id} writes Order {order_id} into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id} writes Order {order_id} into DB.", 123, 456);
+				index = output.IndexOf("User 123 writes Order 456 into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id:D3} writes Order {order_id} into DB.", 1, 2);
+				index = output.IndexOf("User 001 writes Order 2 into DB.");
+				Assert.True(index != -1, output);
+
+				output = "";
+				log.Info("User {user_id:D3} writes Order {order_id} into DB.", "db", 2);
+				index = output.IndexOf("User db writes Order 2 into DB.");
+				Assert.True(index != -1, output);
 			}
 		}
 	}

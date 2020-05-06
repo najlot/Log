@@ -2,32 +2,23 @@
 
 namespace Najlot.Log
 {
-	public class LogErrorHandler
+	public sealed class LogErrorHandler
 	{
 		public static LogErrorHandler Instance { get; } = new LogErrorHandler();
 
-		private LogErrorHandler() { }
-
-		public void Handle(string message)
+		private LogErrorHandler()
 		{
-			OnErrorOccured(new LogErrorEventArgs
-			{
-				Message = message
-			});
 		}
 
 		public void Handle(string message, Exception ex)
 		{
-			OnErrorOccured(new LogErrorEventArgs
+			var args = new LogErrorEventArgs
 			{
 				Message = message,
 				Exception = ex
-			});
-		}
+			};
 
-		protected virtual void OnErrorOccured(LogErrorEventArgs e)
-		{
-			ErrorOccured?.Invoke(this, e);
+			ErrorOccured?.Invoke(this, args);
 		}
 
 		public event EventHandler<LogErrorEventArgs> ErrorOccured;

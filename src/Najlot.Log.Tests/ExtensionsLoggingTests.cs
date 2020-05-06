@@ -1,10 +1,9 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Najlot.Log.Extensions.Logging;
-using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
 using System.IO;
 using Xunit;
@@ -33,10 +32,10 @@ namespace Najlot.Log.Tests
 
 				loggerFactory.AddNajlotLog((adminitrator) =>
 				{
-					logAdminitrator = adminitrator
-						.SetLogLevel(LogLevel.Trace)
-						.AddConsoleLogDestination();
+					logAdminitrator = adminitrator.AddConsoleLogDestination();
 				});
+
+				logAdminitrator.SetLogLevel(LogLevel.Trace);
 
 				var logger = loggerFactory.CreateLogger("default");
 
@@ -61,6 +60,10 @@ namespace Najlot.Log.Tests
 				logAdminitrator.SetLogLevel(LogLevel.Fatal);
 				Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
 				Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical));
+
+				logAdminitrator.SetLogLevel(LogLevel.Info);
+
+				logger.LogInformation("Done!");
 			}
 		}
 
@@ -76,12 +79,10 @@ namespace Najlot.Log.Tests
 
 			using (var loggerFactory = new LoggerFactory())
 			{
-				loggerFactory.AddNajlotLog((configurator) =>
+				loggerFactory.AddNajlotLog((admin) =>
 				{
-					configurator
-						.SetLogLevel(LogLevel.Trace)
-						.SetExecutionMiddleware<SyncExecutionMiddleware>()
-						.AddConsoleLogDestination()
+					admin.SetLogLevel(LogLevel.Trace)
+						.AddConsoleLogDestination(true)
 						.AddFileLogDestination(logFile);
 				});
 
@@ -167,7 +168,7 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void LoggingBuilderExtensionMustLogCorrect()
+		public void LoggerBuilderMustProduceLogger()
 		{
 			var logFile = "LoggingBuilderExtension.log";
 
@@ -182,26 +183,23 @@ namespace Najlot.Log.Tests
 
 			services.AddLogging(loggerBuilder =>
 			{
-				loggerBuilder.AddNajlotLog((configurator) =>
+				loggerBuilder.AddNajlotLog((admin) =>
 				{
-					logAdminitrator = configurator;
-
-					logAdminitrator
-						.SetLogLevel(LogLevel.Debug)
-						.SetExecutionMiddleware<SyncExecutionMiddleware>()
-						.AddFileLogDestination(logFile);
+					logAdminitrator = admin;
+					logAdminitrator.AddFileLogDestination(logFile);
 				});
 			});
 
-			services.AddTransient<DependencyInjectionLoggerService>();
+			using (logAdminitrator)
+			{
+				services.AddTransient<DependencyInjectionLoggerService>();
 
-			var serviceProvider = services.BuildServiceProvider();
+				var serviceProvider = services.BuildServiceProvider();
 
-			var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
-			service.GetLogger().LogInformation("Logger created!");
-			service.GetLogger().LogTrace("This should not be logged!");
-
-			logAdminitrator.Dispose();
+				var service = serviceProvider.GetService<DependencyInjectionLoggerService>();
+				service.GetLogger().LogInformation("Logger created!");
+				service.GetLogger().LogTrace("This should not be logged!");
+			}
 
 			var content = File.ReadAllText(logFile);
 

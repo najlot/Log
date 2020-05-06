@@ -1,12 +1,14 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Configuration.FileSource;
 using Najlot.Log.Middleware;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
+using Najlot.Log.Tests.Mocks;
+using Najlot.Log.Configuration.FileSource;
 using Xunit;
+using System.Linq;
+using System.IO;
+using System;
+using System.Threading;
 
 namespace Najlot.Log.Tests
 {
@@ -14,7 +16,7 @@ namespace Najlot.Log.Tests
 	{
 		public FileConfigurationTests()
 		{
-			foreach (var type in typeof(FileConfigurationTests).Assembly.GetTypes())
+			foreach (var type in GetType().Assembly.GetTypes())
 			{
 				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
 				{
@@ -24,216 +26,107 @@ namespace Najlot.Log.Tests
 		}
 
 		[Fact]
-		public void ApplicationMustNotDieOnBadConfigurationFile()
+		public void LogConfigurationsShouldBeRead()
 		{
-			const string configPath = "BadLogConfiguration.config";
-			var content = "<?xml version=\"1.0\" encod";
+			var configName = nameof(LogConfigurationsShouldBeRead) + ".config";
 
-			if (File.Exists(configPath))
+			if (File.Exists(configName))
 			{
-				File.Delete(configPath);
+				File.Delete(configName);
 			}
 
-			File.WriteAllText(configPath, content);
+			using (var admin = LogAdministrator.CreateNew())
+			{
+				admin
+					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.SetCollectMiddleware<ConcurrentCollectMiddleware, LogDestinationMock>()
+					.AddMiddleware<JsonFormatMiddleware, LogDestinationMock>()
+					.ReadConfigurationFromXmlFile(configName, false, true);
+			}
 
-			LogAdministrator
-				.CreateNew()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
+			Assert.True(File.Exists(configName));
+
+			using (var admin = LogAdministrator.CreateNew())
+			{
+				var name = LogConfigurationMapper.Instance.GetName<LogDestinationMock>();
+				var concurrentCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<ConcurrentCollectMiddleware>();
+				var jsonFormatMiddlewareName = LogConfigurationMapper.Instance.GetName<JsonFormatMiddleware>();
+
+				admin
+					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.GetLogConfiguration(out var config);
+
+				// Standard should not be ConcurrentCollectMiddleware
+				Assert.NotEqual(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+
+				admin.ReadConfigurationFromXmlFile(configName, true, false);
+				
+				Assert.Equal(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+				Assert.Equal(jsonFormatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == jsonFormatMiddlewareName));
+			}
 		}
 
 		[Fact]
-		public void ApplicationMustNotDieOnBadConfigurationPath()
+		public void LogConfigurationsShouldBeListenedTo()
 		{
-			// Very bad path :)
-			const string configPath = "::::";
+			var configName = nameof(LogConfigurationsShouldBeListenedTo) + ".config";
 
-			if (File.Exists(configPath))
+			if (File.Exists(configName))
 			{
-				File.Delete(configPath);
+				File.Delete(configName);
 			}
 
-			LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
-		}
-
-		[Fact]
-		public void ExtensionMustReadExecutionMiddlewareFromConfigurationFile()
-		{
-			const string configPath = "LogConfigurationToRead.config";
-			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>TaskExecutionMiddleware</ExecutionMiddleware>" +
-				"</NajlotLogConfiguration>";
-
-			if (File.Exists(configPath))
+			using (var admin = LogAdministrator.CreateNew())
 			{
-				File.Delete(configPath);
+				admin
+					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.SetCollectMiddleware<ConcurrentCollectMiddleware, LogDestinationMock>()
+					.AddMiddleware<JsonFormatMiddleware, LogDestinationMock>()
+					.ReadConfigurationFromXmlFile(configName, false, true);
 			}
 
-			File.WriteAllText(configPath, content);
+			Assert.True(File.Exists(configName));
 
-			LogAdministrator
-				.CreateNew()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			var taskExecutionMiddlewareName = LogConfigurationMapper.Instance.GetName<TaskExecutionMiddleware>();
-
-			Assert.Equal(taskExecutionMiddlewareName, logConfiguration.ExecutionMiddlewareName);
-		}
-
-		[Fact]
-		public void ExtensionMustReadLogLevelFromConfigurationFile()
-		{
-			const string configPath = "LogConfigurationToRead.config";
-			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>SyncExecutionMiddleware</ExecutionMiddleware>" +
-				"</NajlotLogConfiguration>";
-
-			if (File.Exists(configPath))
+			using (var admin = LogAdministrator.CreateNew())
 			{
-				File.Delete(configPath);
+				var name = LogConfigurationMapper.Instance.GetName<LogDestinationMock>();
+				var concurrentCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<ConcurrentCollectMiddleware>();
+				var jsonFormatMiddlewareName = LogConfigurationMapper.Instance.GetName<JsonFormatMiddleware>();
+				var formatMiddlewareName = LogConfigurationMapper.Instance.GetName<FormatMiddleware>();
+
+				admin
+					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.GetLogConfiguration(out var config);
+
+				// Standard should not be ConcurrentCollectMiddleware
+				Assert.NotEqual(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+
+				admin.ReadConfigurationFromXmlFile(configName, true, false);
+
+				Assert.Equal(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+				Assert.Equal(jsonFormatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == jsonFormatMiddlewareName));
+
+				var content = File.ReadAllText(configName);
+				var syncCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<SyncCollectMiddleware>();
+
+				content = content
+					.Replace(concurrentCollectMiddlewareName, syncCollectMiddlewareName)
+					.Replace(jsonFormatMiddlewareName, formatMiddlewareName)
+					.Replace(LogLevel.Debug.ToString(), LogLevel.Trace.ToString());
+
+				File.WriteAllText(configName, content);
+
+				var endTime = DateTime.Now.AddSeconds(5);
+
+				while (DateTime.Now < endTime && config.GetCollectMiddlewareName(name) == concurrentCollectMiddlewareName)
+				{
+					Thread.Sleep(25);
+				}
+
+				Assert.Equal(syncCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+				Assert.Equal(LogLevel.Trace, config.LogLevel);
+				Assert.Equal(formatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == formatMiddlewareName));
 			}
-
-			File.WriteAllText(configPath, content);
-
-			LogAdministrator
-				.CreateNew()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
-		}
-
-		[Fact]
-		public void ExtensionMustWriteExampleFile()
-		{
-			const string configPath = "LogConfigurationExamle.config";
-
-			if (File.Exists(configPath))
-			{
-				File.Delete(configPath);
-			}
-
-			LogAdministrator
-				.CreateNew()
-				.SetLogLevel(LogLevel.Info)
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: false, writeExampleIfSourceDoesNotExists: true);
-
-			Assert.True(File.Exists(configPath));
-		}
-
-		[Fact]
-		public void FileConfigurationMustUpdateAtRuntimeWithoutApplicationFailure()
-		{
-			const string configPath = nameof(FileConfigurationMustUpdateAtRuntimeWithoutApplicationFailure) + ".config";
-
-			var content = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-					"<LogLevel>Error</LogLevel>" +
-					"<ExecutionMiddleware>TaskExecutionMiddleware</ExecutionMiddleware>" +
-				"</NajlotLogConfiguration>";
-
-			var newContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-				"<NajlotLogConfiguration xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-					"<LogLevel>Info</LogLevel>" +
-					"<ExecutionMiddleware>SyncExecutionMiddleware</ExecutionMiddleware>" +
-				"</NajlotLogConfiguration>";
-
-			if (File.Exists(configPath))
-			{
-				File.Delete(configPath);
-			}
-
-			File.WriteAllText(configPath, content);
-
-			LogAdministrator
-				.CreateNew()
-				.SetExecutionMiddleware<SyncExecutionMiddleware>()
-				.SetLogLevel(LogLevel.Trace)
-				.ReadConfigurationFromXmlFile(configPath, listenForChanges: true, writeExampleIfSourceDoesNotExists: true)
-				.GetLogConfiguration(out ILogConfiguration logConfiguration);
-
-			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
-			Assert.Equal(nameof(TaskExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
-
-			// Sometimes too fast, that the FileSystemListener is not ready
-			Thread.Sleep(100);
-
-			// Write new configuration, wait until it changes and fail if it does not
-			File.WriteAllText(configPath, newContent);
-			var stopwatch = Stopwatch.StartNew();
-
-			while (stopwatch.ElapsedMilliseconds < 5000 &&
-				(logConfiguration.LogLevel == LogLevel.Error ||
-				nameof(TaskExecutionMiddleware) == logConfiguration.ExecutionMiddlewareName))
-			{
-				Thread.Sleep(10);
-			}
-
-			stopwatch.Stop();
-
-			Assert.Equal(LogLevel.Info, logConfiguration.LogLevel);
-			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
-
-			File.WriteAllText(configPath, newContent
-				.Replace("Najlot.Log.Middleware.SyncExecutionMiddleware", "Najlot.Log.Middleware.BadExecutionMiddleware")
-				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Warn</LogLevel>"));
-
-			stopwatch = Stopwatch.StartNew();
-
-			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Info)
-			{
-				Thread.Sleep(10);
-			}
-
-			stopwatch.Stop();
-
-			Assert.Equal(LogLevel.Warn, logConfiguration.LogLevel);
-			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
-
-			File.WriteAllText(configPath, newContent
-				.Replace("SyncExecutionMiddleware", "System.Guid")
-				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Error</LogLevel>"));
-
-			stopwatch = Stopwatch.StartNew();
-
-			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Warn)
-			{
-				Thread.Sleep(10);
-			}
-
-			stopwatch.Stop();
-
-			Assert.Equal(LogLevel.Error, logConfiguration.LogLevel);
-			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
-
-			File.WriteAllText(configPath, newContent
-				.Replace("SyncExecutionMiddleware", "BadExecutionMiddleware")
-				.Replace("<LogLevel>Info</LogLevel>", "<LogLevel>Trace</LogLevel>"));
-
-			stopwatch = Stopwatch.StartNew();
-
-			while (stopwatch.ElapsedMilliseconds < 5000 && logConfiguration.LogLevel == LogLevel.Error)
-			{
-				Thread.Sleep(10);
-			}
-
-			stopwatch.Stop();
-
-			Assert.Equal(LogLevel.Trace, logConfiguration.LogLevel);
-			Assert.Equal(nameof(SyncExecutionMiddleware), logConfiguration.ExecutionMiddlewareName);
-
-			File.Delete(configPath);
-
-			Thread.Sleep(300);
 		}
 	}
 }

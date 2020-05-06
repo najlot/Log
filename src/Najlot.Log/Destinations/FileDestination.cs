@@ -1,7 +1,6 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,51 +12,51 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Writes all messages to a file.
 	/// </summary>
-	[LogConfigurationName(nameof(FileLogDestination))]
-	public sealed class FileLogDestination : ILogDestination
+	[LogConfigurationName(nameof(FileDestination))]
+	public sealed class FileDestination : ILogDestination
 	{
-		private readonly string NewLine = Environment.NewLine;
+		private readonly string _newLine = Environment.NewLine;
 		private Stream _stream = null;
 		private readonly Encoding _encoding = Encoding.UTF8;
 
-		public readonly int MaxFiles;
-		public readonly string LogFilePaths = null;
-		public readonly bool AutoCleanUp;
-		public readonly bool KeepFileOpen;
-		public readonly Func<string> GetPath;
+		private readonly int _maxFiles;
+		private readonly string _logFilePaths = null;
+		private readonly bool _autoCleanUp;
+		private readonly bool _keepFileOpen;
+		private readonly Func<string> _getPath;
 
 		public string FilePath { get; private set; }
 
-		public FileLogDestination(Func<string> getPath, int maxFiles, string logFilePaths, bool keepFileOpen)
+		public FileDestination(Func<string> getPath, int maxFiles, string logFilePaths, bool keepFileOpen)
 		{
-			KeepFileOpen = keepFileOpen;
-			GetPath = getPath;
-			MaxFiles = maxFiles;
-			LogFilePaths = logFilePaths;
+			_keepFileOpen = keepFileOpen;
+			_getPath = getPath ?? throw new NullReferenceException();
+			_maxFiles = maxFiles;
+			_logFilePaths = logFilePaths;
 
-			AutoCleanUp = MaxFiles > 0 && !string.IsNullOrWhiteSpace(LogFilePaths);
+			_autoCleanUp = _maxFiles > 0 && !string.IsNullOrWhiteSpace(_logFilePaths);
 
-			var path = GetPath();
+			var path = _getPath();
 			EnsureDirectoryExists(path);
 			FilePath = path;
 
-			if (KeepFileOpen)
+			if (_keepFileOpen)
 			{
 				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 			}
 
-			if (AutoCleanUp) CleanUpOldFiles(path);
+			if (_autoCleanUp) CleanUpOldFiles(path);
 		}
 
-		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		public void Log(IEnumerable<LogMessage> messages)
 		{
-			Log(messages, formatMiddleware, true);
+			Log(messages, true);
 		}
 
-		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware, bool logRetry)
+		public void Log(IEnumerable<LogMessage> messages, bool logRetry)
 		{
 			bool cleanUp = false;
-			var path = GetPath();
+			var path = _getPath();
 
 			// Ensure directory is created when the path changes,
 			// but try to create when DirectoryNotFoundException occurs.
@@ -68,9 +67,9 @@ namespace Najlot.Log.Destinations
 				{
 					FilePath = path;
 					EnsureDirectoryExists(path);
-					if (AutoCleanUp) cleanUp = true;
+					if (_autoCleanUp) cleanUp = true;
 
-					if (KeepFileOpen)
+					if (_keepFileOpen)
 					{
 						SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 					}
@@ -80,11 +79,11 @@ namespace Najlot.Log.Destinations
 
 				foreach (var message in messages)
 				{
-					sb.Append(formatMiddleware.Format(message));
-					sb.Append(NewLine);
+					sb.Append(message.Message);
+					sb.Append(_newLine);
 				}
 
-				if (KeepFileOpen)
+				if (_keepFileOpen)
 				{
 					Write(sb.ToString());
 				}
@@ -101,55 +100,48 @@ namespace Najlot.Log.Destinations
 
 				if (logRetry)
 				{
-					Log(messages, formatMiddleware, false);
+					Log(messages, false);
 				}
 			}
 		}
 
 		private void CleanUpOldFiles(string path)
 		{
-			try
+			List<string> logFilePathsList = null;
+
+			if (File.Exists(_logFilePaths))
 			{
-				List<string> logFilePathsList = null;
-
-				if (File.Exists(LogFilePaths))
-				{
-					logFilePathsList = new List<string>(File.ReadAllLines(LogFilePaths));
-				}
-				else
-				{
-					logFilePathsList = new List<string>();
-				}
-
-				logFilePathsList.Add(path);
-
-				if (logFilePathsList.Count < MaxFiles)
-				{
-					File.WriteAllLines(LogFilePaths, logFilePathsList.Distinct());
-					return;
-				}
-
-				logFilePathsList = logFilePathsList
-					.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p))
-					.Distinct().ToList();
-
-				while (logFilePathsList.Count > MaxFiles)
-				{
-					var file = logFilePathsList[0];
-					logFilePathsList.Remove(file);
-					File.WriteAllLines(LogFilePaths, logFilePathsList);
-					File.Delete(file);
-				}
-
-				File.WriteAllLines(LogFilePaths, logFilePathsList);
+				logFilePathsList = new List<string>(File.ReadAllLines(_logFilePaths));
 			}
-			catch (Exception ex)
+			else
 			{
-				LogErrorHandler.Instance.Handle("Error cleaning up old files in FileLogDestination", ex);
+				logFilePathsList = new List<string>();
 			}
+
+			logFilePathsList.Add(path);
+
+			if (logFilePathsList.Count < _maxFiles)
+			{
+				File.WriteAllLines(_logFilePaths, logFilePathsList.Distinct());
+				return;
+			}
+
+			logFilePathsList = logFilePathsList
+				.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p))
+				.Distinct().ToList();
+
+			while (logFilePathsList.Count > _maxFiles)
+			{
+				var file = logFilePathsList[0];
+				logFilePathsList.Remove(file);
+				File.WriteAllLines(_logFilePaths, logFilePathsList);
+				if (File.Exists(file)) File.Delete(file);
+			}
+
+			File.WriteAllLines(_logFilePaths, logFilePathsList);
 		}
 
-		private void EnsureDirectoryExists(string path)
+		private static void EnsureDirectoryExists(string path)
 		{
 			if (!File.Exists(path))
 			{

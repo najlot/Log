@@ -1,7 +1,8 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -10,12 +11,18 @@ using System.Xml.Serialization;
 
 namespace Najlot.Log.Configuration.FileSource
 {
-	[XmlRoot("NajlotLogConfiguration")]
-	public class FileConfiguration
+	public class Configurations
 	{
 		public LogLevel LogLevel { get; set; }
-		public string ExecutionMiddleware { get; set; }
-		public string FilterMiddleware { get; set; }
+
+		public List<DestinationEntry> Destinations { get; set; } = new List<DestinationEntry>();
+	}
+
+	public class DestinationEntry
+	{
+		public string DestinationName { get; set; }
+		public string CollectMiddlewareName { get; set; }
+		public List<string> MiddlewareNames { get; set; }
 	}
 
 	public static class LogConfiguratorExtension
@@ -28,19 +35,34 @@ namespace Najlot.Log.Configuration.FileSource
 
 			try
 			{
-				var currentExecutionMiddlewareName = logConfiguration.ExecutionMiddlewareName;
-
-				var xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
+				var xmlSerializer = new XmlSerializer(typeof(Configurations));
 
 				using (var stringWriter = new CustomStringWriter(encoding))
 				{
 					using (var xmlWriter = XmlWriter.Create(stringWriter))
 					{
-						xmlSerializer.Serialize(xmlWriter, new FileConfiguration()
+						logAdminitrator.GetLogConfiguration(out var config);
+
+						var configurations = new Configurations()
 						{
-							LogLevel = logConfiguration.LogLevel,
-							ExecutionMiddleware = currentExecutionMiddlewareName
-						});
+							LogLevel = logConfiguration.LogLevel
+						};
+
+						var names = config.GetDestinationNames();
+
+						foreach (var name in names)
+						{
+							var collectMiddlewareName = config.GetCollectMiddlewareName(name);
+
+							configurations.Destinations.Add(new DestinationEntry
+							{
+								CollectMiddlewareName = collectMiddlewareName,
+								DestinationName = name,
+								MiddlewareNames = new List<string>(config.GetMiddlewareNames(name))
+							});
+						}
+
+						xmlSerializer.Serialize(xmlWriter, configurations);
 
 						File.WriteAllText(path, stringWriter.ToString(), encoding);
 					}
@@ -116,19 +138,27 @@ namespace Najlot.Log.Configuration.FileSource
 
 		private static void ReadConfiguration(string path, LogAdministrator logAdminitrator)
 		{
-			FileConfiguration fileConfiguration;
+			Configurations fileConfigurations;
 
-			XmlSerializer xmlSerializer = new XmlSerializer(typeof(FileConfiguration));
+			XmlSerializer xmlSerializer = new XmlSerializer(typeof(Configurations));
 			using (var streamReader = new StreamReader(path))
 			{
-				fileConfiguration = xmlSerializer.Deserialize(streamReader) as FileConfiguration;
+				fileConfigurations = xmlSerializer.Deserialize(streamReader) as Configurations;
 			}
 
-			logAdminitrator.SetLogLevel(fileConfiguration.LogLevel);
+			logAdminitrator.SetLogLevel(fileConfigurations.LogLevel);
 
-			if (fileConfiguration?.ExecutionMiddleware != null)
+			foreach (var fileConfiguration in fileConfigurations.Destinations)
 			{
-				logAdminitrator.SetExecutionMiddleware(fileConfiguration.ExecutionMiddleware);
+				string destinationName = fileConfiguration.DestinationName;
+
+				logAdminitrator.ClearMiddlewares(destinationName);
+				logAdminitrator.SetCollectMiddleware(destinationName, fileConfiguration.CollectMiddlewareName);
+
+				foreach (var middlewareName in fileConfiguration.MiddlewareNames)
+				{
+					logAdminitrator.AddMiddleware(destinationName, middlewareName);
+				}
 			}
 		}
 	}

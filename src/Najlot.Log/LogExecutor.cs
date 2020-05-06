@@ -1,4 +1,4 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Util;
@@ -32,7 +32,7 @@ namespace Najlot.Log
 
 		private readonly string _category;
 		private readonly LoggerPool _loggerPool;
-		private static readonly object[] _emptyArgs = new object[0];
+		private static readonly object[] _emptyArgs = Array.Empty<object>();
 		private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyKeyValueList = Array.Empty<KeyValuePair<string, object>>();
 
 		public LogExecutor(string category, LoggerPool loggerPool)
@@ -48,56 +48,48 @@ namespace Najlot.Log
 
 			foreach (var entry in _loggerPool.GetLogDestinations())
 			{
-				var filterMiddleware = entry.FilterMiddleware;
-				var queueMiddleware = entry.QueueMiddleware;
-
-				entry.ExecutionMiddleware.Execute(() =>
+				try
 				{
-					try
+					var message = new LogMessage
 					{
-						LogMessage message;
+						DateTime = time,
+						LogLevel = logLevel,
+						Category = _category,
+						State = state,
+						RawMessage = string.Empty,
+						Exception = ex,
+						RawArguments = _emptyArgs,
+						Arguments = _emptyKeyValueList,
+						ExceptionIsValid = ex != null
+					};
 
-						args = args ?? _emptyArgs;
-
-						if (msg == null)
-						{
-							message = new LogMessage(time, logLevel, _category, state, "", ex, _emptyKeyValueList);
-						}
-						else if (args.Length == 0)
-						{
-							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, _emptyKeyValueList);
-						}
-						else if (args.Length == 1 && args[0] is IReadOnlyList<KeyValuePair<string, object>> pair)
-						{
-							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, pair);
-						}
-						else
-						{
-							var parsedKeyValuePairs = LogArgumentsParser.ParseArguments(msg.ToString(), args);
-							message = new LogMessage(time, logLevel, _category, state, msg.ToString(), ex, parsedKeyValuePairs);
-						}
-
-						if (filterMiddleware.AllowThrough(message))
-						{
-							queueMiddleware.QueueWriteMessage(message);
-						}
-					}
-					catch (Exception logEx)
+					if (args != null)
 					{
-						LogErrorHandler.Instance.Handle("Error writing a log message", logEx);
+						message.RawArguments = args;
 					}
-				});
+
+					if (msg != null) message.RawMessage = msg.ToString();
+
+					if (message.RawArguments.Count == 1 && message.RawArguments[0] is IReadOnlyList<KeyValuePair<string, object>> pair)
+					{
+						message.Arguments = pair;
+					}
+					else if (message.RawArguments.Count > 0)
+					{
+						var parsedKeyValuePairs = LogArgumentsParser.ParseArguments(message.RawMessage, args);
+						message.Arguments = parsedKeyValuePairs;
+					}
+
+					entry.CollectMiddleware.Execute(message);
+				}
+				catch (Exception exc)
+				{
+					LogErrorHandler.Instance.Handle("An error in the log pipeline occured.", exc);
+				}
 			}
 		}
 
-		public void Flush()
-		{
-			foreach (var entry in _loggerPool.GetLogDestinations())
-			{
-				entry.ExecutionMiddleware.Flush();
-				entry.QueueMiddleware.Flush();
-			}
-		}
+		public void Flush() => _loggerPool.Flush();
 
 		#region IDisposable Support
 

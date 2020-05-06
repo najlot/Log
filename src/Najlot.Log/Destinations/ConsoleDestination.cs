@@ -1,7 +1,6 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,14 +10,13 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Writes all messages to console.
 	/// </summary>
-	[LogConfigurationName(nameof(ConsoleLogDestination))]
-	public sealed class ConsoleLogDestination : ILogDestination
+	[LogConfigurationName(nameof(ConsoleDestination))]
+	public sealed class ConsoleDestination : ILogDestination
 	{
-		public readonly bool UseColors;
-		public readonly ConsoleColor DefaultColor;
-		private readonly string _newLine = Environment.NewLine;
+		private readonly bool UseColors;
+		private readonly ConsoleColor DefaultColor;
 
-		public ConsoleLogDestination(bool useColors)
+		public ConsoleDestination(bool useColors)
 		{
 			UseColors = useColors;
 
@@ -33,11 +31,13 @@ namespace Najlot.Log.Destinations
 			// Nothing to dispose
 		}
 
-		public void Log(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		public void Log(IEnumerable<LogMessage> messages)
 		{
+			if (messages == null) return;
+
 			if (UseColors)
 			{
-				LogWithColors(messages, formatMiddleware);
+				LogWithColors(messages);
 			}
 			else
 			{
@@ -45,15 +45,14 @@ namespace Najlot.Log.Destinations
 
 				foreach (var message in messages)
 				{
-					sb.Append(formatMiddleware.Format(message));
-					sb.Append(_newLine);
+					sb.AppendLine(message.Message);
 				}
 
 				Console.Out.Write(sb.ToString());
 			}
 		}
 
-		private void LogWithColors(IEnumerable<LogMessage> messages, IFormatMiddleware formatMiddleware)
+		private void LogWithColors(IEnumerable<LogMessage> messages)
 		{
 			var previousLogLevel = LogLevel.None;
 			bool first = true;
@@ -76,8 +75,7 @@ namespace Najlot.Log.Destinations
 					sb.Clear();
 				}
 
-				sb.Append(formatMiddleware.Format(message));
-				sb.Append(_newLine);
+				sb.AppendLine(message.Message);
 			}
 
 			Console.Out.Write(sb.ToString());
@@ -85,7 +83,7 @@ namespace Najlot.Log.Destinations
 			Console.ForegroundColor = DefaultColor;
 		}
 
-		private void SetColor(LogLevel logLevel)
+		private static void SetColor(LogLevel logLevel)
 		{
 			switch (logLevel)
 			{

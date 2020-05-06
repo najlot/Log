@@ -1,7 +1,9 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
+using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
+using System;
 using System.Collections.Generic;
 
 namespace Najlot.Log
@@ -10,7 +12,9 @@ namespace Najlot.Log
 	{
 		public static LogConfiguration Instance { get; } = new LogConfiguration();
 
-		internal LogConfiguration(){}
+		internal LogConfiguration()
+		{
+		}
 
 		private LogLevel _logLevel = LogLevel.Debug;
 
@@ -25,54 +29,134 @@ namespace Najlot.Log
 				if (_logLevel != value)
 				{
 					_logLevel = value;
-					NotifyObservers();
+
+					lock (_loglevelObserverList)
+					{
+						foreach (var observer in _loglevelObserverList)
+						{
+							try
+							{
+								observer.NotifyLogLevelChanged(value);
+							}
+							catch (Exception ex)
+							{
+								LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
+							}
+						}
+					}
 				}
 			}
 		}
 
-		private string _executionMiddlewareName = nameof(SyncExecutionMiddleware);
+		public Dictionary<string, List<string>> Middlewares { get; } = new Dictionary<string, List<string>>();
+		public Dictionary<string, string> CollectMiddlewares { get; } = new Dictionary<string, string>();
 
-		public string ExecutionMiddlewareName
+		public IEnumerable<string> GetDestinationNames()
 		{
-			get
+			foreach (var middlewares in Middlewares)
 			{
-				return _executionMiddlewareName;
+				yield return middlewares.Key;
 			}
-			set
+		}
+
+		public void AddMiddleware<TMiddleware, TDestination>()
+			where TMiddleware : IMiddleware
+			where TDestination : ILogDestination
+		{
+			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
+			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
+
+			AddMiddleware(destinationName, middlewareName);
+		}
+
+		public void AddMiddleware(string destinationName, string middlewareName)
+		{
+			if (Middlewares.TryGetValue(destinationName, out var list))
 			{
-				if (string.IsNullOrEmpty(value))
+				list.Add(middlewareName);
+			}
+			else
+			{
+				var newList = new List<string>
 				{
-					LogErrorHandler.Instance.Handle("New execution middleware name is null or empty");
-					return;
-				}
+					middlewareName
+				};
 
-				var type = LogConfigurationMapper.Instance.GetType(value);
+				Middlewares.Add(destinationName, newList);
+			}
 
-				if (type == null)
+			lock (_observerList)
+			{
+				foreach (var observer in _observerList)
 				{
-					LogErrorHandler.Instance.Handle(value + " is not registered");
-					return;
-				}
-
-				if (!typeof(IExecutionMiddleware).IsAssignableFrom(type))
-				{
-					LogErrorHandler.Instance.Handle(type.FullName + " does not implement IExecutionMiddleware");
-					return;
-				}
-
-				if (_executionMiddlewareName != value)
-				{
-					_executionMiddlewareName = value;
-					NotifyObservers();
+					try
+					{
+						observer.NotifyMiddlewareAdded(destinationName, middlewareName);
+					}
+					catch (Exception ex)
+					{
+						LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
+					}
 				}
 			}
+		}
+
+		public void SetCollectMiddleware<TMiddleware, TDestination>()
+			where TMiddleware : ICollectMiddleware
+			where TDestination : ILogDestination
+		{
+			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
+			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
+
+			SetCollectMiddleware(destinationName, middlewareName);
+		}
+
+		public void SetCollectMiddleware(string destinationName, string middlewareName)
+		{
+			CollectMiddlewares[destinationName] = middlewareName;
+
+			lock (_observerList)
+			{
+				foreach (var observer in _observerList)
+				{
+					try
+					{
+						observer.NotifyCollectMiddlewareChanged(destinationName, middlewareName);
+					}
+					catch (Exception ex)
+					{
+						LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
+					}
+				}
+			}
+		}
+
+		public IEnumerable<string> GetMiddlewareNames(string destinationName)
+		{
+			if (Middlewares.TryGetValue(destinationName, out var list))
+			{
+				return list;
+			}
+
+			return Array.Empty<string>();
+		}
+
+		public string GetCollectMiddlewareName(string destinationName)
+		{
+			if (CollectMiddlewares.TryGetValue(destinationName, out var entry))
+			{
+				return entry;
+			}
+
+			return LogConfigurationMapper.Instance.GetName<SyncCollectMiddleware>();
 		}
 
 		#region Configuration observers
 
-		private readonly List<IConfigurationObserver> _observerList = new List<IConfigurationObserver>();
+		private readonly List<IMiddlewareConfigurationObserver> _observerList = new List<IMiddlewareConfigurationObserver>();
+		private readonly List<ILogLevelObserver> _loglevelObserverList = new List<ILogLevelObserver>();
 
-		public void AttachObserver(IConfigurationObserver observer)
+		public void AttachObserver(IMiddlewareConfigurationObserver observer)
 		{
 			lock (_observerList)
 			{
@@ -80,211 +164,53 @@ namespace Najlot.Log
 			}
 		}
 
-		public void DetachObserver(IConfigurationObserver observer)
+		public void DetachObserver(IMiddlewareConfigurationObserver observer)
 		{
-			bool couldRemove;
-
 			lock (_observerList)
 			{
-				do
-				{
-					couldRemove = _observerList.Remove(observer);
-				}
-				while (couldRemove);
+				while (_observerList.Remove(observer)) ;
 			}
 		}
 
-		public void NotifyObservers()
+		public void AttachObserver(ILogLevelObserver observer)
 		{
-			foreach (var observer in _observerList)
+			lock (_loglevelObserverList)
 			{
-				observer.NotifyConfigurationChanged(this);
+				_loglevelObserverList.Add(observer);
+			}
+		}
+
+		public void DetachObserver(ILogLevelObserver observer)
+		{
+			lock (_loglevelObserverList)
+			{
+				while (_loglevelObserverList.Remove(observer)) ;
+			}
+		}
+
+		public void ClearMiddlewares(string destinationName)
+		{
+			if (Middlewares.TryGetValue(destinationName, out var list))
+			{
+				list.Clear();
+			}
+
+			lock (_observerList)
+			{
+				foreach (var observer in _observerList)
+				{
+					try
+					{
+						observer.NotifyClearMiddlewares(destinationName);
+					}
+					catch (Exception ex)
+					{
+						LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
+					}
+				}
 			}
 		}
 
 		#endregion Configuration observers
-
-		#region Format middleware
-
-		private readonly Dictionary<string, string> _formatMiddlewareNames = new Dictionary<string, string>();
-
-		public string GetFormatMiddlewareName(string name)
-		{
-			string middlewareName;
-
-			lock (_formatMiddlewareNames)
-			{
-				if (!_formatMiddlewareNames.TryGetValue(name, out middlewareName))
-				{
-					middlewareName = nameof(FormatMiddleware);
-					_formatMiddlewareNames.Add(name, middlewareName);
-				}
-			}
-
-			return middlewareName;
-		}
-
-		public IReadOnlyCollection<KeyValuePair<string, string>> GetFormatMiddlewares()
-		{
-			lock (_formatMiddlewareNames)
-			{
-				return new Dictionary<string, string>(_formatMiddlewareNames);
-			}
-		}
-
-		public void SetFormatMiddleware<TMiddleware>(string name) where TMiddleware : IFormatMiddleware, new()
-		{
-			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
-
-			if (string.IsNullOrEmpty(middlewareName))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
-				return;
-			}
-
-			if (!typeof(IFormatMiddleware).IsAssignableFrom(typeof(TMiddleware)))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IFormatMiddleware");
-				return;
-			}
-
-			lock (_formatMiddlewareNames)
-			{
-				if (!_formatMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
-				{
-					_formatMiddlewareNames.Add(name, middlewareName);
-					NotifyObservers();
-				}
-				else if (oldMiddlewareName != middlewareName)
-				{
-					_formatMiddlewareNames[name] = middlewareName;
-					NotifyObservers();
-				}
-			}
-		}
-
-		#endregion Format middleware
-
-		#region Queue middleware
-
-		private readonly Dictionary<string, string> _queueMiddlewareNames = new Dictionary<string, string>();
-
-		public string GetQueueMiddlewareName(string name)
-		{
-			string middlewareName;
-
-			lock (_queueMiddlewareNames)
-			{
-				if (!_queueMiddlewareNames.TryGetValue(name, out middlewareName))
-				{
-					middlewareName = nameof(NoQueueMiddleware);
-					_queueMiddlewareNames.Add(name, middlewareName);
-				}
-			}
-
-			return middlewareName;
-		}
-
-		public IReadOnlyCollection<KeyValuePair<string, string>> GetQueueMiddlewares()
-		{
-			lock (_queueMiddlewareNames)
-			{
-				return new Dictionary<string, string>(_queueMiddlewareNames);
-			}
-		}
-
-		public void SetQueueMiddleware<TMiddleware>(string name) where TMiddleware : IQueueMiddleware, new()
-		{
-			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
-
-			if (string.IsNullOrEmpty(middlewareName))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
-				return;
-			}
-
-			if (!typeof(IQueueMiddleware).IsAssignableFrom(typeof(TMiddleware)))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IQueueMiddleware");
-				return;
-			}
-
-			lock (_queueMiddlewareNames)
-			{
-				if (!_queueMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
-				{
-					_queueMiddlewareNames.Add(name, middlewareName);
-					NotifyObservers();
-				}
-				else if (oldMiddlewareName != middlewareName)
-				{
-					_queueMiddlewareNames[name] = middlewareName;
-					NotifyObservers();
-				}
-			}
-		}
-
-		#endregion Queue middleware
-
-		#region Filter middleware
-
-		private readonly Dictionary<string, string> _filterMiddlewareNames = new Dictionary<string, string>();
-
-		public string GetFilterMiddlewareName(string name)
-		{
-			string middlewareName;
-
-			lock (_filterMiddlewareNames)
-			{
-				if (!_filterMiddlewareNames.TryGetValue(name, out middlewareName))
-				{
-					middlewareName = nameof(NoFilterMiddleware);
-					_filterMiddlewareNames.Add(name, middlewareName);
-				}
-			}
-
-			return middlewareName;
-		}
-
-		public IReadOnlyCollection<KeyValuePair<string, string>> GetFilterMiddlewares()
-		{
-			lock (_filterMiddlewareNames)
-			{
-				return new Dictionary<string, string>(_filterMiddlewareNames);
-			}
-		}
-
-		public void SetFilterMiddleware<TMiddleware>(string name) where TMiddleware : IFilterMiddleware, new()
-		{
-			var middlewareName = LogConfigurationMapper.Instance.GetName(typeof(TMiddleware));
-
-			if (string.IsNullOrEmpty(middlewareName))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " is not registered");
-				return;
-			}
-
-			if (!typeof(IFilterMiddleware).IsAssignableFrom(typeof(TMiddleware)))
-			{
-				LogErrorHandler.Instance.Handle(typeof(TMiddleware).FullName + " does not implement IQueueMiddleware");
-				return;
-			}
-
-			lock (_filterMiddlewareNames)
-			{
-				if (!_filterMiddlewareNames.TryGetValue(name, out var oldMiddlewareName))
-				{
-					_filterMiddlewareNames.Add(name, middlewareName);
-					NotifyObservers();
-				}
-				else if (oldMiddlewareName != middlewareName)
-				{
-					_filterMiddlewareNames[name] = middlewareName;
-					NotifyObservers();
-				}
-			}
-		}
-
-		#endregion Filter middleware
 	}
 }
