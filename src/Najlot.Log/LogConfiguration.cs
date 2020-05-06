@@ -168,7 +168,11 @@ namespace Najlot.Log
 		{
 			lock (_observerList)
 			{
-				while (_observerList.Remove(observer)) ;
+				while (_observerList.Remove(observer))
+				{
+					// Remove returns true, if it could remove.
+					// -> Remove all
+				}
 			}
 		}
 
@@ -184,7 +188,11 @@ namespace Najlot.Log
 		{
 			lock (_loglevelObserverList)
 			{
-				while (_loglevelObserverList.Remove(observer)) ;
+				while (_loglevelObserverList.Remove(observer))
+				{
+					// Remove returns true, if it could remove.
+					// -> Remove all
+				}
 			}
 		}
 

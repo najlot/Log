@@ -32,7 +32,7 @@ namespace Najlot.Log.Tests
 
 				loggerFactory.AddNajlotLog((adminitrator) =>
 				{
-					logAdminitrator = adminitrator.AddConsoleLogDestination();
+					logAdminitrator = adminitrator.AddConsoleDestination();
 				});
 
 				logAdminitrator.SetLogLevel(LogLevel.Trace);
@@ -82,8 +82,8 @@ namespace Najlot.Log.Tests
 				loggerFactory.AddNajlotLog((admin) =>
 				{
 					admin.SetLogLevel(LogLevel.Trace)
-						.AddConsoleLogDestination(true)
-						.AddFileLogDestination(logFile);
+						.AddConsoleDestination(true)
+						.AddFileDestination(logFile);
 				});
 
 				var logger = loggerFactory.CreateLogger("default");
@@ -186,7 +186,7 @@ namespace Najlot.Log.Tests
 				loggerBuilder.AddNajlotLog((admin) =>
 				{
 					logAdminitrator = admin;
-					logAdminitrator.AddFileLogDestination(logFile);
+					logAdminitrator.AddFileDestination(logFile);
 				});
 			});
 

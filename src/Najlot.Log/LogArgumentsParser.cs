@@ -21,17 +21,7 @@ namespace Najlot.Log
 
 			if (_parsedKeyCache.TryGetValue(message, out var value))
 			{
-				var cached = new List<KeyValuePair<string, object>>(value);
-
-				for (int i = 0; i < cached.Count; i++)
-				{
-					if (i < args.Length)
-					{
-						cached[i] = new KeyValuePair<string, object>(cached[i].Key, args[i]);
-					}
-				}
-
-				return cached;
+				return CopyArgsToCached(args, value);
 			}
 
 			var arguments = new List<KeyValuePair<string, object>>();
@@ -80,6 +70,21 @@ namespace Najlot.Log
 
 			CacheArgumentKeys(message, arguments);
 			return arguments;
+		}
+
+		private static IReadOnlyList<KeyValuePair<string, object>> CopyArgsToCached(object[] args, KeyValuePair<string, object>[] value)
+		{
+			var cached = new List<KeyValuePair<string, object>>(value);
+
+			for (int i = 0; i < cached.Count; i++)
+			{
+				if (i < args.Length)
+				{
+					cached[i] = new KeyValuePair<string, object>(cached[i].Key, args[i]);
+				}
+			}
+
+			return cached;
 		}
 
 		private static void CacheArgumentKeys(string message, List<KeyValuePair<string, object>> arguments)

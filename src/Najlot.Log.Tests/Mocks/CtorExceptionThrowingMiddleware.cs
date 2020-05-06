@@ -10,7 +10,6 @@ namespace Najlot.Log.Tests.Mocks
 	[LogConfigurationName(nameof(CtorExceptionThrowingMiddleware))]
 	public sealed class CtorExceptionThrowingMiddleware : IMiddleware
 	{
-		private readonly Action<LogMessage> _logAction;
 		public IMiddleware NextMiddleware { get; set; }
 
 		public CtorExceptionThrowingMiddleware()

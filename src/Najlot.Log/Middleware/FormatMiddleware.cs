@@ -50,9 +50,7 @@ namespace Najlot.Log.Middleware
 			NextMiddleware.Execute(messages);
 		}
 
-		public void Flush()
-		{
-		}
+		public void Flush() => NextMiddleware?.Flush();
 
 		public void Dispose() => Flush();
 	}

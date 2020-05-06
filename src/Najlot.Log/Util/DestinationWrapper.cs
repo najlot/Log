@@ -18,6 +18,7 @@ namespace Najlot.Log.Util
 
 		public void Flush()
 		{
+			// NextMiddleware will be null and ILogDestination has no flush method
 		}
 
 		public void Dispose() => Flush();

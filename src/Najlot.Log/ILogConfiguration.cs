@@ -1,6 +1,7 @@
 ﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
+using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System.Collections.Generic;
 
@@ -19,15 +20,9 @@ namespace Najlot.Log
 
 		void AddMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : IMiddleware
-			where TDestination : Destinations.ILogDestination;
+			where TDestination : ILogDestination;
 
-		void SetCollectMiddleware<TMiddleware, TDestination>()
-			where TMiddleware : ICollectMiddleware
-			where TDestination : Destinations.ILogDestination;
-
-		IEnumerable<string> GetMiddlewareNames(string destinationName);
-
-		string GetCollectMiddlewareName(string destinationName);
+		void AddMiddleware(string destinationName, string middlewareName);
 
 		/// <summary>
 		/// Attaches an observer, that gets notified when changes occur
@@ -41,7 +36,7 @@ namespace Najlot.Log
 		/// <param name="observer">Observer to attach</param>
 		void AttachObserver(ILogLevelObserver observer);
 
-		IEnumerable<string> GetDestinationNames();
+		void ClearMiddlewares(string destinationName);
 
 		/// <summary>
 		/// Detaches the observer, so that it does not get notified anymore
@@ -55,9 +50,15 @@ namespace Najlot.Log
 		/// <param name="observer">Observer to detach</param>
 		void DetachObserver(ILogLevelObserver observer);
 
-		void ClearMiddlewares(string destinationName);
+		string GetCollectMiddlewareName(string destinationName);
 
-		void AddMiddleware(string destinationName, string middlewareName);
+		IEnumerable<string> GetDestinationNames();
+
+		IEnumerable<string> GetMiddlewareNames(string destinationName);
+
+		void SetCollectMiddleware<TMiddleware, TDestination>()
+			where TMiddleware : ICollectMiddleware
+			where TDestination : ILogDestination;
 
 		void SetCollectMiddleware(string destinationName, string middlewareName);
 	}

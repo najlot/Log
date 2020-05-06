@@ -10,7 +10,6 @@ namespace Najlot.Log.Tests.Mocks
 	[LogConfigurationName(nameof(ExecuteExceptionThrowingMiddleware))]
 	public sealed class ExecuteExceptionThrowingMiddleware : IMiddleware
 	{
-		private readonly Action<LogMessage> _logAction;
 		public IMiddleware NextMiddleware { get; set; }
 
 		public ExecuteExceptionThrowingMiddleware()
