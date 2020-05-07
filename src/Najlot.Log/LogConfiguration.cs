@@ -156,13 +156,7 @@ namespace Najlot.Log
 		private readonly List<IMiddlewareConfigurationObserver> _observerList = new List<IMiddlewareConfigurationObserver>();
 		private readonly List<ILogLevelObserver> _loglevelObserverList = new List<ILogLevelObserver>();
 
-		public void AttachObserver(IMiddlewareConfigurationObserver observer)
-		{
-			lock (_observerList)
-			{
-				_observerList.Add(observer);
-			}
-		}
+		
 
 		public void DetachObserver(IMiddlewareConfigurationObserver observer)
 		{
@@ -176,14 +170,6 @@ namespace Najlot.Log
 			}
 		}
 
-		public void AttachObserver(ILogLevelObserver observer)
-		{
-			lock (_loglevelObserverList)
-			{
-				_loglevelObserverList.Add(observer);
-			}
-		}
-
 		public void DetachObserver(ILogLevelObserver observer)
 		{
 			lock (_loglevelObserverList)
@@ -193,6 +179,22 @@ namespace Najlot.Log
 					// Remove returns true, if it could remove.
 					// -> Remove all
 				}
+			}
+		}
+
+		public void AttachObserver(IMiddlewareConfigurationObserver observer)
+		{
+			lock (_observerList)
+			{
+				_observerList.Add(observer);
+			}
+		}
+
+		public void AttachObserver(ILogLevelObserver observer)
+		{
+			lock (_loglevelObserverList)
+			{
+				_loglevelObserverList.Add(observer);
 			}
 		}
 
