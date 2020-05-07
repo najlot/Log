@@ -1,14 +1,14 @@
 ﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
+using Najlot.Log.Configuration.FileSource;
 using Najlot.Log.Middleware;
 using Najlot.Log.Tests.Mocks;
-using Najlot.Log.Configuration.FileSource;
-using Xunit;
-using System.Linq;
-using System.IO;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
+using Xunit;
 
 namespace Najlot.Log.Tests
 {
@@ -38,9 +38,9 @@ namespace Najlot.Log.Tests
 			using (var admin = LogAdministrator.CreateNew())
 			{
 				admin
-					.AddCustomDestination(new LogDestinationMock(m => { }))
-					.SetCollectMiddleware<ConcurrentCollectMiddleware, LogDestinationMock>()
-					.AddMiddleware<JsonFormatMiddleware, LogDestinationMock>()
+					.AddCustomDestination(new DestinationMock(m => { }))
+					.SetCollectMiddleware<ConcurrentCollectMiddleware, DestinationMock>()
+					.AddMiddleware<JsonFormatMiddleware, DestinationMock>()
 					.ReadConfigurationFromXmlFile(configName, false, true);
 			}
 
@@ -48,19 +48,19 @@ namespace Najlot.Log.Tests
 
 			using (var admin = LogAdministrator.CreateNew())
 			{
-				var name = LogConfigurationMapper.Instance.GetName<LogDestinationMock>();
+				var name = LogConfigurationMapper.Instance.GetName<DestinationMock>();
 				var concurrentCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<ConcurrentCollectMiddleware>();
 				var jsonFormatMiddlewareName = LogConfigurationMapper.Instance.GetName<JsonFormatMiddleware>();
 
 				admin
-					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.AddCustomDestination(new DestinationMock(m => { }))
 					.GetLogConfiguration(out var config);
 
 				// Standard should not be ConcurrentCollectMiddleware
 				Assert.NotEqual(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
 
 				admin.ReadConfigurationFromXmlFile(configName, true, false);
-				
+
 				Assert.Equal(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
 				Assert.Equal(jsonFormatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == jsonFormatMiddlewareName));
 			}
@@ -79,9 +79,9 @@ namespace Najlot.Log.Tests
 			using (var admin = LogAdministrator.CreateNew())
 			{
 				admin
-					.AddCustomDestination(new LogDestinationMock(m => { }))
-					.SetCollectMiddleware<ConcurrentCollectMiddleware, LogDestinationMock>()
-					.AddMiddleware<JsonFormatMiddleware, LogDestinationMock>()
+					.AddCustomDestination(new DestinationMock(m => { }))
+					.SetCollectMiddleware<ConcurrentCollectMiddleware, DestinationMock>()
+					.AddMiddleware<JsonFormatMiddleware, DestinationMock>()
 					.ReadConfigurationFromXmlFile(configName, false, true);
 			}
 
@@ -89,13 +89,13 @@ namespace Najlot.Log.Tests
 
 			using (var admin = LogAdministrator.CreateNew())
 			{
-				var name = LogConfigurationMapper.Instance.GetName<LogDestinationMock>();
+				var name = LogConfigurationMapper.Instance.GetName<DestinationMock>();
 				var concurrentCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<ConcurrentCollectMiddleware>();
 				var jsonFormatMiddlewareName = LogConfigurationMapper.Instance.GetName<JsonFormatMiddleware>();
 				var formatMiddlewareName = LogConfigurationMapper.Instance.GetName<FormatMiddleware>();
 
 				admin
-					.AddCustomDestination(new LogDestinationMock(m => { }))
+					.AddCustomDestination(new DestinationMock(m => { }))
 					.GetLogConfiguration(out var config);
 
 				// Standard should not be ConcurrentCollectMiddleware

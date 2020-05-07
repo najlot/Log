@@ -8,7 +8,7 @@ using System.Text;
 namespace Najlot.Log.Middleware
 {
 	/// <summary>
-	/// Serialises LogMessage to a single line json string.
+	/// Serialises a message to a single line json string
 	/// </summary>
 	[LogConfigurationName(nameof(JsonFormatMiddleware))]
 	public sealed class JsonFormatMiddleware : IMiddleware

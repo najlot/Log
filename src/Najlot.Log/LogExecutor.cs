@@ -9,7 +9,7 @@ using System.Threading;
 namespace Najlot.Log
 {
 	/// <summary>
-	/// Internal class for multiple log destinations
+	/// Internal class for handling multiple destinations
 	/// </summary>
 	internal class LogExecutor : IDisposable
 	{
@@ -46,7 +46,7 @@ namespace Najlot.Log
 			var state = _currentState.Value;
 			var time = DateTime.Now;
 
-			foreach (var entry in _loggerPool.GetLogDestinations())
+			foreach (var entry in _loggerPool.GetDestinations())
 			{
 				try
 				{

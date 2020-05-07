@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Helps to deal with type to name mapping
+	/// </summary>
 	public class LogConfigurationMapper
 	{
 		public static LogConfigurationMapper Instance { get; } = new LogConfigurationMapper();

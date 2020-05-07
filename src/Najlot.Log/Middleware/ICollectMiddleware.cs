@@ -5,6 +5,9 @@ using System;
 
 namespace Najlot.Log.Middleware
 {
+	/// <summary>
+	/// Common interface for a middleware that collects messages from different threads
+	/// </summary>
 	public interface ICollectMiddleware : IDisposable
 	{
 		IMiddleware NextMiddleware { get; set; }

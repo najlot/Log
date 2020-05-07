@@ -11,20 +11,6 @@ using System.Xml.Serialization;
 
 namespace Najlot.Log.Configuration.FileSource
 {
-	public class Configurations
-	{
-		public LogLevel LogLevel { get; set; }
-
-		public List<DestinationEntry> Destinations { get; set; } = new List<DestinationEntry>();
-	}
-
-	public class DestinationEntry
-	{
-		public string DestinationName { get; set; }
-		public string CollectMiddlewareName { get; set; }
-		public List<string> MiddlewareNames { get; set; }
-	}
-
 	public static class LogConfiguratorExtension
 	{
 		private static void WriteXmlConfigurationFile(LogAdministrator logAdminitrator, string path)
@@ -102,7 +88,7 @@ namespace Najlot.Log.Configuration.FileSource
 				{
 					var dir = Path.GetDirectoryName(path);
 
-					if (dir == "")
+					if (string.IsNullOrWhiteSpace(dir))
 					{
 						dir = Directory.GetCurrentDirectory();
 					}

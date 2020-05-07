@@ -34,16 +34,14 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void CheckIsLogLevelEnabled()
 		{
-			using (var logAdminitrator = LogAdministrator.CreateNew())
-			{
-				logAdminitrator.SetLogLevel(LogLevel.Warn);
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.SetLogLevel(LogLevel.Warn);
 
-				var logger = logAdminitrator.GetLogger(GetType());
+			var logger = logAdminitrator.GetLogger(GetType());
 
-				Assert.False(logger.IsEnabled(LogLevel.Info));
-				Assert.True(logger.IsEnabled(LogLevel.Warn));
-				Assert.True(logger.IsEnabled(LogLevel.Error));
-			}
+			Assert.False(logger.IsEnabled(LogLevel.Info));
+			Assert.True(logger.IsEnabled(LogLevel.Warn));
+			Assert.True(logger.IsEnabled(LogLevel.Error));
 		}
 
 		[Fact]
@@ -52,50 +50,48 @@ namespace Najlot.Log.Tests
 			var gotLogMessage = false;
 			var shouldGetMessage = true;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.SetLogLevel(LogLevel.Fatal)
+.AddCustomDestination(new DestinationMock(msg =>
+{
+	gotLogMessage = true;
+}));
+
+			var log = logAdminitrator.GetLogger(GetType());
+
+			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Fatal)
-					.AddCustomDestination(new LogDestinationMock(msg =>
-					{
-						gotLogMessage = true;
-					}));
+				logAdminitrator.SetLogLevel(logLevel);
 
-				var log = logAdminitrator.GetLogger(GetType());
+				shouldGetMessage = logLevel <= LogLevel.Trace;
+				log.Trace("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
+				gotLogMessage = false;
 
-				foreach (var logLevel in _logLevels)
-				{
-					logAdminitrator.SetLogLevel(logLevel);
+				shouldGetMessage = logLevel <= LogLevel.Debug;
+				log.Debug("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Trace;
-					log.Trace("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Info;
+				log.Info("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Debug;
-					log.Debug("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Warn;
+				log.Warn("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Info;
-					log.Info("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Error;
+				log.Error("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Warn;
-					log.Warn("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Error;
-					log.Error("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Fatal;
-					log.Fatal("");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
-					gotLogMessage = false;
-				}
+				shouldGetMessage = logLevel <= LogLevel.Fatal;
+				log.Fatal("");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
+				gotLogMessage = false;
 			}
 		}
 
@@ -105,51 +101,49 @@ namespace Najlot.Log.Tests
 			var gotLogMessage = false;
 			var shouldGetMessage = true;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.SetLogLevel(LogLevel.Fatal)
+.AddCustomDestination(new DestinationMock(msg =>
+{
+	gotLogMessage = true;
+}));
+
+			var log = logAdminitrator.GetLogger(GetType());
+			var obj = new object();
+
+			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Fatal)
-					.AddCustomDestination(new LogDestinationMock(msg =>
-					{
-						gotLogMessage = true;
-					}));
+				logAdminitrator.SetLogLevel(logLevel);
 
-				var log = logAdminitrator.GetLogger(GetType());
-				var obj = new object();
+				shouldGetMessage = logLevel <= LogLevel.Trace;
+				log.Trace(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
+				gotLogMessage = false;
 
-				foreach (var logLevel in _logLevels)
-				{
-					logAdminitrator.SetLogLevel(logLevel);
+				shouldGetMessage = logLevel <= LogLevel.Debug;
+				log.Debug(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Trace;
-					log.Trace(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Info;
+				log.Info(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Debug;
-					log.Debug(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Warn;
+				log.Warn(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Info;
-					log.Info(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Error;
+				log.Error(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Warn;
-					log.Warn(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Error;
-					log.Error(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Fatal;
-					log.Fatal(obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
-					gotLogMessage = false;
-				}
+				shouldGetMessage = logLevel <= LogLevel.Fatal;
+				log.Fatal(obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
+				gotLogMessage = false;
 			}
 		}
 
@@ -160,51 +154,49 @@ namespace Najlot.Log.Tests
 			var shouldGetMessage = true;
 			var ex = new Exception("Something bad happened!");
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.SetLogLevel(LogLevel.Fatal)
+.AddCustomDestination(new DestinationMock(msg =>
+{
+	gotLogMessage = true;
+}));
+
+			var log = logAdminitrator.GetLogger(GetType());
+			var obj = new object();
+
+			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Fatal)
-					.AddCustomDestination(new LogDestinationMock(msg =>
-					{
-						gotLogMessage = true;
-					}));
+				logAdminitrator.SetLogLevel(logLevel);
 
-				var log = logAdminitrator.GetLogger(GetType());
-				var obj = new object();
+				shouldGetMessage = logLevel <= LogLevel.Trace;
+				log.Trace(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
+				gotLogMessage = false;
 
-				foreach (var logLevel in _logLevels)
-				{
-					logAdminitrator.SetLogLevel(logLevel);
+				shouldGetMessage = logLevel <= LogLevel.Debug;
+				log.Debug(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Trace;
-					log.Trace(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Info;
+				log.Info(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Debug;
-					log.Debug(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Warn;
+				log.Warn(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Info;
-					log.Info(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Error;
+				log.Error(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Warn;
-					log.Warn(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Error;
-					log.Error(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Fatal;
-					log.Fatal(ex, obj);
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
-					gotLogMessage = false;
-				}
+				shouldGetMessage = logLevel <= LogLevel.Fatal;
+				log.Fatal(ex, obj);
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
+				gotLogMessage = false;
 			}
 		}
 
@@ -215,51 +207,49 @@ namespace Najlot.Log.Tests
 			var shouldGetMessage = true;
 			var ex = new Exception("Something bad happened!");
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.SetLogLevel(LogLevel.Fatal)
+.AddCustomDestination(new DestinationMock(msg =>
+{
+	gotLogMessage = true;
+}));
+
+			var log = logAdminitrator.GetLogger(GetType());
+			var obj = new object();
+
+			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Fatal)
-					.AddCustomDestination(new LogDestinationMock(msg =>
-					{
-						gotLogMessage = true;
-					}));
+				logAdminitrator.SetLogLevel(logLevel);
 
-				var log = logAdminitrator.GetLogger(GetType());
-				var obj = new object();
+				shouldGetMessage = logLevel <= LogLevel.Trace;
+				log.Trace(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
+				gotLogMessage = false;
 
-				foreach (var logLevel in _logLevels)
-				{
-					logAdminitrator.SetLogLevel(logLevel);
+				shouldGetMessage = logLevel <= LogLevel.Debug;
+				log.Debug(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Trace;
-					log.Trace(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Info;
+				log.Info(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Debug;
-					log.Debug(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Debug message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Warn;
+				log.Warn(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Info;
-					log.Info(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Info message");
-					gotLogMessage = false;
+				shouldGetMessage = logLevel <= LogLevel.Error;
+				log.Error(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
+				gotLogMessage = false;
 
-					shouldGetMessage = logLevel <= LogLevel.Warn;
-					log.Warn(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Warn message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Error;
-					log.Error(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Error message");
-					gotLogMessage = false;
-
-					shouldGetMessage = logLevel <= LogLevel.Fatal;
-					log.Fatal(ex, "");
-					Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
-					gotLogMessage = false;
-				}
+				shouldGetMessage = logLevel <= LogLevel.Fatal;
+				log.Fatal(ex, "");
+				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Fatal message");
+				gotLogMessage = false;
 			}
 		}
 	}

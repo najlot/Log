@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Najlot.Log.Configuration.FileSource
 {
+	/// <summary>
+	/// StringWriter that allows to change its encoding
+	/// </summary>
 	internal sealed class CustomStringWriter : StringWriter
 	{
 		private readonly Encoding _encoding;

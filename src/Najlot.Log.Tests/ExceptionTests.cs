@@ -33,8 +33,8 @@ namespace Najlot.Log.Tests
 
 			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.AddCustomDestination(new LogDestinationMock((message) => { }));
-				logAdminitrator.AddMiddleware<ExecuteExceptionThrowingMiddleware, LogDestinationMock>();
+				logAdminitrator.AddCustomDestination(new DestinationMock((message) => { }));
+				logAdminitrator.AddMiddleware<ExecuteExceptionThrowingMiddleware, DestinationMock>();
 
 				Assert.False(gotError);
 				logAdminitrator.GetLogger(GetType()).Error("");
@@ -58,9 +58,9 @@ namespace Najlot.Log.Tests
 
 			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.AddCustomDestination(new LogDestinationMock((message) => { }));
+				logAdminitrator.AddCustomDestination(new DestinationMock((message) => { }));
 				Assert.False(gotError);
-				logAdminitrator.AddMiddleware<CtorExceptionThrowingMiddleware, LogDestinationMock>();
+				logAdminitrator.AddMiddleware<CtorExceptionThrowingMiddleware, DestinationMock>();
 				Assert.True(gotError);
 			}
 
@@ -81,7 +81,7 @@ namespace Najlot.Log.Tests
 
 			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.AddCustomDestination(new LogDestinationMock((message) => throw new System.Exception()));
+				logAdminitrator.AddCustomDestination(new DestinationMock((message) => throw new System.Exception()));
 
 				Assert.False(gotError);
 				logAdminitrator.GetLogger(GetType()).Info("");

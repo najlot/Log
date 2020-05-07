@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Helps to work with structured messages
+	/// </summary>
 	public static class LogArgumentsParser
 	{
 		private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> _parsedKeyCache = new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
@@ -69,6 +72,7 @@ namespace Najlot.Log
 			while (endIndex != -1);
 
 			CacheArgumentKeys(message, arguments);
+
 			return arguments;
 		}
 

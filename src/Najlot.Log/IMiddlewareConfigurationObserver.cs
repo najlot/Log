@@ -3,6 +3,9 @@
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Interface for an observer that reacts to changes to middlewares
+	/// </summary>
 	public interface IMiddlewareConfigurationObserver
 	{
 		void NotifyCollectMiddlewareChanged(string destinationName, string middlewareName);

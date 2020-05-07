@@ -8,6 +8,10 @@ using System.Threading;
 
 namespace Najlot.Log.Middleware
 {
+	/// <summary>
+	/// Middleware that collects messages from different threads
+	/// and pass them to the next middleware on an other thread
+	/// </summary>
 	[LogConfigurationName(nameof(ConcurrentCollectMiddleware))]
 	public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 	{

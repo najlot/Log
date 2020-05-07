@@ -5,8 +5,17 @@ using System;
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Common logger interface
+	/// </summary>
 	public interface ILogger : IDisposable
 	{
+		/// <summary>
+		/// Starts a new scope that ends when you dispose the return value
+		/// </summary>
+		/// <typeparam name="T">Generic type</typeparam>
+		/// <param name="state">Scope itself, will be converted to string</param>
+		/// <returns></returns>
 		IDisposable BeginScope<T>(T state);
 
 		void Trace<T>(T o);

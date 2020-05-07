@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	[LogConfigurationName(nameof(LogDestinationMock))]
-	public sealed class LogDestinationMock : ILogDestination
+	[LogConfigurationName(nameof(DestinationMock))]
+	public sealed class DestinationMock : IDestination
 	{
 		private readonly Action<LogMessage> _logAction;
 
-		public LogDestinationMock(Action<LogMessage> logAction)
+		public DestinationMock(Action<LogMessage> logAction)
 		{
 			_logAction = logAction;
 		}

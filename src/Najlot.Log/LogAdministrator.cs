@@ -8,7 +8,7 @@ using System;
 namespace Najlot.Log
 {
 	/// <summary>
-	/// Class to help the user to configure log destinations, execution middleware, log level etc.
+	/// Class to help the user to configure destinations, middlewares, log level etc.
 	/// </summary>
 	public class LogAdministrator : IDisposable
 	{
@@ -50,30 +50,30 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdministrator AddConsoleDestination(bool useColors = false)
 		{
-			var logDestination = new ConsoleDestination(useColors);
-			return AddCustomDestination(logDestination);
+			var destination = new ConsoleDestination(useColors);
+			return AddCustomDestination(destination);
 		}
 
 		/// <summary>
 		/// Adds a custom destination.
 		/// All destinations will be used when creating a logger from a LoggerPool.
 		/// </summary>
-		/// <param name="logDestination">Instance of the new destination</param>
+		/// <param name="destination">Instance of the new destination</param>
 		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogAdministrator AddCustomDestination(ILogDestination logDestination)
+		public LogAdministrator AddCustomDestination(IDestination destination)
 		{
-			if (logDestination == null)
+			if (destination == null)
 			{
-				throw new ArgumentNullException(nameof(logDestination));
+				throw new ArgumentNullException(nameof(destination));
 			}
 
-			_loggerPool.AddLogDestination(logDestination);
+			_loggerPool.AddDestination(destination);
 
 			return this;
 		}
 
-		/// Adds a FileLogDestination that calculates the path
+		/// Adds a FileDestination that calculates the path
 		/// </summary>
 		/// <param name="getFileName">Function to calculate the path</param>
 		/// <param name="formatFunction">Function to customize the output</param>
@@ -82,12 +82,12 @@ namespace Najlot.Log
 		/// <returns></returns>
 		public LogAdministrator AddFileDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
 		{
-			var logDestination = new FileDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
-			return AddCustomDestination(logDestination);
+			var destination = new FileDestination(getFileName, maxFiles, logFilePaths, keepFileOpen);
+			return AddCustomDestination(destination);
 		}
 
 		/// <summary>
-		/// Adds a FileLogDestination that uses a constant path
+		/// Adds a FileDestination that uses a constant path
 		/// </summary>
 		/// <param name="fileName">Path to the file</param>
 		/// <param name="formatFunction">Function to customize the output</param>
@@ -99,7 +99,7 @@ namespace Najlot.Log
 
 		public LogAdministrator AddMiddleware<TMiddleware, TDestination>()
 					where TMiddleware : IMiddleware
-					where TDestination : ILogDestination
+					where TDestination : IDestination
 		{
 			_logConfiguration.AddMiddleware<TMiddleware, TDestination>();
 			return this;
@@ -149,7 +149,7 @@ namespace Najlot.Log
 
 		public LogAdministrator SetCollectMiddleware<TMiddleware, TDestination>()
 							where TMiddleware : ICollectMiddleware
-			where TDestination : ILogDestination
+			where TDestination : IDestination
 		{
 			_logConfiguration.SetCollectMiddleware<TMiddleware, TDestination>();
 			return this;

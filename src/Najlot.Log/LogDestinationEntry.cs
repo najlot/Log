@@ -8,30 +8,30 @@ using System;
 
 namespace Najlot.Log
 {
-	internal sealed class LogDestinationEntry : IMiddlewareConfigurationObserver, IDisposable
+	internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisposable
 	{
-		public string LogDestinationName;
-		public ILogDestination LogDestination;
+		public string DestinationName;
+		public IDestination Destination;
 
 		public string CollectMiddlewareName;
 		public ICollectMiddleware CollectMiddleware;
 
 		public void NotifyCollectMiddlewareChanged(string destinationName, string middlewareName)
 		{
-			if (LogDestinationName != destinationName)
+			if (DestinationName != destinationName)
 			{
 				return;
 			}
 
 			CollectMiddlewareName = middlewareName;
 			var oldCollectMiddleware = CollectMiddleware;
-			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, LogDestination);
+			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, Destination);
 			oldCollectMiddleware?.Dispose();
 		}
 
 		public void NotifyMiddlewareAdded(string destinationName, string middlewareName)
 		{
-			if (LogDestinationName != destinationName)
+			if (DestinationName != destinationName)
 			{
 				return;
 			}
@@ -73,13 +73,13 @@ namespace Najlot.Log
 
 		public void NotifyClearMiddlewares(string destinationName)
 		{
-			if (LogDestinationName != destinationName)
+			if (DestinationName != destinationName)
 			{
 				return;
 			}
 
 			var oldCollectMiddleware = CollectMiddleware;
-			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, LogDestination);
+			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, Destination);
 			DisposeMiddlewares(oldCollectMiddleware);
 		}
 
@@ -104,12 +104,14 @@ namespace Najlot.Log
 		/// - Destination
 		/// </summary>
 		/// <param name="collectMiddlewareName">Name of the CollectMiddleware to create and return</param>
-		/// <param name="logDestination">Destination to append at the end</param>
+		/// <param name="destination">Destination to append at the end</param>
 		/// <returns></returns>
-		private static ICollectMiddleware BuildInitialMiddlewarePipe(string collectMiddlewareName, ILogDestination logDestination)
+		private static ICollectMiddleware BuildInitialMiddlewarePipe(string collectMiddlewareName, IDestination destination)
 		{
-			var middleware = new FormatMiddleware();
-			middleware.NextMiddleware = new DestinationWrapper(logDestination);
+			var middleware = new FormatMiddleware
+			{
+				NextMiddleware = new DestinationWrapper(destination)
+			};
 
 			var collectMiddlewareType = LogConfigurationMapper.Instance.GetType(collectMiddlewareName);
 			var collectMiddleware = (ICollectMiddleware)Activator.CreateInstance(collectMiddlewareType);
@@ -131,7 +133,7 @@ namespace Najlot.Log
 				if (disposing)
 				{
 					DisposeMiddlewares(CollectMiddleware);
-					LogDestination.Dispose();
+					Destination.Dispose();
 				}
 			}
 		}

@@ -2,6 +2,9 @@
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Global handler for loging errors
+	/// </summary>
 	public sealed class LogErrorHandler
 	{
 		public static LogErrorHandler Instance { get; } = new LogErrorHandler();

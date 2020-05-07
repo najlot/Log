@@ -6,6 +6,9 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Middleware
 {
+	/// <summary>
+	/// Common interface for a middleware in the logging-pipeline
+	/// </summary>
 	public interface IMiddleware : IDisposable
 	{
 		IMiddleware NextMiddleware { get; set; }

@@ -5,6 +5,10 @@ using System;
 
 namespace Najlot.Log.Util
 {
+	/// <summary>
+	/// Class to run a function on dispose.
+	/// Used for managing scopes.
+	/// </summary>
 	internal sealed class OnDisposeExcecutor : IDisposable
 	{
 		private readonly Action _action;

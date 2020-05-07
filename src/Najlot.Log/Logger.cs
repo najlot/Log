@@ -7,7 +7,7 @@ namespace Najlot.Log
 {
 	/// <summary>
 	/// Class to be used for logging.
-	/// Can bundle multiple log destinations and decides whether the message should be logged
+	/// Can bundle multiple destinations and decides whether the message should be logged depending on the loglevel
 	/// </summary>
 	public sealed class Logger : ILogger, ILogLevelObserver
 	{

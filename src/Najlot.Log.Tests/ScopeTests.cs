@@ -28,42 +28,40 @@ namespace Najlot.Log.Tests
 			bool scopesAreCorrect = true;
 			object state = null;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using var logAdminitrator = LogAdministrator.CreateNew();
+			logAdminitrator.AddCustomDestination(new DestinationMock((msg) =>
 			{
-				logAdminitrator.AddCustomDestination(new LogDestinationMock((msg) =>
+				if (!scopesAreCorrect) return;
+				state = msg.State;
+				scopesAreCorrect = msg.RawMessage == state?.ToString();
+			}));
+
+			var log = logAdminitrator.GetLogger(GetType());
+
+			using (log.BeginScope("scope 1"))
+			{
+				log.Info("scope 1");
+
+				using (log.BeginScope("scope 2"))
 				{
-					if (!scopesAreCorrect) return;
-					state = msg.State;
-					scopesAreCorrect = msg.RawMessage == state?.ToString();
-				}));
+					log.Info("scope 2");
+					log.Info("scope 2");
 
-				var log = logAdminitrator.GetLogger(GetType());
-
-				using (log.BeginScope("scope 1"))
-				{
-					log.Info("scope 1");
-
-					using (log.BeginScope("scope 2"))
+					using (log.BeginScope("scope 3"))
 					{
-						log.Info("scope 2");
-						log.Info("scope 2");
-
-						using (log.BeginScope("scope 3"))
-						{
-							log.Info("scope 3");
-						}
-
-						log.Info("scope 2");
+						log.Info("scope 3");
 					}
 
-					log.Info("scope 1");
+					log.Info("scope 2");
 				}
 
-				Assert.True(scopesAreCorrect, "scopes are not correct");
-
-				log.Info("out of scope");
-				Assert.Null(state);
+				log.Info("scope 1");
 			}
+
+			Assert.True(scopesAreCorrect, "scopes are not correct");
+
+			log.Info("out of scope");
+			Assert.Null(state);
 		}
 
 		[Fact]
@@ -74,7 +72,7 @@ namespace Najlot.Log.Tests
 			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
 				logAdminitrator.SetLogLevel(LogLevel.Info)
-					.AddCustomDestination(new LogDestinationMock((msg) =>
+					.AddCustomDestination(new DestinationMock((msg) =>
 					{
 						if (Environment.CurrentManagedThreadId != (int)msg.State)
 						{
@@ -107,7 +105,7 @@ namespace Najlot.Log.Tests
 			using (var logAdminitrator = LogAdministrator.CreateNew())
 			{
 				logAdminitrator.SetLogLevel(LogLevel.Info)
-					.AddCustomDestination(new LogDestinationMock((msg) =>
+					.AddCustomDestination(new DestinationMock((msg) =>
 					{
 						// state must be the same thread id the message comes from
 						if (msg.RawMessage != msg.State.ToString())

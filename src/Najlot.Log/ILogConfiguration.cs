@@ -20,7 +20,7 @@ namespace Najlot.Log
 
 		void AddMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : IMiddleware
-			where TDestination : ILogDestination;
+			where TDestination : IDestination;
 
 		void AddMiddleware(string destinationName, string middlewareName);
 
@@ -58,7 +58,7 @@ namespace Najlot.Log
 
 		void SetCollectMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : ICollectMiddleware
-			where TDestination : ILogDestination;
+			where TDestination : IDestination;
 
 		void SetCollectMiddleware(string destinationName, string middlewareName);
 	}

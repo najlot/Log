@@ -9,7 +9,7 @@ namespace Najlot.Log.Destinations
 	/// <summary>
 	/// Common interface for all destinations
 	/// </summary>
-	public interface ILogDestination : IDisposable
+	public interface IDestination : IDisposable
 	{
 		/// <summary>
 		/// Tells the destination to log the messages

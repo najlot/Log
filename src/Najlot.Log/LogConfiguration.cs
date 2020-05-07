@@ -61,7 +61,7 @@ namespace Najlot.Log
 
 		public void AddMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : IMiddleware
-			where TDestination : ILogDestination
+			where TDestination : IDestination
 		{
 			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
 			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
@@ -103,7 +103,7 @@ namespace Najlot.Log
 
 		public void SetCollectMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : ICollectMiddleware
-			where TDestination : ILogDestination
+			where TDestination : IDestination
 		{
 			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
 			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();

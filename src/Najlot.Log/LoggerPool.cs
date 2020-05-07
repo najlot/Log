@@ -19,8 +19,8 @@ namespace Najlot.Log
 		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
 
 		private readonly ILogConfiguration _logConfiguration;
-		private List<LogDestinationEntry> _logDestinations = new List<LogDestinationEntry>();
-		private readonly List<LogDestinationEntry> _pendingLogDestinations = new List<LogDestinationEntry>();
+		private List<DestinationEntry> _destinations = new List<DestinationEntry>();
+		private readonly List<DestinationEntry> _pendingDestinations = new List<DestinationEntry>();
 		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 		private bool _hasLogdestinationsPending = false;
 
@@ -29,27 +29,27 @@ namespace Najlot.Log
 			_logConfiguration = logConfiguration;
 		}
 
-		internal void AddLogDestination<T>(T logDestination) where T : ILogDestination
+		internal void AddDestination<T>(T destination) where T : IDestination
 		{
-			var entry = CreateLogDestinationEntry(logDestination);
+			var entry = CreateDestinationEntry(destination);
 
 			_logConfiguration.AttachObserver(entry);
 
-			lock (_pendingLogDestinations) _pendingLogDestinations.Add(entry);
+			lock (_pendingDestinations) _pendingDestinations.Add(entry);
 
 			_hasLogdestinationsPending = true;
 		}
 
-		private LogDestinationEntry CreateLogDestinationEntry<T>(T logDestination) where T : ILogDestination
+		private DestinationEntry CreateDestinationEntry<T>(T destination) where T : IDestination
 		{
 			var mapper = LogConfigurationMapper.Instance;
 
-			var destinationName = mapper.GetName(logDestination);
+			var destinationName = mapper.GetName(destination);
 
-			var entry = new LogDestinationEntry()
+			var entry = new DestinationEntry()
 			{
-				LogDestination = logDestination,
-				LogDestinationName = destinationName,
+				Destination = destination,
+				DestinationName = destinationName,
 			};
 
 			var collectMiddlewareName = _logConfiguration.GetCollectMiddlewareName(destinationName);
@@ -65,33 +65,33 @@ namespace Najlot.Log
 			return entry;
 		}
 
-		internal IEnumerable<LogDestinationEntry> GetLogDestinations()
+		internal IEnumerable<DestinationEntry> GetDestinations()
 		{
 			if (_hasLogdestinationsPending)
 			{
-				lock (_pendingLogDestinations)
+				lock (_pendingDestinations)
 				{
 					if (_hasLogdestinationsPending)
 					{
-						_logDestinations = new List<LogDestinationEntry>(_logDestinations);
+						_destinations = new List<DestinationEntry>(_destinations);
 
-						foreach (var destination in _pendingLogDestinations)
+						foreach (var destination in _pendingDestinations)
 						{
-							_logDestinations.Add(destination);
+							_destinations.Add(destination);
 						}
 
-						_pendingLogDestinations.Clear();
+						_pendingDestinations.Clear();
 						_hasLogdestinationsPending = false;
 					}
 				}
 			}
 
-			return _logDestinations;
+			return _destinations;
 		}
 
 		internal void Flush()
 		{
-			foreach (var entry in GetLogDestinations())
+			foreach (var entry in GetDestinations())
 			{
 				entry.CollectMiddleware.Flush();
 
@@ -149,13 +149,13 @@ namespace Najlot.Log
 
 					_loggerCache.Clear();
 
-					foreach (var destination in GetLogDestinations())
+					foreach (var destination in GetDestinations())
 					{
 						destination.Dispose();
 					}
 
-					_logDestinations.Clear();
-					_logDestinations = null;
+					_destinations.Clear();
+					_destinations = null;
 				}
 			}
 		}

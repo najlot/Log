@@ -7,29 +7,30 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	[LogConfigurationName(nameof(DestinationMock))]
-	public sealed class MiddlewareMock : IMiddleware
+	public sealed class ActionMiddleware : IMiddleware
 	{
-		private readonly Action<LogMessage> _logAction;
+		private readonly Action<IEnumerable<LogMessage>> _action;
+
 		public IMiddleware NextMiddleware { get; set; }
 
-		public MiddlewareMock(Action<LogMessage> logAction)
+		public ActionMiddleware(Action<IEnumerable<LogMessage>> action)
 		{
-			_logAction = logAction;
+			_action = action;
+		}
+
+		public void Dispose()
+		{
+			// nothing to do
 		}
 
 		public void Execute(IEnumerable<LogMessage> messages)
 		{
-			foreach (var message in messages)
-			{
-				_logAction(message);
-			}
+			_action(messages);
 		}
 
 		public void Flush()
 		{
+			// nothing to do
 		}
-
-		public void Dispose() => Flush();
 	}
 }

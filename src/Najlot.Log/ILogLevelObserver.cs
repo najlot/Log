@@ -3,6 +3,9 @@
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Interface for an observer that reacts when LogLevel changes
+	/// </summary>
 	public interface ILogLevelObserver
 	{
 		void NotifyLogLevelChanged(LogLevel logLevel);

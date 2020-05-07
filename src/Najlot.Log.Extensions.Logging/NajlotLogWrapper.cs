@@ -44,6 +44,11 @@ namespace Najlot.Log.Extensions.Logging
 					}
 				}
 
+				if (format == "Unknown")
+				{
+					format = state.ToString();
+				}
+
 				switch (logLevel)
 				{
 					case Microsoft.Extensions.Logging.LogLevel.Trace:

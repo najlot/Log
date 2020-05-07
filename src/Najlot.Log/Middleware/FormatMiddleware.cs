@@ -6,6 +6,9 @@ using System.Globalization;
 
 namespace Najlot.Log.Middleware
 {
+	/// <summary>
+	/// Default middleware for formatting messages
+	/// </summary>
 	[LogConfigurationName(nameof(FormatMiddleware))]
 	public sealed class FormatMiddleware : IMiddleware
 	{

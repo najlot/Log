@@ -3,6 +3,9 @@
 
 namespace Najlot.Log
 {
+	/// <summary>
+	/// Enum containing possible loglevels
+	/// </summary>
 	public enum LogLevel
 	{
 		/// <summary>

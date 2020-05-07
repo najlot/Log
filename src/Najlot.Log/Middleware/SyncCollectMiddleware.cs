@@ -3,6 +3,11 @@
 
 namespace Najlot.Log.Middleware
 {
+	/// <summary>
+	/// Middleware, that collects messages from different threads
+	/// and passes them further to the next middleware.
+	/// Caution: The calls block until finished and allow only one execution at a time (using lock)
+	/// </summary>
 	[LogConfigurationName(nameof(SyncCollectMiddleware))]
 	public sealed class SyncCollectMiddleware : ICollectMiddleware
 	{
