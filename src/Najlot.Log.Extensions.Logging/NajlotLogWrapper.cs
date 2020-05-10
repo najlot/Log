@@ -1,4 +1,4 @@
-﻿// Licensed under the MIT License. 
+﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ namespace Najlot.Log.Extensions.Logging
 
 		public NajlotLogWrapper(Logger logger)
 		{
-			this._logger = logger;
+			_logger = logger;
 		}
 
 		public IDisposable BeginScope<TState>(TState state)
@@ -42,6 +42,11 @@ namespace Najlot.Log.Extensions.Logging
 						args.Remove(value);
 						break;
 					}
+				}
+
+				if (format == "Unknown")
+				{
+					format = state.ToString();
 				}
 
 				switch (logLevel)
