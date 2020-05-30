@@ -11,7 +11,7 @@ namespace Najlot.Log.Util
 	/// Pops states back on dispose
 	/// Used for managing scopes.
 	/// </summary>
-	internal class DisposableState : IDisposable
+	internal sealed class DisposableState : IDisposable
 	{
 		private readonly ThreadLocal<object> _currentState;
 		private readonly Stack<object> _states;
