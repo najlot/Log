@@ -2,20 +2,24 @@
 // See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace Najlot.Log.Util
 {
 	/// <summary>
-	/// Class to run a function on dispose.
+	/// Pops states back on dispose
 	/// Used for managing scopes.
 	/// </summary>
-	internal sealed class OnDisposeExcecutor : IDisposable
+	internal class DisposableState : IDisposable
 	{
-		private readonly Action _action;
+		private readonly ThreadLocal<object> _currentState;
+		private readonly Stack<object> _states;
 
-		public OnDisposeExcecutor(Action action)
+		public DisposableState(ThreadLocal<object> state, Stack<object> states)
 		{
-			_action = action;
+			_currentState = state;
+			_states = states;
 		}
 
 		#region IDisposable Support
@@ -27,7 +31,7 @@ namespace Najlot.Log.Util
 			if (!_disposedValue)
 			{
 				_disposedValue = true;
-				_action();
+				_currentState.Value = _states.Pop();
 			}
 		}
 

@@ -25,7 +25,7 @@ namespace Najlot.Log
 			states.Push(_currentState.Value);
 			_currentState.Value = state;
 
-			return new OnDisposeExcecutor(() => _currentState.Value = states.Pop());
+			return new DisposableState(_currentState, states);
 		}
 
 		#endregion State Support
