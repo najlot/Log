@@ -55,6 +55,18 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
+		/// Adds a destination that puts the requests on an HTTP server
+		/// </summary>
+		/// <param name="url">Url of the server</param>
+		/// <param name="token">Authentication token</param>
+		/// <returns></returns>
+		public LogAdministrator AddHttpDestination(string url, string token = null)
+		{
+			var destination = new HttpDestination(url, token);
+			return AddCustomDestination(destination);
+		}
+
+		/// <summary>
 		/// Adds a custom destination.
 		/// All destinations will be used when creating a logger from a LoggerPool.
 		/// </summary>
