@@ -28,6 +28,7 @@ namespace Najlot.Log
 				{ nameof(SyncCollectMiddleware), typeof(SyncCollectMiddleware) },
 				{ nameof(ConsoleDestination), typeof(ConsoleDestination) },
 				{ nameof(FileDestination), typeof(FileDestination) },
+				{ nameof(HttpDestination), typeof(HttpDestination) },
 				{ nameof(ConcurrentCollectMiddleware), typeof(ConcurrentCollectMiddleware) },
 			};
 
@@ -38,6 +39,7 @@ namespace Najlot.Log
 				{ typeof(SyncCollectMiddleware), nameof(SyncCollectMiddleware) },
 				{ typeof(ConsoleDestination), nameof(ConsoleDestination) },
 				{ typeof(FileDestination), nameof(FileDestination) },
+				{ typeof(HttpDestination), nameof(HttpDestination) },
 				{ typeof(ConcurrentCollectMiddleware), nameof(ConcurrentCollectMiddleware) },
 			};
 		}
