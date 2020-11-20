@@ -27,6 +27,10 @@ namespace Najlot.Log.Tests.Mocks
 			// Nothing to clean up
 		}
 
+		public void Flush()
+		{
+		}
+
 		public void Log(IEnumerable<LogMessage> messages)
 		{
 			foreach (var message in messages)
