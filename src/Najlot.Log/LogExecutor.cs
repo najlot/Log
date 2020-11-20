@@ -11,7 +11,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Internal class for handling multiple destinations
 	/// </summary>
-	internal class LogExecutor : IDisposable
+	internal sealed class LogExecutor : IDisposable
 	{
 		#region State Support
 
@@ -32,8 +32,8 @@ namespace Najlot.Log
 
 		private readonly string _category;
 		private readonly LoggerPool _loggerPool;
-		private static readonly object[] _emptyArgs = Array.Empty<object>();
-		private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyKeyValueList = Array.Empty<KeyValuePair<string, object>>();
+		private static readonly object[] EmptyArgs = Array.Empty<object>();
+		private static readonly IReadOnlyList<KeyValuePair<string, object>> EmptyKeyValueList = Array.Empty<KeyValuePair<string, object>>();
 
 		public LogExecutor(string category, LoggerPool loggerPool)
 		{
@@ -58,8 +58,8 @@ namespace Najlot.Log
 						State = state,
 						RawMessage = string.Empty,
 						Exception = ex,
-						RawArguments = _emptyArgs,
-						Arguments = _emptyKeyValueList,
+						RawArguments = EmptyArgs,
+						Arguments = EmptyKeyValueList,
 						ExceptionIsValid = ex != null
 					};
 
@@ -93,13 +93,13 @@ namespace Najlot.Log
 
 		#region IDisposable Support
 
-		private bool disposedValue = false; // To detect redundant calls
+		private bool _disposedValue = false; // To detect redundant calls
 
-		protected virtual void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

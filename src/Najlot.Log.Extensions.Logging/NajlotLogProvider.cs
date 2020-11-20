@@ -8,28 +8,30 @@ namespace Najlot.Log.Extensions.Logging
 	[ProviderAlias("Najlot.Log")]
 	public sealed class NajlotLogProvider : ILoggerProvider
 	{
-		private LogAdministrator _logAdminitrator;
+		private LogAdministrator _logAdministrator;
 		private bool _disposed = false;
 
 		public NajlotLogProvider(LogAdministrator logConfigurator)
 		{
-			_logAdminitrator = logConfigurator;
+			_logAdministrator = logConfigurator;
 		}
 
 		public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
 		{
-			return new NajlotLogWrapper(_logAdminitrator.GetLogger(categoryName));
+			return new NajlotLogWrapper(_logAdministrator.GetLogger(categoryName));
 		}
 
 		public void Dispose()
 		{
-			if (!_disposed)
+			if (_disposed)
 			{
-				_disposed = true;
-
-				_logAdminitrator.Dispose();
-				_logAdminitrator = null;
+				return;
 			}
+			
+			_disposed = true;
+
+			_logAdministrator.Dispose();
+			_logAdministrator = null;
 		}
 	}
 }

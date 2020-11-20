@@ -4,26 +4,46 @@
 using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Najlot.Log
 {
 	/// <summary>
 	/// Class to help the user to configure destinations, middlewares, log level etc.
 	/// </summary>
-	public class LogAdministrator : IDisposable
+	public sealed class LogAdministrator : IDisposable
 	{
 		private LogConfiguration _logConfiguration;
 		private LoggerPool _loggerPool;
 
-		internal LogAdministrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
+		private LogAdministrator(LogConfiguration logConfiguration, LoggerPool loggerPool)
 		{
 			_logConfiguration = logConfiguration;
 			_loggerPool = loggerPool;
 		}
 
+		public LogAdministrator GetDestinationConfiguration(string destinationName, out IDictionary<string, string> configuration)
+		{
+			configuration = LogDestinationConfigurator.GetDestinationConfiguration(_loggerPool, destinationName);
+			return this;
+		}
+
+		public LogAdministrator SetDestinationConfiguration(string destinationName, IDictionary<string, string> configuration)
+		{
+			LogDestinationConfigurator.SetDestinationConfiguration(_loggerPool, destinationName, configuration);
+			return this;
+		}
+
+		public LogAdministrator GetDestinationNames(out IEnumerable<string> destinationNames)
+		{
+			destinationNames = _loggerPool.GetDestinations().Select(d => d.DestinationName);
+			return this;
+		}
+
 		/// <summary>
 		/// Returns an static registered instance of a LogConfigurator
-		/// that has static resistered configuration and pool.
+		/// that has static registered configuration and pool.
 		/// </summary>
 		/// <returns></returns>
 		public static LogAdministrator Instance { get; } = new LogAdministrator(LogConfiguration.Instance, LoggerPool.Instance);
@@ -45,7 +65,6 @@ namespace Najlot.Log
 		/// Adds a destination that writes to the console.
 		/// All destinations will be used when creating a logger from a LoggerPool.
 		/// </summary>
-		/// <param name="formatFunction"></param>
 		/// <param name="useColors"></param>
 		/// <returns></returns>
 		public LogAdministrator AddConsoleDestination(bool useColors = false)
@@ -71,9 +90,8 @@ namespace Najlot.Log
 		/// All destinations will be used when creating a logger from a LoggerPool.
 		/// </summary>
 		/// <param name="destination">Instance of the new destination</param>
-		/// <param name="formatFunction">Default formatting function to pass to this destination</param>
 		/// <returns></returns>
-		public LogAdministrator AddCustomDestination(IDestination destination)
+		public LogAdministrator AddCustomDestination<TDestination>(TDestination destination) where TDestination : IDestination, new()
 		{
 			if (destination == null)
 			{
@@ -85,12 +103,13 @@ namespace Najlot.Log
 			return this;
 		}
 
+		/// <summary>
 		/// Adds a FileDestination that calculates the path
 		/// </summary>
 		/// <param name="getFileName">Function to calculate the path</param>
-		/// <param name="formatFunction">Function to customize the output</param>
 		/// <param name="maxFiles">Max count of files.</param>
 		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
+		/// <param name="keepFileOpen">Should the file be kept open</param>
 		/// <returns></returns>
 		public LogAdministrator AddFileDestination(Func<string> getFileName, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = true)
 		{
@@ -99,14 +118,17 @@ namespace Najlot.Log
 		}
 
 		/// <summary>
-		/// Adds a FileDestination that uses a constant path
+		/// Adds a FileDestination
 		/// </summary>
-		/// <param name="fileName">Path to the file</param>
-		/// <param name="formatFunction">Function to customize the output</param>
+		/// <param name="path">Log file path.</param>
+		/// <param name="maxFiles">Max count of files.</param>
+		/// <param name="logFilePaths">File where to save the different logfiles to delete them when they are bigger then maxFiles</param>
+		/// <param name="keepFileOpen">Should the file be kept open</param>
 		/// <returns></returns>
-		public LogAdministrator AddFileDestination(string fileName, bool keepFileOpen = true)
+		public LogAdministrator AddFileDestination(string path, int maxFiles = 30, string logFilePaths = null, bool keepFileOpen = false)
 		{
-			return AddFileDestination(() => fileName, keepFileOpen: keepFileOpen);
+			var destination = new FileDestination(path, maxFiles, logFilePaths, keepFileOpen);
+			return AddCustomDestination(destination);
 		}
 
 		public LogAdministrator AddMiddleware<TMiddleware, TDestination>()
@@ -120,6 +142,26 @@ namespace Najlot.Log
 		public LogAdministrator AddMiddleware(string destinationName, string middlewareName)
 		{
 			_logConfiguration.AddMiddleware(destinationName, middlewareName);
+			return this;
+		}
+
+		public LogAdministrator SetMiddlewareNames(string destinationName, IEnumerable<string> middlewareNames)
+		{
+			var middlewaresChanged = !_logConfiguration.GetMiddlewareNames(destinationName)
+				.SequenceEqual(middlewareNames);
+
+			if (!middlewaresChanged)
+			{
+				return this;
+			}
+			
+			ClearMiddlewares(destinationName);
+
+			foreach (var middlewareName in middlewareNames)
+			{
+				AddMiddleware(destinationName, middlewareName);
+			}
+
 			return this;
 		}
 
@@ -183,6 +225,7 @@ namespace Najlot.Log
 			_logConfiguration.LogLevel = logLevel;
 			return this;
 		}
+
 		#region IDisposable Support
 
 		private bool _disposedValue = false; // To detect redundant calls
@@ -193,7 +236,7 @@ namespace Najlot.Log
 			GC.SuppressFinalize(this);
 		}
 
-		protected virtual void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
 			if (!_disposedValue)
 			{
@@ -208,6 +251,7 @@ namespace Najlot.Log
 				_logConfiguration = null;
 			}
 		}
+
 		#endregion IDisposable Support
 	}
 }

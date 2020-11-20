@@ -22,7 +22,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void MiddlewareExecutionExceptionsShouldGoToErrorHandler()
 		{
-			bool gotError = false;
+			var gotError = false;
 
 			void ExecutionErrorOccured(object sender, LogErrorEventArgs e)
 			{
@@ -31,13 +31,13 @@ namespace Najlot.Log.Tests
 
 			LogErrorHandler.Instance.ErrorOccured += ExecutionErrorOccured;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using (var logAdministrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.AddCustomDestination(new DestinationMock((message) => { }));
-				logAdminitrator.AddMiddleware<ExecuteExceptionThrowingMiddleware, DestinationMock>();
+				logAdministrator.AddCustomDestination(new DestinationMock((message) => { }));
+				logAdministrator.AddMiddleware<ExecuteExceptionThrowingMiddleware, DestinationMock>();
 
 				Assert.False(gotError);
-				logAdminitrator.GetLogger(GetType()).Error("");
+				logAdministrator.GetLogger(GetType()).Error("");
 				Assert.True(gotError);
 			}
 
@@ -47,7 +47,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void MiddlewareCreationExceptionsShouldGoToErrorHandler()
 		{
-			bool gotError = false;
+			var gotError = false;
 
 			void CreationErrorOccured(object sender, LogErrorEventArgs e)
 			{
@@ -56,11 +56,11 @@ namespace Najlot.Log.Tests
 
 			LogErrorHandler.Instance.ErrorOccured += CreationErrorOccured;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using (var logAdministrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.AddCustomDestination(new DestinationMock((message) => { }));
+				logAdministrator.AddCustomDestination(new DestinationMock((message) => { }));
 				Assert.False(gotError);
-				logAdminitrator.AddMiddleware<CtorExceptionThrowingMiddleware, DestinationMock>();
+				logAdministrator.AddMiddleware<CtorExceptionThrowingMiddleware, DestinationMock>();
 				Assert.True(gotError);
 			}
 
@@ -70,7 +70,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void DestinationExceptionsShouldGoToErrorHandler()
 		{
-			bool gotError = false;
+			var gotError = false;
 
 			void DestinationErrorOccured(object sender, LogErrorEventArgs e)
 			{
@@ -79,16 +79,19 @@ namespace Najlot.Log.Tests
 
 			LogErrorHandler.Instance.ErrorOccured += DestinationErrorOccured;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			try
 			{
-				logAdminitrator.AddCustomDestination(new DestinationMock((message) => throw new System.Exception()));
+				using var logAdministrator = LogAdministrator.CreateNew();
+				logAdministrator.AddCustomDestination(new DestinationMock((message) => throw new System.Exception()));
 
 				Assert.False(gotError);
-				logAdminitrator.GetLogger(GetType()).Info("");
+				logAdministrator.GetLogger(GetType()).Info("");
 				Assert.True(gotError);
 			}
-
-			LogErrorHandler.Instance.ErrorOccured -= DestinationErrorOccured;
+			finally
+			{
+				LogErrorHandler.Instance.ErrorOccured -= DestinationErrorOccured;
+			}
 		}
 	}
 }

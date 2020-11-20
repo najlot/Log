@@ -69,7 +69,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void LogConfigurationsShouldBeListenedTo()
 		{
-			var configName = nameof(LogConfigurationsShouldBeListenedTo) + ".config";
+			const string configName = nameof(LogConfigurationsShouldBeListenedTo) + ".config";
 
 			if (File.Exists(configName))
 			{

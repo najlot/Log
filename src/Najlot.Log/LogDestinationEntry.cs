@@ -5,16 +5,34 @@ using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using Najlot.Log.Util;
 using System;
+using System.Collections.Generic;
 
 namespace Najlot.Log
 {
 	internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisposable
 	{
-		public string DestinationName;
-		public IDestination Destination;
+		public readonly string DestinationName;
+		public readonly IDestination Destination;
 
-		public string CollectMiddlewareName;
+		private string _collectMiddlewareName;
 		public ICollectMiddleware CollectMiddleware;
+
+		public DestinationEntry(
+			IDestination destination,
+			string destinationName,
+			string collectMiddlewareName,
+			IEnumerable<string> middlewareNames)
+		{
+			Destination = destination;
+			DestinationName = destinationName;
+
+			CollectMiddleware = BuildInitialMiddlewarePipe(collectMiddlewareName, destination);
+
+			foreach (var name in middlewareNames)
+			{
+				NotifyMiddlewareAdded(DestinationName, name);
+			}
+		}
 
 		public void NotifyCollectMiddlewareChanged(string destinationName, string middlewareName)
 		{
@@ -23,9 +41,12 @@ namespace Najlot.Log
 				return;
 			}
 
-			CollectMiddlewareName = middlewareName;
+			_collectMiddlewareName = middlewareName;
 			var oldCollectMiddleware = CollectMiddleware;
-			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, Destination);
+			CollectMiddleware = BuildInitialMiddlewarePipe(_collectMiddlewareName, Destination);
+			CollectMiddleware.NextMiddleware = oldCollectMiddleware.NextMiddleware;
+
+			oldCollectMiddleware.NextMiddleware = null;
 			oldCollectMiddleware?.Dispose();
 		}
 
@@ -36,22 +57,19 @@ namespace Najlot.Log
 				return;
 			}
 
-			var mapper = LogConfigurationMapper.Instance;
-			var formatMiddlewareName = mapper.GetName<FormatMiddleware>();
-			var middlewareType = mapper.GetType(middlewareName);
+			var middlewareType = LogConfigurationMapper.Instance.GetType(middlewareName);
 			var middleware = (IMiddleware)Activator.CreateInstance(middlewareType);
 			var currentMiddleware = CollectMiddleware.NextMiddleware;
-			var currentMiddlewareName = mapper.GetName(currentMiddleware);
 
 			/* Log pipeline consists of
 			 * - 1 CollectMiddleware
 			 * 0 ... N Custom Middlewares we try to insert here
 			 * - 1 FormatMiddleware
 			 * - 1 DestinationWrapper
-			 * - Destination
+			 * - 1 Destination
 			 * */
 
-			if (currentMiddlewareName == formatMiddlewareName)
+			if (currentMiddleware.NextMiddleware is DestinationWrapper)
 			{
 				middleware.NextMiddleware = currentMiddleware;
 				CollectMiddleware.NextMiddleware = middleware;
@@ -60,11 +78,10 @@ namespace Najlot.Log
 
 			var previousMiddleware = currentMiddleware;
 
-			while (currentMiddlewareName != formatMiddlewareName)
+			while (!(currentMiddleware.NextMiddleware is DestinationWrapper))
 			{
 				previousMiddleware = currentMiddleware;
 				currentMiddleware = currentMiddleware.NextMiddleware;
-				currentMiddlewareName = mapper.GetName(currentMiddleware);
 			}
 
 			middleware.NextMiddleware = currentMiddleware;
@@ -79,7 +96,7 @@ namespace Najlot.Log
 			}
 
 			var oldCollectMiddleware = CollectMiddleware;
-			CollectMiddleware = BuildInitialMiddlewarePipe(CollectMiddlewareName, Destination);
+			CollectMiddleware = BuildInitialMiddlewarePipe(_collectMiddlewareName, Destination);
 			DisposeMiddlewares(oldCollectMiddleware);
 		}
 
@@ -101,34 +118,32 @@ namespace Najlot.Log
 		/// - 1 CollectMiddleware
 		/// - 1 FormatMiddleware
 		/// - 1 DestinationWrapper
-		/// - Destination
+		/// - 1 Destination
 		/// </summary>
 		/// <param name="collectMiddlewareName">Name of the CollectMiddleware to create and return</param>
 		/// <param name="destination">Destination to append at the end</param>
 		/// <returns></returns>
 		private static ICollectMiddleware BuildInitialMiddlewarePipe(string collectMiddlewareName, IDestination destination)
 		{
-			var middleware = new FormatMiddleware
+			var collectMiddlewareType = LogConfigurationMapper.Instance.GetType(collectMiddlewareName);
+			var collectMiddleware = (ICollectMiddleware)Activator.CreateInstance(collectMiddlewareType);
+			collectMiddleware.NextMiddleware = new FormatMiddleware
 			{
 				NextMiddleware = new DestinationWrapper(destination)
 			};
-
-			var collectMiddlewareType = LogConfigurationMapper.Instance.GetType(collectMiddlewareName);
-			var collectMiddleware = (ICollectMiddleware)Activator.CreateInstance(collectMiddlewareType);
-			collectMiddleware.NextMiddleware = middleware;
 
 			return collectMiddleware;
 		}
 
 		#region IDisposable Support
 
-		private bool disposedValue = false; // To detect redundant calls
+		private bool _disposedValue = false; // To detect redundant calls
 
 		private void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
-				disposedValue = true;
+				_disposedValue = true;
 
 				if (disposing)
 				{

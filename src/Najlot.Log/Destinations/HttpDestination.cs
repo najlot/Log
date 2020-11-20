@@ -13,19 +13,26 @@ namespace Najlot.Log.Destinations
 	[LogConfigurationName(nameof(HttpDestination))]
 	public sealed class HttpDestination : IDestination
 	{
-		private readonly Uri _uri;
-		private readonly string _token;
+		[LogConfigurationName(nameof(Uri))]
+		public string Uri { get; set; }
+
+		[LogConfigurationName(nameof(Token))]
+		public string Token { get; set; }
+
+		public HttpDestination()
+		{
+		}
 
 		public HttpDestination(string url, string token = null)
 		{
-			_uri = new Uri(url);
-			_token = token;
+			Uri = url;
+			Token = token;
 		}
 
 		public void Log(IEnumerable<LogMessage> messages)
 		{
-			int slice = 0;
-			int sliceSize = 200;
+			var slice = 0;
+			const int sliceSize = 200;
 
 			while (LogSlice(messages, slice, sliceSize))
 			{
@@ -55,14 +62,14 @@ namespace Najlot.Log.Destinations
 			var json = $"[{string.Join(", ", messages).TrimEnd(' ', ',')}]";
 			var bytes = Encoding.UTF8.GetBytes(json);
 
-			var request = WebRequest.CreateHttp(_uri);
+			var request = WebRequest.CreateHttp(new Uri(Uri));
 			request.Method = "PUT";
 			request.ContentType = "application/json";
 			request.ContentLength = bytes.Length;
 
-			if (!string.IsNullOrWhiteSpace(_token))
+			if (!string.IsNullOrWhiteSpace(Token))
 			{
-				request.Headers.Add(HttpRequestHeader.Authorization, $"Bearer {_token}");
+				request.Headers.Add(HttpRequestHeader.Authorization, $"Bearer {Token}");
 			}
 
 			using (var requestStream = request.GetRequestStream())
@@ -74,40 +81,29 @@ namespace Najlot.Log.Destinations
 			{
 				if ((int)response.StatusCode >= 400)
 				{
-					using (Stream responseStream = response.GetResponseStream())
+					using (var responseStream = response.GetResponseStream())
 					{
 						using (var myStreamReader = new StreamReader(responseStream, Encoding.UTF8))
 						{
 							var responseString = myStreamReader.ReadToEnd();
 							var ex = new Exception(responseString);
-							LogErrorHandler.Instance.Handle("Error writing log messages to " + _uri, ex);
+							LogErrorHandler.Instance.Handle("Error writing log messages to " + Uri, ex);
 						}
 					}
 				}
 			}
 		}
 
-		#region IDisposable Support
-
-		private bool _disposedValue;
-		
-		private void Dispose(bool disposing)
+		public void Flush()
 		{
-			if (!_disposedValue)
-			{
-				_disposedValue = true;
-
-				if (disposing)
-				{
-					
-				}
-			}
+			// Nothing to do
 		}
+
+		#region IDisposable Support
 
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
+			// Nothing to do
 		}
 
 		#endregion IDisposable Support

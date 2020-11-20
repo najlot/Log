@@ -19,10 +19,7 @@ namespace Najlot.Log.Util
 
 		public void Execute(IEnumerable<LogMessage> messages) => _destination.Log(messages);
 
-		public void Flush()
-		{
-			// NextMiddleware will be null and IDestination has no flush method
-		}
+		public void Flush() => _destination.Flush();
 
 		public void Dispose() => Flush();
 	}

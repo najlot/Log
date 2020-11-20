@@ -2,7 +2,6 @@
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Tests.Mocks;
-using System;
 using Xunit;
 
 namespace Najlot.Log.Tests
@@ -14,14 +13,16 @@ namespace Najlot.Log.Tests
 		{
 			var mapper = LogConfigurationMapper.Instance;
 
-			foreach (Type type in typeof(LogConfigurationMapper).Assembly.GetTypes())
+			foreach (var type in typeof(LogConfigurationMapper).Assembly.GetTypes())
 			{
-				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
+				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length <= 0)
 				{
-					var name = mapper.GetName(type);
-					Assert.NotNull(name);
-					Assert.NotNull(mapper.GetType(name));
+					continue;
 				}
+				
+				var name = mapper.GetName(type);
+				Assert.NotNull(name);
+				Assert.NotNull(mapper.GetType(name));
 			}
 		}
 
@@ -39,7 +40,7 @@ namespace Najlot.Log.Tests
 		public void MapperShouldMapNamesByType()
 		{
 			var mapper = LogConfigurationMapper.Instance;
-			Type type = typeof(MiddlewareMock);
+			var type = typeof(MiddlewareMock);
 			mapper.AddToMapping(type);
 			var name = mapper.GetName(type);
 			Assert.NotNull(name);
@@ -50,7 +51,7 @@ namespace Najlot.Log.Tests
 		public void MapperShouldReturnNullIfNotFound()
 		{
 			var mapper = LogConfigurationMapper.Instance;
-			Type type = typeof(string);
+			var type = typeof(string);
 			var name = mapper.GetName(type);
 			Assert.Null(name);
 			var unknown = mapper.GetType(type.Name);

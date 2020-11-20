@@ -23,20 +23,19 @@ namespace Najlot.Log.Tests
 
 			LogConfigurationMapper.Instance.AddToMapping<HttpDestination>();
 
-			using (var admin = LogAdministrator.CreateNew())
+			using var admin = LogAdministrator.CreateNew();
+			
+			admin
+				.SetLogLevel(LogLevel.Debug)
+				.SetCollectMiddleware<ConcurrentCollectMiddleware, HttpDestination>()
+				.AddMiddleware<JsonFormatMiddleware, HttpDestination>()
+				.AddHttpDestination(config.Url, config.Token);
+
+			var logger = admin.GetLogger(typeof(HttpDestinationTests));
+
+			foreach (var i in Enumerable.Range(0, 500))
 			{
-				admin
-					.SetLogLevel(LogLevel.Debug)
-					.SetCollectMiddleware<ConcurrentCollectMiddleware, HttpDestination>()
-					.AddMiddleware<JsonFormatMiddleware, HttpDestination>()
-					.AddHttpDestination(config.Url, config.Token);
-				
-				var logger = admin.GetLogger(typeof(HttpDestinationTests));
-				
-				foreach (var i in Enumerable.Range(0, 500))
-				{
-					logger.Info(i);
-				}
+				logger.Info(i);
 			}
 		}
 	}

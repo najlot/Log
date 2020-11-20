@@ -12,7 +12,7 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void FileDestinationShouldChangePaths()
 		{
-			int i = 0;
+			var i = 0;
 
 			string GetPath()
 			{

@@ -25,18 +25,18 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void NestedScopesMustBeLogged()
 		{
-			bool scopesAreCorrect = true;
+			var scopesAreCorrect = true;
 			object state = null;
 
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.AddCustomDestination(new DestinationMock((msg) =>
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
 			{
 				if (!scopesAreCorrect) return;
 				state = msg.State;
 				scopesAreCorrect = msg.RawMessage == state?.ToString();
 			}));
 
-			var log = logAdminitrator.GetLogger(GetType());
+			var log = logAdministrator.GetLogger(GetType());
 
 			using (log.BeginScope("scope 1"))
 			{
@@ -67,11 +67,11 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ScopesMustNotBeSharedBetweenThreads()
 		{
-			bool error = false;
+			var error = false;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using (var logAdministrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Info)
+				logAdministrator.SetLogLevel(LogLevel.Info)
 					.AddCustomDestination(new DestinationMock((msg) =>
 					{
 						if (Environment.CurrentManagedThreadId != (int)msg.State)
@@ -80,17 +80,17 @@ namespace Najlot.Log.Tests
 						}
 					}));
 
-				void action()
+				void Action()
 				{
-					var log = logAdminitrator.GetLogger("test");
+					var log = logAdministrator.GetLogger("test");
 
 					using (log.BeginScope(Environment.CurrentManagedThreadId))
 					{
-						for (int i = 0; i < 10; i++) log.Info("");
+						for (var i = 0; i < 10; i++) log.Info("");
 					}
 				}
 
-				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => action).ToArray();
+				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
 				Parallel.Invoke(actions);
 			}
 
@@ -100,11 +100,11 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void ScopesMustNotBeSharedBetweenThreadsInTask()
 		{
-			bool error = false;
+			var error = false;
 
-			using (var logAdminitrator = LogAdministrator.CreateNew())
+			using (var logAdministrator = LogAdministrator.CreateNew())
 			{
-				logAdminitrator.SetLogLevel(LogLevel.Info)
+				logAdministrator.SetLogLevel(LogLevel.Info)
 					.AddCustomDestination(new DestinationMock((msg) =>
 					{
 						// state must be the same thread id the message comes from
@@ -114,20 +114,20 @@ namespace Najlot.Log.Tests
 						}
 					}));
 
-				void action()
+				void Action()
 				{
 					Task.Factory.StartNew(() =>
 					{
-						var log = logAdminitrator.GetLogger("test");
+						var log = logAdministrator.GetLogger("test");
 
 						using (log.BeginScope(Environment.CurrentManagedThreadId))
 						{
-							for (int i = 0; i < 10; i++) log.Info(Environment.CurrentManagedThreadId);
+							for (var i = 0; i < 10; i++) log.Info(Environment.CurrentManagedThreadId);
 						}
 					}).Wait();
 				}
 
-				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => action).ToArray();
+				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
 				Parallel.Invoke(actions);
 			}
 

@@ -16,12 +16,12 @@ namespace Najlot.Log
 	{
 		public static LogConfigurationMapper Instance { get; } = new LogConfigurationMapper();
 
-		private readonly Dictionary<string, Type> _stringToTypeMaping;
+		private readonly Dictionary<string, Type> _stringToTypeMapping;
 		private readonly Dictionary<Type, string> _typeToStringMapping;
 
 		private LogConfigurationMapper()
 		{
-			_stringToTypeMaping = new Dictionary<string, Type>
+			_stringToTypeMapping = new Dictionary<string, Type>
 			{
 				{ nameof(FormatMiddleware), typeof(FormatMiddleware) },
 				{ nameof(JsonFormatMiddleware), typeof(JsonFormatMiddleware) },
@@ -57,9 +57,9 @@ namespace Najlot.Log
 			{
 				var name = nameAttribute.Name;
 
-				lock (_stringToTypeMaping)
+				lock (_stringToTypeMapping)
 				{
-					_stringToTypeMaping[name] = type;
+					_stringToTypeMapping[name] = type;
 				}
 
 				lock (_typeToStringMapping)
@@ -85,7 +85,7 @@ namespace Najlot.Log
 
 			lock (_typeToStringMapping)
 			{
-				if (_typeToStringMapping.TryGetValue(type, out string value))
+				if (_typeToStringMapping.TryGetValue(type, out var value))
 				{
 					return value;
 				}
@@ -101,9 +101,9 @@ namespace Najlot.Log
 				return null;
 			}
 
-			lock (_stringToTypeMaping)
+			lock (_stringToTypeMapping)
 			{
-				if (_stringToTypeMaping.TryGetValue(name, out Type value))
+				if (_stringToTypeMapping.TryGetValue(name, out var value))
 				{
 					return value;
 				}

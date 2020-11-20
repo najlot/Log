@@ -18,6 +18,6 @@ namespace Najlot.Log.Configuration.FileSource
 			_encoding = encoding;
 		}
 
-		public override Encoding Encoding { get { return _encoding; } }
+		public override Encoding Encoding => _encoding;
 	}
 }

@@ -52,8 +52,6 @@ namespace Najlot.Log
 
 		string GetCollectMiddlewareName(string destinationName);
 
-		IEnumerable<string> GetDestinationNames();
-
 		IEnumerable<string> GetMiddlewareNames(string destinationName);
 
 		void SetCollectMiddleware<TMiddleware, TDestination>()

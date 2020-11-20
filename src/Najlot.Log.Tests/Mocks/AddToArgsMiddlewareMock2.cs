@@ -2,28 +2,29 @@
 // See LICENSE file in the project root for full license information.
 
 using Najlot.Log.Middleware;
-using System;
 using System.Collections.Generic;
 
 namespace Najlot.Log.Tests.Mocks
 {
-	[LogConfigurationName(nameof(MiddlewareMock))]
-	public sealed class MiddlewareMock : IMiddleware
+	[LogConfigurationName(nameof(AddToArgsMiddlewareMock2))]
+	public sealed class AddToArgsMiddlewareMock2 : IMiddleware
 	{
-		private readonly Action<LogMessage> _logAction;
 		public IMiddleware NextMiddleware { get; set; }
 
-		public MiddlewareMock(Action<LogMessage> logAction)
+		public AddToArgsMiddlewareMock2()
 		{
-			_logAction = logAction;
 		}
 
 		public void Execute(IEnumerable<LogMessage> messages)
 		{
 			foreach (var message in messages)
 			{
-				_logAction(message);
+				var args = new List<object>(message.RawArguments);
+				args.Add(2);
+				message.RawArguments = args;
 			}
+
+			NextMiddleware.Execute(messages);
 		}
 
 		public void Flush()

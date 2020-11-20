@@ -26,7 +26,7 @@ namespace Najlot.Log.Middleware
 				return;
 			}
 
-			foreach (char c in raw)
+			foreach (var c in raw)
 			{
 				switch (c)
 				{
@@ -73,7 +73,7 @@ namespace Najlot.Log.Middleware
 			}
 		}
 
-		private void SerializeArgument(StringBuilder sb, KeyValuePair<string, object> arg)
+		private static void SerializeArgument(StringBuilder sb, KeyValuePair<string, object> arg)
 		{
 			sb.Append("{\"Key\":\"");
 			AppendJson(sb, arg.Key);
@@ -139,7 +139,7 @@ namespace Najlot.Log.Middleware
 
 				sb.Append(",\"Arguments\":[");
 
-				bool isFirst = true;
+				var isFirst = true;
 
 				foreach (var arg in message.Arguments)
 				{

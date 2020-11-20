@@ -13,7 +13,8 @@ namespace Najlot.Log
 	/// </summary>
 	public static class LogArgumentsParser
 	{
-		private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> _parsedKeyCache = new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
+		private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> ParsedKeyCache
+			= new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
 
 		public static IReadOnlyList<KeyValuePair<string, object>> ParseArguments(string message, object[] args)
 		{
@@ -22,23 +23,21 @@ namespace Najlot.Log
 				return Array.Empty<KeyValuePair<string, object>>();
 			}
 
-			if (_parsedKeyCache.TryGetValue(message, out var value))
+			if (ParsedKeyCache.TryGetValue(message, out var value))
 			{
 				return CopyArgsToCached(args, value);
 			}
 
 			var arguments = new List<KeyValuePair<string, object>>();
 
-			int argId = 0;
-			int startIndex = -1;
-			int endIndex;
-			object arg;
-
+			var argId = 0;
+			var startIndex = -1;
+			
 			do
 			{
 				startIndex = FindParseStartIndex(message, startIndex);
 
-				endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
+				var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
 
 				if (endIndex == -1)
 				{
@@ -46,8 +45,7 @@ namespace Najlot.Log
 				}
 
 				var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
-				var splittedKey = key.Split(':');
-				var keyWithoutFormat = splittedKey[0];
+				var keyWithoutFormat = key.Split(':')[0];
 
 				startIndex = endIndex;
 
@@ -56,20 +54,17 @@ namespace Najlot.Log
 					continue;
 				}
 
+				object arg = null;
 				if (argId < args.Length)
 				{
 					arg = args[argId];
-				}
-				else
-				{
-					arg = null;
 				}
 
 				arguments.Add(new KeyValuePair<string, object>(keyWithoutFormat, arg));
 
 				argId++;
 			}
-			while (endIndex != -1);
+			while (true);
 
 			CacheArgumentKeys(message, arguments);
 
@@ -80,7 +75,7 @@ namespace Najlot.Log
 		{
 			var cached = new List<KeyValuePair<string, object>>(value);
 
-			for (int i = 0; i < cached.Count; i++)
+			for (var i = 0; i < cached.Count; i++)
 			{
 				if (i < args.Length)
 				{
@@ -95,12 +90,12 @@ namespace Najlot.Log
 		{
 			var cache = new KeyValuePair<string, object>[arguments.Count];
 
-			for (int i = 0; i < cache.Length; i++)
+			for (var i = 0; i < cache.Length; i++)
 			{
 				cache[i] = new KeyValuePair<string, object>(arguments[i].Key, null);
 			}
 
-			_parsedKeyCache.TryAdd(message, cache);
+			ParsedKeyCache.TryAdd(message, cache);
 		}
 
 		private static int FindParseStartIndex(string message, int startIndex)
@@ -127,14 +122,13 @@ namespace Najlot.Log
 				return message;
 			}
 
-			int startIndex = -1;
-			int endIndex;
+			var startIndex = -1;
 
 			do
 			{
 				FindInsertStartIndex(ref message, ref startIndex);
 
-				endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
+				var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
 
 				if (endIndex == -1)
 				{
@@ -145,7 +139,7 @@ namespace Najlot.Log
 				var splittedKey = key.Split(':');
 				var keyWithoutFormat = splittedKey[0];
 
-				int index = FindKeyIndex(arguments, keyWithoutFormat);
+				var index = FindKeyIndex(arguments, keyWithoutFormat);
 
 				if (index > -1)
 				{
@@ -155,16 +149,16 @@ namespace Najlot.Log
 					startIndex += valueString.Length - 1;
 				}
 			}
-			while (endIndex != -1);
+			while (true);
 
 			return message;
 		}
 
 		private static int FindKeyIndex(IReadOnlyList<KeyValuePair<string, object>> list, string key)
 		{
-			int count = list.Count;
+			var count = list.Count;
 
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				if (list[i].Key == key)
 				{

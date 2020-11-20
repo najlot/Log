@@ -16,5 +16,10 @@ namespace Najlot.Log.Destinations
 		/// </summary>
 		/// <param name="messages">Messages to be logged</param>
 		void Log(IEnumerable<LogMessage> messages);
+
+		/// <summary>
+		/// Forces the destination to flush all cached messages
+		/// </summary>
+		void Flush();
 	}
 }

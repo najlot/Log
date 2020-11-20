@@ -4,7 +4,7 @@
 namespace Najlot.Log
 {
 	/// <summary>
-	/// Enum containing possible loglevels
+	/// Enum containing possible loglevel
 	/// </summary>
 	public enum LogLevel
 	{
@@ -14,7 +14,7 @@ namespace Najlot.Log
 		Trace = 0,
 
 		/// <summary>
-		/// Log messages that may help to find a bug
+		/// Log messages that may help to find bugs
 		/// </summary>
 		Debug = 1,
 

@@ -34,10 +34,10 @@ namespace Najlot.Log.Tests
 		[Fact]
 		public void CheckIsLogLevelEnabled()
 		{
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.SetLogLevel(LogLevel.Warn);
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator.SetLogLevel(LogLevel.Warn);
 
-			var logger = logAdminitrator.GetLogger(GetType());
+			var logger = logAdministrator.GetLogger(GetType());
 
 			Assert.False(logger.IsEnabled(LogLevel.Info));
 			Assert.True(logger.IsEnabled(LogLevel.Warn));
@@ -48,22 +48,22 @@ namespace Najlot.Log.Tests
 		public void LoggerMustLogTextWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
-			var shouldGetMessage = true;
 
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.SetLogLevel(LogLevel.Fatal)
-.AddCustomDestination(new DestinationMock(msg =>
-{
-	gotLogMessage = true;
-}));
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator
+				.SetLogLevel(LogLevel.Fatal)
+				.AddCustomDestination(new DestinationMock(msg =>
+				{
+					gotLogMessage = true;
+				}));
 
-			var log = logAdminitrator.GetLogger(GetType());
+			var log = logAdministrator.GetLogger(GetType());
 
 			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(logLevel);
+				logAdministrator.SetLogLevel(logLevel);
 
-				shouldGetMessage = logLevel <= LogLevel.Trace;
+				var shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace("");
 				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
 				gotLogMessage = false;
@@ -99,23 +99,23 @@ namespace Najlot.Log.Tests
 		public void LoggerMustLogObjectWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
-			var shouldGetMessage = true;
 
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.SetLogLevel(LogLevel.Fatal)
-.AddCustomDestination(new DestinationMock(msg =>
-{
-	gotLogMessage = true;
-}));
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator
+				.SetLogLevel(LogLevel.Fatal)
+				.AddCustomDestination(new DestinationMock(msg =>
+				{
+					gotLogMessage = true;
+				}));
 
-			var log = logAdminitrator.GetLogger(GetType());
+			var log = logAdministrator.GetLogger(GetType());
 			var obj = new object();
 
 			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(logLevel);
+				logAdministrator.SetLogLevel(logLevel);
 
-				shouldGetMessage = logLevel <= LogLevel.Trace;
+				var shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace(obj);
 				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
 				gotLogMessage = false;
@@ -151,24 +151,24 @@ namespace Najlot.Log.Tests
 		public void LoggerMustLogObjectAndExceptionWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
-			var shouldGetMessage = true;
 			var ex = new Exception("Something bad happened!");
 
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.SetLogLevel(LogLevel.Fatal)
-.AddCustomDestination(new DestinationMock(msg =>
-{
-	gotLogMessage = true;
-}));
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator
+				.SetLogLevel(LogLevel.Fatal)
+				.AddCustomDestination(new DestinationMock(msg =>
+				{
+					gotLogMessage = true;
+				}));
 
-			var log = logAdminitrator.GetLogger(GetType());
+			var log = logAdministrator.GetLogger(GetType());
 			var obj = new object();
 
 			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(logLevel);
+				logAdministrator.SetLogLevel(logLevel);
 
-				shouldGetMessage = logLevel <= LogLevel.Trace;
+				var shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace(ex, obj);
 				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
 				gotLogMessage = false;
@@ -204,24 +204,23 @@ namespace Najlot.Log.Tests
 		public void LoggerMustLogStringAndExceptionWithCorrectLogLevel()
 		{
 			var gotLogMessage = false;
-			var shouldGetMessage = true;
 			var ex = new Exception("Something bad happened!");
 
-			using var logAdminitrator = LogAdministrator.CreateNew();
-			logAdminitrator.SetLogLevel(LogLevel.Fatal)
-.AddCustomDestination(new DestinationMock(msg =>
-{
-	gotLogMessage = true;
-}));
+			using var logAdministrator = LogAdministrator.CreateNew();
+			logAdministrator
+				.SetLogLevel(LogLevel.Fatal)
+				.AddCustomDestination(new DestinationMock(msg =>
+				{
+					gotLogMessage = true;
+				}));
 
-			var log = logAdminitrator.GetLogger(GetType());
-			var obj = new object();
+			var log = logAdministrator.GetLogger(GetType());
 
 			foreach (var logLevel in _logLevels)
 			{
-				logAdminitrator.SetLogLevel(logLevel);
+				logAdministrator.SetLogLevel(logLevel);
 
-				shouldGetMessage = logLevel <= LogLevel.Trace;
+				var shouldGetMessage = logLevel <= LogLevel.Trace;
 				log.Trace(ex, "");
 				Assert.True(gotLogMessage == shouldGetMessage, $"{logLevel}, but did not got Trace message");
 				gotLogMessage = false;

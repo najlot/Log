@@ -3,7 +3,7 @@
 namespace Najlot.Log
 {
 	/// <summary>
-	/// Global handler for loging errors
+	/// Global handler for logging errors
 	/// </summary>
 	public sealed class LogErrorHandler
 	{

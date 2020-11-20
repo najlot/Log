@@ -12,52 +12,39 @@ namespace Najlot.Log
 	{
 		public static LogConfiguration Instance { get; } = new LogConfiguration();
 
-		internal LogConfiguration()
-		{
-		}
-
 		private LogLevel _logLevel = LogLevel.Debug;
 
 		public LogLevel LogLevel
 		{
-			get
-			{
-				return _logLevel;
-			}
+			get => _logLevel;
 			set
 			{
-				if (_logLevel != value)
+				if (_logLevel == value)
 				{
-					_logLevel = value;
+					return;
+				}
+				
+				_logLevel = value;
 
-					lock (_loglevelObserverList)
+				lock (_loglevelObserverList)
+				{
+					foreach (var observer in _loglevelObserverList)
 					{
-						foreach (var observer in _loglevelObserverList)
+						try
 						{
-							try
-							{
-								observer.NotifyLogLevelChanged(value);
-							}
-							catch (Exception ex)
-							{
-								LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
-							}
+							observer.NotifyLogLevelChanged(value);
+						}
+						catch (Exception ex)
+						{
+							LogErrorHandler.Instance.Handle("An error while notifying occured.", ex);
 						}
 					}
 				}
 			}
 		}
 
-		public Dictionary<string, List<string>> Middlewares { get; } = new Dictionary<string, List<string>>();
-		public Dictionary<string, string> CollectMiddlewares { get; } = new Dictionary<string, string>();
-
-		public IEnumerable<string> GetDestinationNames()
-		{
-			foreach (var middlewares in Middlewares)
-			{
-				yield return middlewares.Key;
-			}
-		}
+		private Dictionary<string, List<string>> Middlewares { get; } = new Dictionary<string, List<string>>();
+		private Dictionary<string, string> CollectMiddlewares { get; } = new Dictionary<string, string>();
 
 		public void AddMiddleware<TMiddleware, TDestination>()
 			where TMiddleware : IMiddleware
@@ -71,6 +58,9 @@ namespace Najlot.Log
 
 		public void AddMiddleware(string destinationName, string middlewareName)
 		{
+			if (destinationName == null) throw new ArgumentNullException(nameof(destinationName));
+			if (middlewareName == null) throw new ArgumentNullException(nameof(middlewareName));
+
 			if (Middlewares.TryGetValue(destinationName, out var list))
 			{
 				list.Add(middlewareName);
@@ -113,6 +103,12 @@ namespace Najlot.Log
 
 		public void SetCollectMiddleware(string destinationName, string middlewareName)
 		{
+			if (CollectMiddlewares.TryGetValue(destinationName, out var currentMiddlewareName)
+				&& currentMiddlewareName == middlewareName)
+			{
+				return;
+			}
+
 			CollectMiddlewares[destinationName] = middlewareName;
 
 			lock (_observerList)
@@ -155,8 +151,6 @@ namespace Najlot.Log
 
 		private readonly List<IMiddlewareConfigurationObserver> _observerList = new List<IMiddlewareConfigurationObserver>();
 		private readonly List<ILogLevelObserver> _loglevelObserverList = new List<ILogLevelObserver>();
-
-		
 
 		public void DetachObserver(IMiddlewareConfigurationObserver observer)
 		{

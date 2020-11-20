@@ -34,7 +34,7 @@ namespace Najlot.Log.Extensions.Logging
 				var format = "Unknown";
 				var args = new List<KeyValuePair<string, object>>(values);
 
-				foreach (KeyValuePair<string, object> value in values)
+				foreach (var value in values)
 				{
 					if (value.Key == "{OriginalFormat}")
 					{

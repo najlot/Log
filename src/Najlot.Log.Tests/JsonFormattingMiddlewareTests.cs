@@ -23,7 +23,7 @@ namespace Najlot.Log.Tests
 				})
 			};
 
-			DateTime dateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00");
+			var dateTime = DateTime.Parse("2019-05-12T18:02:50.6571583+02:00");
 
 			var message = new LogMessage
 			{
@@ -65,7 +65,7 @@ namespace Najlot.Log.Tests
 
 			try
 			{
-				throw new Exception("No CD-ROM / cup holder avaible"); ;
+				throw new Exception("No CD-ROM / cup holder available");
 			}
 			catch (Exception ex)
 			{
@@ -91,11 +91,11 @@ namespace Najlot.Log.Tests
 
 			formatMiddleware.Execute(new[] { message });
 
-			var expectedToFind = "No CD-ROM / cup holder avaible";
-			Assert.True(actual.IndexOf(expectedToFind) != -1);
+			var expectedToFind = "No CD-ROM / cup holder available";
+			Assert.Contains(expectedToFind, actual);
 
 			expectedToFind = "\"ExceptionIsValid\":true";
-			Assert.True(actual.IndexOf(expectedToFind) != -1);
+			Assert.Contains(expectedToFind, actual);
 		}
 	}
 }

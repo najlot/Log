@@ -13,22 +13,19 @@ namespace Najlot.Log.Destinations
 	[LogConfigurationName(nameof(ConsoleDestination))]
 	public sealed class ConsoleDestination : IDestination
 	{
-		private readonly bool UseColors;
-		private readonly ConsoleColor DefaultColor;
+		[LogConfigurationName(nameof(UseColors))]
+		public bool UseColors { get; set; }
+
+		private readonly ConsoleColor _defaultColor;
+
+		public ConsoleDestination() : this(false)
+		{
+		}
 
 		public ConsoleDestination(bool useColors)
 		{
 			UseColors = useColors;
-
-			if (UseColors)
-			{
-				DefaultColor = Console.ForegroundColor;
-			}
-		}
-
-		public void Dispose()
-		{
-			// Nothing to dispose
+			_defaultColor = Console.ForegroundColor;
 		}
 
 		public void Log(IEnumerable<LogMessage> messages)
@@ -55,7 +52,7 @@ namespace Najlot.Log.Destinations
 		private void LogWithColors(IEnumerable<LogMessage> messages)
 		{
 			var previousLogLevel = LogLevel.None;
-			bool first = true;
+			var first = true;
 			var sb = new StringBuilder();
 
 			foreach (var message in messages)
@@ -80,7 +77,7 @@ namespace Najlot.Log.Destinations
 
 			Console.Out.Write(sb.ToString());
 
-			Console.ForegroundColor = DefaultColor;
+			Console.ForegroundColor = _defaultColor;
 		}
 
 		private static void SetColor(LogLevel logLevel)
@@ -111,6 +108,15 @@ namespace Najlot.Log.Destinations
 					Console.ForegroundColor = ConsoleColor.DarkRed;
 					break;
 			}
+		}
+
+		public void Flush()
+		{
+		}
+
+		public void Dispose()
+		{
+			// Nothing to dispose
 		}
 	}
 }

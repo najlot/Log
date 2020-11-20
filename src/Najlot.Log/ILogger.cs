@@ -8,7 +8,7 @@ namespace Najlot.Log
 	/// <summary>
 	/// Common logger interface
 	/// </summary>
-	public interface ILogger : IDisposable
+	public interface ILogger
 	{
 		/// <summary>
 		/// Starts a new scope that ends when you dispose the return value

@@ -15,37 +15,98 @@ namespace Najlot.Log.Destinations
 	[LogConfigurationName(nameof(FileDestination))]
 	public sealed class FileDestination : IDestination
 	{
+		[LogConfigurationName(nameof(OutputPath))]
+		public string OutputPath { get; set; }
+
+		[LogConfigurationName(nameof(KeepFileOpen))]
+		public bool KeepFileOpen { get; set; }
+
+		[LogConfigurationName(nameof(MaxFiles))]
+		public int MaxFiles { get; set; }
+
+		[LogConfigurationName(nameof(LogFilesPath))]
+		public string LogFilesPath { get; set; }
+
 		private readonly string _newLine = Environment.NewLine;
 		private Stream _stream = null;
 		private readonly Encoding _encoding = Encoding.UTF8;
+		private readonly Func<string> _customGetPathFunc;
 
-		private readonly int _maxFiles;
-		private readonly string _logFilePaths = null;
-		private readonly bool _autoCleanUp;
-		private readonly bool _keepFileOpen;
-		private readonly Func<string> _getPath;
+		private bool AutoCleanUp { get => MaxFiles > 0 && !string.IsNullOrWhiteSpace(LogFilesPath); }
 
-		public string FilePath { get; private set; }
-
-		public FileDestination(Func<string> getPath, int maxFiles, string logFilePaths, bool keepFileOpen)
+		private string GetPath()
 		{
-			_keepFileOpen = keepFileOpen;
-			_getPath = getPath ?? throw new NullReferenceException();
-			_maxFiles = maxFiles;
-			_logFilePaths = logFilePaths;
+			if (_customGetPathFunc != null)
+			{
+				return _customGetPathFunc();
+			}
 
-			_autoCleanUp = _maxFiles > 0 && !string.IsNullOrWhiteSpace(_logFilePaths);
+			if (OutputPath.Contains('{'))
+			{
+				var now = DateTime.Now;
 
-			var path = _getPath();
+				return OutputPath
+					.Replace("{Day}", now.Day.ToString())
+					.Replace("{Month}", now.Month.ToString())
+					.Replace("{Year}", now.Year.ToString())
+					.Replace("{Hour}", now.Hour.ToString())
+					.Replace("{Minute}", now.Minute.ToString())
+					;
+			}
+
+			return OutputPath;
+		}
+
+		private string _lastFilePath;
+
+		public FileDestination()
+		{
+			OutputPath = "log_{Year}-{Month}-{Year}.txt";
+			KeepFileOpen = false;
+			MaxFiles = 30;
+			LogFilesPath = ".logs";
+		}
+
+		public FileDestination(Func<string> customGetPathFunc, int maxFiles, string logFilePaths, bool keepFileOpen)
+		{
+			_customGetPathFunc = customGetPathFunc;
+
+			OutputPath = null;
+			KeepFileOpen = keepFileOpen;
+			MaxFiles = maxFiles;
+			LogFilesPath = logFilePaths;
+
+			var path = GetPath();
 			EnsureDirectoryExists(path);
-			FilePath = path;
+			_lastFilePath = path;
 
-			if (_keepFileOpen)
+			if (KeepFileOpen)
 			{
 				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 			}
 
-			if (_autoCleanUp) CleanUpOldFiles(path);
+			if (AutoCleanUp) CleanUpOldFiles(path);
+		}
+
+		public FileDestination(string outputPath, int maxFiles, string logFilePaths, bool keepFileOpen)
+		{
+			_customGetPathFunc = null;
+
+			OutputPath = outputPath;
+			KeepFileOpen = keepFileOpen;
+			MaxFiles = maxFiles;
+			LogFilesPath = logFilePaths;
+
+			var path = GetPath();
+			EnsureDirectoryExists(path);
+			_lastFilePath = path;
+
+			if (KeepFileOpen)
+			{
+				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
+			}
+
+			if (AutoCleanUp) CleanUpOldFiles(path);
 		}
 
 		public void Log(IEnumerable<LogMessage> messages)
@@ -53,26 +114,31 @@ namespace Najlot.Log.Destinations
 			Log(messages, true);
 		}
 
-		public void Log(IEnumerable<LogMessage> messages, bool logRetry)
+		private void Log(IEnumerable<LogMessage> messages, bool logRetry)
 		{
-			bool cleanUp = false;
-			var path = _getPath();
+			var cleanUp = false;
+			var keepFileOpen = KeepFileOpen;
+			var path = GetPath();
 
 			// Ensure directory is created when the path changes,
 			// but try to create when DirectoryNotFoundException occurs.
 			// The directory could be deleted by the user in the meantime...
 			try
 			{
-				if (FilePath != path)
+				if (_lastFilePath != path)
 				{
-					FilePath = path;
+					_lastFilePath = path;
 					EnsureDirectoryExists(path);
-					if (_autoCleanUp) cleanUp = true;
+					if (AutoCleanUp) cleanUp = true;
 
-					if (_keepFileOpen)
+					if (keepFileOpen)
 					{
 						SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 					}
+				}
+				else if (keepFileOpen && _stream == null)
+				{
+					SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 				}
 
 				var sb = new StringBuilder();
@@ -83,7 +149,7 @@ namespace Najlot.Log.Destinations
 					sb.Append(_newLine);
 				}
 
-				if (_keepFileOpen)
+				if (keepFileOpen)
 				{
 					Write(sb.ToString());
 				}
@@ -109,9 +175,9 @@ namespace Najlot.Log.Destinations
 		{
 			List<string> logFilePathsList = null;
 
-			if (File.Exists(_logFilePaths))
+			if (File.Exists(LogFilesPath))
 			{
-				logFilePathsList = new List<string>(File.ReadAllLines(_logFilePaths));
+				logFilePathsList = new List<string>(File.ReadAllLines(LogFilesPath));
 			}
 			else
 			{
@@ -120,37 +186,40 @@ namespace Najlot.Log.Destinations
 
 			logFilePathsList.Add(path);
 
-			if (logFilePathsList.Count < _maxFiles)
+			if (logFilePathsList.Count < MaxFiles)
 			{
-				File.WriteAllLines(_logFilePaths, logFilePathsList.Distinct());
+				File.WriteAllLines(LogFilesPath, logFilePathsList.Distinct());
 				return;
 			}
 
 			logFilePathsList = logFilePathsList
 				.Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p))
-				.Distinct().ToList();
+				.Distinct()
+				.ToList();
 
-			while (logFilePathsList.Count > _maxFiles)
+			while (logFilePathsList.Count > MaxFiles)
 			{
 				var file = logFilePathsList[0];
 				logFilePathsList.Remove(file);
-				File.WriteAllLines(_logFilePaths, logFilePathsList);
+				File.WriteAllLines(LogFilesPath, logFilePathsList);
 				if (File.Exists(file)) File.Delete(file);
 			}
 
-			File.WriteAllLines(_logFilePaths, logFilePathsList);
+			File.WriteAllLines(LogFilesPath, logFilePathsList);
 		}
 
 		private static void EnsureDirectoryExists(string path)
 		{
-			if (!File.Exists(path))
+			if (File.Exists(path))
 			{
-				var dir = Path.GetDirectoryName(path);
+				return;
+			}
+			
+			var dir = Path.GetDirectoryName(path);
 
-				if (!string.IsNullOrWhiteSpace(dir))
-				{
-					Directory.CreateDirectory(dir);
-				}
+			if (!string.IsNullOrWhiteSpace(dir))
+			{
+				Directory.CreateDirectory(dir);
 			}
 		}
 
@@ -170,21 +239,26 @@ namespace Najlot.Log.Destinations
 			Write(_encoding.GetBytes(msg));
 		}
 
+		public void Flush()
+		{
+			_stream?.Flush();
+		}
+
 		#region IDisposable Support
 
-		private bool disposedValue = false; // To detect redundant calls
+		private bool _disposedValue = false; // To detect redundant calls
 
 		public void Dispose(bool disposing)
 		{
-			if (!disposedValue)
+			if (!_disposedValue)
 			{
+				_disposedValue = true;
+				
 				if (disposing)
 				{
 					_stream?.Dispose();
 					_stream = null;
 				}
-
-				disposedValue = true;
 			}
 		}
 

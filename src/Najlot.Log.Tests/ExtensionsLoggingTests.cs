@@ -29,40 +29,40 @@ namespace Najlot.Log.Tests
 		public void IsEnabledMustReturnCorrectLogLevelEnabled()
 		{
 			using var loggerFactory = new LoggerFactory();
-			LogAdministrator logAdminitrator = null;
+			LogAdministrator logAdministrator = null;
 
-			loggerFactory.AddNajlotLog((adminitrator) =>
+			loggerFactory.AddNajlotLog((administrator) =>
 			{
-				logAdminitrator = adminitrator.AddConsoleDestination();
+				logAdministrator = administrator.AddConsoleDestination();
 			});
 
-			logAdminitrator.SetLogLevel(LogLevel.Trace);
+			logAdministrator.SetLogLevel(LogLevel.Trace);
 
 			var logger = loggerFactory.CreateLogger("default");
 
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
 
-			logAdminitrator.SetLogLevel(LogLevel.Debug);
+			logAdministrator.SetLogLevel(LogLevel.Debug);
 			Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
 
-			logAdminitrator.SetLogLevel(LogLevel.Info);
+			logAdministrator.SetLogLevel(LogLevel.Info);
 			Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug));
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
 
-			logAdminitrator.SetLogLevel(LogLevel.Warn);
+			logAdministrator.SetLogLevel(LogLevel.Warn);
 			Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information));
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
 
-			logAdminitrator.SetLogLevel(LogLevel.Error);
+			logAdministrator.SetLogLevel(LogLevel.Error);
 			Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning));
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
 
-			logAdminitrator.SetLogLevel(LogLevel.Fatal);
+			logAdministrator.SetLogLevel(LogLevel.Fatal);
 			Assert.False(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Error));
 			Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Critical));
 
-			logAdminitrator.SetLogLevel(LogLevel.Info);
+			logAdministrator.SetLogLevel(LogLevel.Info);
 
 			logger.LogInformation("Done!");
 		}
@@ -131,48 +131,48 @@ namespace Najlot.Log.Tests
 
 			var content = File.ReadAllText(logFile);
 
-			Assert.NotEqual(-1, content.IndexOf("Critical logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Debug logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Error logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Info logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Trace logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Warning logged!"));
+			Assert.Contains("Critical logged!", content);
+			Assert.Contains("Debug logged!", content);
+			Assert.Contains("Error logged!", content);
+			Assert.Contains("Info logged!", content);
+			Assert.Contains("Trace logged!", content);
+			Assert.Contains("Warning logged!", content);
+			
+			Assert.Contains("My Scope", content);
 
-			Assert.NotEqual(-1, content.IndexOf("My Scope"));
+			Assert.Contains("Critical logged with scope!", content);
+			Assert.Contains("Debug logged with scope!", content);
+			Assert.Contains("Error logged with scope!", content);
+			Assert.Contains("Info logged with scope!", content);
+			Assert.Contains("Trace logged with scope!", content);
+			Assert.Contains("Warning logged with scope!", content);
 
-			Assert.NotEqual(-1, content.IndexOf("Critical logged with scope!"));
-			Assert.NotEqual(-1, content.IndexOf("Debug logged with scope!"));
-			Assert.NotEqual(-1, content.IndexOf("Error logged with scope!"));
-			Assert.NotEqual(-1, content.IndexOf("Info logged with scope!"));
-			Assert.NotEqual(-1, content.IndexOf("Trace logged with scope!"));
-			Assert.NotEqual(-1, content.IndexOf("Warning logged with scope!"));
+			Assert.Contains("Structured Critical logged!", content);
+			Assert.Contains("Structured Debug logged!", content);
+			Assert.Contains("Structured Error logged!", content);
+			Assert.Contains("Structured Info logged!", content);
+			Assert.Contains("Structured Trace logged!", content);
+			Assert.Contains("Structured Warning logged!", content);
 
-			Assert.NotEqual(-1, content.IndexOf("Structured Critical logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Debug logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Error logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Info logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Trace logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Warning logged!"));
-
-			Assert.NotEqual(-1, content.IndexOf("Structured Critical, 0 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Debug, 0 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Error, 0 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Info, 0 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Trace, 0 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Warning, 0 logged!"));
-
-			Assert.NotEqual(-1, content.IndexOf("Structured Critical, 0123 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Debug, 0123 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Error, 0123 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Info, 0123 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Trace, 0123 logged!"));
-			Assert.NotEqual(-1, content.IndexOf("Structured Warning, 0123 logged!"));
+			Assert.Contains("Structured Critical, 0 logged!", content);
+			Assert.Contains("Structured Debug, 0 logged!", content);
+			Assert.Contains("Structured Error, 0 logged!", content);
+			Assert.Contains("Structured Info, 0 logged!", content);
+			Assert.Contains("Structured Trace, 0 logged!", content);
+			Assert.Contains("Structured Warning, 0 logged!", content);
+			
+			Assert.Contains("Structured Critical, 0123 logged!", content);
+			Assert.Contains("Structured Debug, 0123 logged!", content);
+			Assert.Contains("Structured Error, 0123 logged!", content);
+			Assert.Contains("Structured Info, 0123 logged!", content);
+			Assert.Contains("Structured Trace, 0123 logged!", content);
+			Assert.Contains("Structured Warning, 0123 logged!", content);
 		}
 
 		[Fact]
 		public void LoggerBuilderMustProduceLogger()
 		{
-			var logFile = "LoggingBuilderExtension.log";
+			const string logFile = "LoggingBuilderExtension.log";
 
 			if (File.Exists(logFile))
 			{
@@ -181,18 +181,18 @@ namespace Najlot.Log.Tests
 
 			var services = new ServiceCollection();
 
-			LogAdministrator logAdminitrator = null;
+			LogAdministrator logAdministrator = null;
 
 			services.AddLogging(loggerBuilder =>
 			{
 				loggerBuilder.AddNajlotLog((admin) =>
 				{
-					logAdminitrator = admin;
-					logAdminitrator.AddFileDestination(logFile);
+					logAdministrator = admin;
+					logAdministrator.AddFileDestination(logFile);
 				});
 			});
 
-			using (logAdminitrator)
+			using (logAdministrator)
 			{
 				services.AddTransient<DependencyInjectionLoggerService>();
 
@@ -205,9 +205,9 @@ namespace Najlot.Log.Tests
 
 			var content = File.ReadAllText(logFile);
 
-			Assert.NotEqual(-1, content.IndexOf("Logger created!"));
-			Assert.Equal(-1, content.IndexOf("This should not be logged!"));
-			Assert.NotEqual(-1, content.IndexOf(typeof(DependencyInjectionLoggerService).FullName));
+			Assert.Contains("Logger created!", content);
+			Assert.DoesNotContain("This should not be logged!", content);
+			Assert.Contains(typeof(DependencyInjectionLoggerService).FullName, content);
 		}
 	}
 }

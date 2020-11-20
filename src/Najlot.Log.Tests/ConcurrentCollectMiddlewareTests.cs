@@ -30,7 +30,7 @@ namespace Najlot.Log.Tests
 				})
 			};
 
-			for (int i = 0; i < 25; i++)
+			for (var i = 0; i < 25; i++)
 			{
 				middleware.Execute(new LogMessage());
 			}
@@ -57,7 +57,7 @@ namespace Najlot.Log.Tests
 				})
 			};
 
-			for (int i = 0; i < 25; i++)
+			for (var i = 0; i < 25; i++)
 			{
 				middleware.Execute(new LogMessage());
 			}
@@ -84,12 +84,12 @@ namespace Najlot.Log.Tests
 					})
 				};
 
-				for (int i = 0; i < 25; i++)
+				for (var i = 0; i < 25; i++)
 				{
 					middleware.Execute(new LogMessage());
 				}
 			}
-			
+
 			Assert.Equal(25, messagesCount);
 		}
 	}

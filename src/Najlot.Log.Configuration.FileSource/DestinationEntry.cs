@@ -2,13 +2,17 @@
 // See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Najlot.Log.Configuration.FileSource
 {
-	public class DestinationEntry
+	public class DestinationEntry : ConfigurationEntry
 	{
-		public string DestinationName { get; set; }
-		public string CollectMiddlewareName { get; set; }
-		public List<string> MiddlewareNames { get; set; }
+		public List<Parameter> Parameters { get; set; }
+
+		public ConfigurationEntry CollectMiddleware { get; set; }
+
+		[XmlArrayItem("Middleware")]
+		public List<ConfigurationEntry> Middlewares { get; set; }
 	}
 }

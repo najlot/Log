@@ -12,6 +12,11 @@ namespace Najlot.Log.Tests.Mocks
 	{
 		private readonly Action<LogMessage> _logAction;
 
+		public DestinationMock()
+		{
+			
+		}
+		
 		public DestinationMock(Action<LogMessage> logAction)
 		{
 			_logAction = logAction;
