@@ -32,7 +32,10 @@ namespace Najlot.Log.Destinations
 		private readonly Encoding _encoding = Encoding.UTF8;
 		private readonly Func<string> _customGetPathFunc;
 
-		private bool AutoCleanUp { get => MaxFiles > 0 && !string.IsNullOrWhiteSpace(LogFilesPath); }
+		private bool ShouldAutoCleanUp()
+		{
+			return MaxFiles > 0 && !string.IsNullOrWhiteSpace(LogFilesPath);
+		}
 
 		private string GetPath()
 		{
@@ -85,7 +88,7 @@ namespace Najlot.Log.Destinations
 				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 			}
 
-			if (AutoCleanUp) CleanUpOldFiles(path);
+			if (ShouldAutoCleanUp()) CleanUpOldFiles(path);
 		}
 
 		public FileDestination(string outputPath, int maxFiles, string logFilePaths, bool keepFileOpen)
@@ -106,7 +109,7 @@ namespace Najlot.Log.Destinations
 				SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 			}
 
-			if (AutoCleanUp) CleanUpOldFiles(path);
+			if (ShouldAutoCleanUp()) CleanUpOldFiles(path);
 		}
 
 		public void Log(IEnumerable<LogMessage> messages)
@@ -129,7 +132,7 @@ namespace Najlot.Log.Destinations
 				{
 					_lastFilePath = path;
 					EnsureDirectoryExists(path);
-					if (AutoCleanUp) cleanUp = true;
+					if (ShouldAutoCleanUp()) cleanUp = true;
 
 					if (keepFileOpen)
 					{

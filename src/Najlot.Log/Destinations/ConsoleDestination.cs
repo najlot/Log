@@ -112,6 +112,7 @@ namespace Najlot.Log.Destinations
 
 		public void Flush()
 		{
+			// Nothing to do
 		}
 
 		public void Dispose()
