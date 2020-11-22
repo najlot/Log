@@ -59,8 +59,7 @@ namespace Najlot.Log
 						RawMessage = string.Empty,
 						Exception = ex,
 						RawArguments = EmptyArgs,
-						Arguments = EmptyKeyValueList,
-						ExceptionIsValid = ex != null
+						Arguments = EmptyKeyValueList
 					};
 
 					if (args != null)

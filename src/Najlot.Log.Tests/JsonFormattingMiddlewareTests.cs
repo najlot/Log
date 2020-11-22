@@ -38,8 +38,7 @@ namespace Najlot.Log.Tests
 				{
 					new KeyValuePair<string, object>("count", 10),
 					new KeyValuePair<string, object>("count", 10)
-				},
-				ExceptionIsValid = false
+				}
 			};
 
 			formatMiddleware.Execute(new[] { message });
@@ -85,8 +84,7 @@ namespace Najlot.Log.Tests
 				{
 					new KeyValuePair<string, object>("count", 10),
 					new KeyValuePair<string, object>("count", 10)
-				},
-				ExceptionIsValid = true
+				}
 			};
 
 			formatMiddleware.Execute(new[] { message });

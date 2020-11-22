@@ -126,7 +126,7 @@ namespace Najlot.Log.Middleware
 				AppendJson(sb, LogArgumentsParser.InsertArguments(message.RawMessage, message.Arguments));
 				sb.Append("\",\"Exception\":");
 
-				if (message.ExceptionIsValid)
+				if (message.Exception != null)
 				{
 					sb.Append("\"");
 					AppendJson(sb, message.Exception.ToString());

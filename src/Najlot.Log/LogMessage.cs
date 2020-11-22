@@ -47,11 +47,6 @@ namespace Najlot.Log
 		public Exception Exception { get; set; }
 
 		/// <summary>
-		/// Specifying whether the exception is null or not
-		/// </summary>
-		public bool ExceptionIsValid { get; set; }
-
-		/// <summary>
 		/// Unparsed arguments received through one of the Trace / Debug / Info / Warn / Error / Fatal functions
 		/// </summary>
 		public IReadOnlyList<object> RawArguments { get; set; }
