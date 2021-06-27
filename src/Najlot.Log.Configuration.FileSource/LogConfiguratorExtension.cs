@@ -17,16 +17,20 @@ namespace Najlot.Log.Configuration.FileSource
 		{
 			try
 			{
-				logAdministrator.GetLogConfiguration(out var config);
-				logAdministrator.GetDestinationNames(out var destinationNames);
+				logAdministrator
+					.GetLogLevel(out var logLevel)
+					.GetDestinationNames(out var destinationNames);
 
 				var configurations = new Configurations()
 				{
-					LogLevel = config.LogLevel,
+					LogLevel = logLevel,
 					Destinations = destinationNames
 						.Select(name =>
 						{
-							logAdministrator.GetDestinationConfiguration(name, out var configuration);
+							logAdministrator
+								.GetDestinationConfiguration(name, out var configuration)
+								.GetCollectMiddlewareName(name, out var collectMiddlewareName)
+								.GetMiddlewareNames(name, out var middlewareNames);
 
 							return new DestinationEntry
 							{
@@ -34,9 +38,8 @@ namespace Najlot.Log.Configuration.FileSource
 								Parameters = configuration
 									.Select(c => new Parameter { Name = c.Key, Value = c.Value })
 									.ToList(),
-								CollectMiddleware = new ConfigurationEntry { Name = config.GetCollectMiddlewareName(name) },
-								Middlewares = config
-									.GetMiddlewareNames(name)
+								CollectMiddleware = new ConfigurationEntry { Name = collectMiddlewareName },
+								Middlewares = middlewareNames
 									.Select(n => new ConfigurationEntry { Name = n })
 									.ToList(),
 							};

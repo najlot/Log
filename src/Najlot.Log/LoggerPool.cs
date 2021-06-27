@@ -13,28 +13,23 @@ namespace Najlot.Log
 	/// </summary>
 	internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 	{
-		/// <summary>
-		/// Static LoggerPool instance
-		/// </summary>
-		public static LoggerPool Instance { get; } = new LoggerPool(LogConfiguration.Instance);
-
-		private readonly ILogConfiguration _logConfiguration;
+		private readonly LogAdministrator _logAdministrator;
 		private List<DestinationEntry> _destinations = new List<DestinationEntry>();
 		private readonly List<DestinationEntry> _pendingDestinations = new List<DestinationEntry>();
 		private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
 		private bool _hasDestinationsPending = false;
 
-		internal LoggerPool(ILogConfiguration logConfiguration)
+		internal LoggerPool(LogAdministrator logAdministrator)
 		{
-			_logConfiguration = logConfiguration;
-			_logConfiguration.AttachObserver(this);
+			_logAdministrator = logAdministrator;
+			_logAdministrator.AttachObserver(this);
 		}
 
 		internal void AddDestination<T>(T destination) where T : IDestination, new()
 		{
 			var entry = CreateDestinationEntry(destination);
 
-			_logConfiguration.AttachObserver(entry);
+			_logAdministrator.AttachObserver(entry);
 
 			lock (_pendingDestinations) _pendingDestinations.Add(entry);
 
@@ -45,11 +40,15 @@ namespace Najlot.Log
 		{
 			var destinationName = LogConfigurationMapper.Instance.GetName(destination);
 
+			_logAdministrator
+				.GetCollectMiddlewareName(destinationName, out var collectMiddlewareName)
+				.GetMiddlewareNames(destinationName, out var middlewareNames);
+
 			return new DestinationEntry(
 				destination,
 				destinationName,
-				_logConfiguration.GetCollectMiddlewareName(destinationName),
-				_logConfiguration.GetMiddlewareNames(destinationName));
+				collectMiddlewareName,
+				middlewareNames);
 		}
 
 		internal IEnumerable<DestinationEntry> GetDestinations()
@@ -109,10 +108,12 @@ namespace Najlot.Log
 				{
 					return logger;
 				}
-				
+
+				_logAdministrator.GetLogLevel(out var logLevel);
+
 				var logExecutor = new LogExecutor(category, this);
 				logger = new Logger(logExecutor);
-				logger.SetupLogLevel(_logConfiguration.LogLevel);
+				logger.SetupLogLevel(logLevel);
 				_loggerCache.Add(category, logger);
 			}
 
@@ -140,7 +141,7 @@ namespace Najlot.Log
 				if (disposing)
 				{
 					Flush();
-					_logConfiguration.DetachObserver(this);
+					_logAdministrator.DetachObserver(this);
 					_loggerCache.Clear();
 
 					foreach (var destination in GetDestinations())

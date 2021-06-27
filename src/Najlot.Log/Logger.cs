@@ -20,7 +20,7 @@ namespace Najlot.Log
 		private volatile bool _logError;
 		private volatile bool _logFatal;
 
-		private static readonly object[] EmptyArgs = Array.Empty<object>();
+		private static readonly object[] _emptyArgs = Array.Empty<object>();
 
 		internal Logger(LogExecutor logExecutor)
 		{
@@ -87,12 +87,12 @@ namespace Najlot.Log
 
 		public void Trace<T>(T o)
 		{
-			if (_logTrace) _logExecutor.Log(LogLevel.Trace, null, o, EmptyArgs);
+			if (_logTrace) _logExecutor.Log(LogLevel.Trace, null, o, _emptyArgs);
 		}
 
 		public void Trace<T>(Exception ex, T o)
 		{
-			if (_logTrace) _logExecutor.Log(LogLevel.Trace, ex, o, EmptyArgs);
+			if (_logTrace) _logExecutor.Log(LogLevel.Trace, ex, o, _emptyArgs);
 		}
 
 		public void Trace(string s, params object[] args)
@@ -107,12 +107,12 @@ namespace Najlot.Log
 
 		public void Debug<T>(T o)
 		{
-			if (_logDebug) _logExecutor.Log(LogLevel.Debug, null, o, EmptyArgs);
+			if (_logDebug) _logExecutor.Log(LogLevel.Debug, null, o, _emptyArgs);
 		}
 
 		public void Debug<T>(Exception ex, T o)
 		{
-			if (_logDebug) _logExecutor.Log(LogLevel.Debug, ex, o, EmptyArgs);
+			if (_logDebug) _logExecutor.Log(LogLevel.Debug, ex, o, _emptyArgs);
 		}
 
 		public void Debug(string s, params object[] args)
@@ -127,12 +127,12 @@ namespace Najlot.Log
 
 		public void Info<T>(T o)
 		{
-			if (_logInfo) _logExecutor.Log(LogLevel.Info, null, o, EmptyArgs);
+			if (_logInfo) _logExecutor.Log(LogLevel.Info, null, o, _emptyArgs);
 		}
 
 		public void Info<T>(Exception ex, T o)
 		{
-			if (_logInfo) _logExecutor.Log(LogLevel.Info, ex, o, EmptyArgs);
+			if (_logInfo) _logExecutor.Log(LogLevel.Info, ex, o, _emptyArgs);
 		}
 
 		public void Info(string s, params object[] args)
@@ -147,12 +147,12 @@ namespace Najlot.Log
 
 		public void Warn<T>(T o)
 		{
-			if (_logWarn) _logExecutor.Log(LogLevel.Warn, null, o, EmptyArgs);
+			if (_logWarn) _logExecutor.Log(LogLevel.Warn, null, o, _emptyArgs);
 		}
 
 		public void Warn<T>(Exception ex, T o)
 		{
-			if (_logWarn) _logExecutor.Log(LogLevel.Warn, ex, o, EmptyArgs);
+			if (_logWarn) _logExecutor.Log(LogLevel.Warn, ex, o, _emptyArgs);
 		}
 
 		public void Warn(string s, params object[] args)
@@ -167,12 +167,12 @@ namespace Najlot.Log
 
 		public void Error<T>(T o)
 		{
-			if (_logError) _logExecutor.Log(LogLevel.Error, null, o, EmptyArgs);
+			if (_logError) _logExecutor.Log(LogLevel.Error, null, o, _emptyArgs);
 		}
 
 		public void Error<T>(Exception ex, T o)
 		{
-			if (_logError) _logExecutor.Log(LogLevel.Error, ex, o, EmptyArgs);
+			if (_logError) _logExecutor.Log(LogLevel.Error, ex, o, _emptyArgs);
 		}
 
 		public void Error(string s, params object[] args)
@@ -187,12 +187,12 @@ namespace Najlot.Log
 
 		public void Fatal<T>(T o)
 		{
-			if (_logFatal) _logExecutor.Log(LogLevel.Fatal, null, o, EmptyArgs);
+			if (_logFatal) _logExecutor.Log(LogLevel.Fatal, null, o, _emptyArgs);
 		}
 
 		public void Fatal<T>(Exception ex, T o)
 		{
-			if (_logFatal) _logExecutor.Log(LogLevel.Fatal, ex, o, EmptyArgs);
+			if (_logFatal) _logExecutor.Log(LogLevel.Fatal, ex, o, _emptyArgs);
 		}
 
 		public void Fatal(string s, params object[] args)

@@ -54,15 +54,18 @@ namespace Najlot.Log.Tests
 
 				admin
 					.AddCustomDestination(new DestinationMock(m => { }))
-					.GetLogConfiguration(out var config);
+					.GetCollectMiddlewareName(name, out var collectMiddlewareName);
 
 				// Standard should not be ConcurrentCollectMiddleware
-				Assert.NotEqual(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+				Assert.NotEqual(concurrentCollectMiddlewareName, collectMiddlewareName);
 
-				admin.ReadConfigurationFromXmlFile(configName, true, false);
+				admin
+					.ReadConfigurationFromXmlFile(configName, true, false)
+					.GetCollectMiddlewareName(name, out collectMiddlewareName)
+					.GetMiddlewareNames(name, out var middlewareNames);
 
-				Assert.Equal(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
-				Assert.Equal(jsonFormatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == jsonFormatMiddlewareName));
+				Assert.Equal(concurrentCollectMiddlewareName, collectMiddlewareName);
+				Assert.Equal(jsonFormatMiddlewareName, middlewareNames.First(n => n == jsonFormatMiddlewareName));
 			}
 		}
 
@@ -96,15 +99,18 @@ namespace Najlot.Log.Tests
 
 				admin
 					.AddCustomDestination(new DestinationMock(m => { }))
-					.GetLogConfiguration(out var config);
+					.GetCollectMiddlewareName(name, out var collectMiddlewareName);
 
 				// Standard should not be ConcurrentCollectMiddleware
-				Assert.NotEqual(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
+				Assert.NotEqual(concurrentCollectMiddlewareName, collectMiddlewareName);
 
-				admin.ReadConfigurationFromXmlFile(configName, true, false);
+				admin
+					.ReadConfigurationFromXmlFile(configName, true, false)
+					.GetCollectMiddlewareName(name, out collectMiddlewareName)
+					.GetMiddlewareNames(name, out var middlewareName);
 
-				Assert.Equal(concurrentCollectMiddlewareName, config.GetCollectMiddlewareName(name));
-				Assert.Equal(jsonFormatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == jsonFormatMiddlewareName));
+				Assert.Equal(concurrentCollectMiddlewareName, collectMiddlewareName);
+				Assert.Equal(jsonFormatMiddlewareName, middlewareName.First(n => n == jsonFormatMiddlewareName));
 
 				var content = File.ReadAllText(configName);
 				var syncCollectMiddlewareName = LogConfigurationMapper.Instance.GetName<SyncCollectMiddleware>();
@@ -118,14 +124,21 @@ namespace Najlot.Log.Tests
 
 				var endTime = DateTime.Now.AddSeconds(5);
 
-				while (DateTime.Now < endTime && config.GetCollectMiddlewareName(name) == concurrentCollectMiddlewareName)
+				while (DateTime.Now < endTime
+					&& admin.GetCollectMiddlewareName(name, out collectMiddlewareName) != null
+					&& collectMiddlewareName  == concurrentCollectMiddlewareName)
 				{
 					Thread.Sleep(25);
 				}
 
-				Assert.Equal(syncCollectMiddlewareName, config.GetCollectMiddlewareName(name));
-				Assert.Equal(LogLevel.Trace, config.LogLevel);
-				Assert.Equal(formatMiddlewareName, config.GetMiddlewareNames(name).First(n => n == formatMiddlewareName));
+				admin
+					.GetCollectMiddlewareName(name, out collectMiddlewareName)
+					.GetLogLevel(out var logLevel)
+					.GetMiddlewareNames(name, out var middlewareNames);
+
+				Assert.Equal(syncCollectMiddlewareName, collectMiddlewareName);
+				Assert.Equal(LogLevel.Trace, logLevel);
+				Assert.Equal(formatMiddlewareName, middlewareNames.First(n => n == formatMiddlewareName));
 			}
 		}
 	}

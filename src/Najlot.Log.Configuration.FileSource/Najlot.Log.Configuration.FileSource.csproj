@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <Description>Extension methods for Najlot.Log to handle log configuration with XML files.</Description>
-    <Version>4.0.0-alpha-10</Version>
+    <Version>4.0.0-alpha-11</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>

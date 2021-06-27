@@ -190,9 +190,8 @@ namespace Najlot.Log.Tests
 
 				logger.Fatal("{Nr2}{Nr1}");
 
-				logAdministrator.GetLogConfiguration(out var conf);
-
-				Assert.Equal(nameof(ConcurrentCollectMiddleware), conf.GetCollectMiddlewareName(nameof(DestinationMock)));
+				logAdministrator.GetCollectMiddlewareName(nameof(DestinationMock), out var collectMiddlewareName);
+				Assert.Equal(nameof(ConcurrentCollectMiddleware), collectMiddlewareName);
 			}
 
 			Assert.Equal("1", message.RawArguments[0].ToString());
