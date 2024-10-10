@@ -4,20 +4,19 @@
 using System.IO;
 using System.Text;
 
-namespace Najlot.Log.Configuration.FileSource
+namespace Najlot.Log.Configuration.FileSource;
+
+/// <summary>
+/// StringWriter that allows to change its encoding
+/// </summary>
+internal sealed class CustomStringWriter : StringWriter
 {
-	/// <summary>
-	/// StringWriter that allows to change its encoding
-	/// </summary>
-	internal sealed class CustomStringWriter : StringWriter
+	private readonly Encoding _encoding;
+
+	public CustomStringWriter(Encoding encoding)
 	{
-		private readonly Encoding _encoding;
-
-		public CustomStringWriter(Encoding encoding)
-		{
-			_encoding = encoding;
-		}
-
-		public override Encoding Encoding => _encoding;
+		_encoding = encoding;
 	}
+
+	public override Encoding Encoding => _encoding;
 }

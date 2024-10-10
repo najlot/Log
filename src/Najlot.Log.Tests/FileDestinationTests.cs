@@ -5,53 +5,52 @@ using Najlot.Log.Destinations;
 using System.IO;
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class FileDestinationTests
 {
-	public class FileDestinationTests
+	[Fact]
+	public void FileDestinationShouldChangePaths()
 	{
-		[Fact]
-		public void FileDestinationShouldChangePaths()
+		var i = 0;
+
+		string GetPath()
 		{
-			var i = 0;
+			return $"log_{i}.log";
+		}
 
-			string GetPath()
+		for (i = 0; i < 10; i++)
+		{
+			var path = GetPath();
+			if (File.Exists(path))
 			{
-				return $"log_{i}.log";
+				File.Delete(path);
 			}
+		}
 
-			for (i = 0; i < 10; i++)
+		var destination = new FileDestination(GetPath, 5, "logs", true);
+
+		for (i = 0; i < 10; i++)
+		{
+			destination.Log(new LogMessage[]
 			{
-				var path = GetPath();
-				if (File.Exists(path))
+				new LogMessage()
 				{
-					File.Delete(path);
+					Message = i.ToString(),
 				}
-			}
+			});
+		}
 
-			var destination = new FileDestination(GetPath, 5, "logs", true);
+		for (i = 0; i < 5; i++)
+		{
+			var path = GetPath();
+			Assert.False(File.Exists(path));
+		}
 
-			for (i = 0; i < 10; i++)
-			{
-				destination.Log(new LogMessage[]
-				{
-					new LogMessage()
-					{
-						Message = i.ToString(),
-					}
-				});
-			}
-
-			for (i = 0; i < 5; i++)
-			{
-				var path = GetPath();
-				Assert.False(File.Exists(path));
-			}
-
-			for (i = 5; i < 10; i++)
-			{
-				var path = GetPath();
-				Assert.True(File.Exists(path));
-			}
+		for (i = 5; i < 10; i++)
+		{
+			var path = GetPath();
+			Assert.True(File.Exists(path));
 		}
 	}
 }

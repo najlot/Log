@@ -4,59 +4,58 @@
 using Najlot.Log.Tests.Mocks;
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class ConfigurationMapperTests
 {
-	public class ConfigurationMapperTests
+	[Fact]
+	public void MapperShouldHaveDefaultNames()
 	{
-		[Fact]
-		public void MapperShouldHaveDefaultNames()
-		{
-			var mapper = LogConfigurationMapper.Instance;
+		var mapper = LogConfigurationMapper.Instance;
 
-			foreach (var type in typeof(LogConfigurationMapper).Assembly.GetTypes())
+		foreach (var type in typeof(LogConfigurationMapper).Assembly.GetTypes())
+		{
+			if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length <= 0)
 			{
-				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length <= 0)
-				{
-					continue;
-				}
-				
-				var name = mapper.GetName(type);
-				Assert.NotNull(name);
-				Assert.NotNull(mapper.GetType(name));
+				continue;
 			}
-		}
-
-		[Fact]
-		public void MapperShouldMapNamesGeneric()
-		{
-			var mapper = LogConfigurationMapper.Instance;
-			mapper.AddToMapping<MiddlewareMock>();
-			var name = mapper.GetName<MiddlewareMock>();
-			Assert.NotNull(name);
-			Assert.NotNull(mapper.GetType(name));
-		}
-
-		[Fact]
-		public void MapperShouldMapNamesByType()
-		{
-			var mapper = LogConfigurationMapper.Instance;
-			var type = typeof(MiddlewareMock);
-			mapper.AddToMapping(type);
+			
 			var name = mapper.GetName(type);
 			Assert.NotNull(name);
 			Assert.NotNull(mapper.GetType(name));
 		}
+	}
 
-		[Fact]
-		public void MapperShouldReturnNullIfNotFound()
-		{
-			var mapper = LogConfigurationMapper.Instance;
-			var type = typeof(string);
-			var name = mapper.GetName(type);
-			Assert.Null(name);
-			var unknown = mapper.GetType(type.Name);
-			Assert.Null(unknown);
-			Assert.Null(mapper.GetType(null));
-		}
+	[Fact]
+	public void MapperShouldMapNamesGeneric()
+	{
+		var mapper = LogConfigurationMapper.Instance;
+		mapper.AddToMapping<MiddlewareMock>();
+		var name = mapper.GetName<MiddlewareMock>();
+		Assert.NotNull(name);
+		Assert.NotNull(mapper.GetType(name));
+	}
+
+	[Fact]
+	public void MapperShouldMapNamesByType()
+	{
+		var mapper = LogConfigurationMapper.Instance;
+		var type = typeof(MiddlewareMock);
+		mapper.AddToMapping(type);
+		var name = mapper.GetName(type);
+		Assert.NotNull(name);
+		Assert.NotNull(mapper.GetType(name));
+	}
+
+	[Fact]
+	public void MapperShouldReturnNullIfNotFound()
+	{
+		var mapper = LogConfigurationMapper.Instance;
+		var type = typeof(string);
+		var name = mapper.GetName(type);
+		Assert.Null(name);
+		var unknown = mapper.GetType(type.Name);
+		Assert.Null(unknown);
+		Assert.Null(mapper.GetType(null));
 	}
 }

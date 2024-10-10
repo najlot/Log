@@ -4,28 +4,27 @@
 using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 
-namespace Najlot.Log
+namespace Najlot.Log;
+
+public static class LogAdministratorGenericExtensions
 {
-	public static class LogAdministratorGenericExtensions
+	public static LogAdministrator AddMiddleware<TMiddleware, TDestination>(this LogAdministrator logAdministrator)
+		where TMiddleware : IMiddleware
+		where TDestination : IDestination
 	{
-		public static LogAdministrator AddMiddleware<TMiddleware, TDestination>(this LogAdministrator logAdministrator)
-			where TMiddleware : IMiddleware
-			where TDestination : IDestination
-		{
-			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
-			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
+		var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
+		var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
 
-			return logAdministrator.AddMiddleware(destinationName, middlewareName);
-		}
+		return logAdministrator.AddMiddleware(destinationName, middlewareName);
+	}
 
-		public static LogAdministrator SetCollectMiddleware<TMiddleware, TDestination>(this LogAdministrator logAdministrator)
-			where TMiddleware : ICollectMiddleware
-			where TDestination : IDestination
-		{
-			var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
-			var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
+	public static LogAdministrator SetCollectMiddleware<TMiddleware, TDestination>(this LogAdministrator logAdministrator)
+		where TMiddleware : ICollectMiddleware
+		where TDestination : IDestination
+	{
+		var destinationName = LogConfigurationMapper.Instance.GetName<TDestination>();
+		var middlewareName = LogConfigurationMapper.Instance.GetName<TMiddleware>();
 
-			return logAdministrator.SetCollectMiddleware(destinationName, middlewareName);
-		}
+		return logAdministrator.SetCollectMiddleware(destinationName, middlewareName);
 	}
 }

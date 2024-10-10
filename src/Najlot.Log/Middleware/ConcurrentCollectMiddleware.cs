@@ -6,93 +6,92 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Najlot.Log.Middleware
+namespace Najlot.Log.Middleware;
+
+/// <summary>
+/// Middleware that collects messages from different threads
+/// and pass them to the next middleware on an other thread
+/// </summary>
+[LogConfigurationName(nameof(ConcurrentCollectMiddleware))]
+public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 {
-	/// <summary>
-	/// Middleware that collects messages from different threads
-	/// and pass them to the next middleware on an other thread
-	/// </summary>
-	[LogConfigurationName(nameof(ConcurrentCollectMiddleware))]
-	public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
+	private readonly ConcurrentQueue<LogMessage> _messages = new ConcurrentQueue<LogMessage>();
+	private volatile bool _cancellationRequested = false;
+	private Thread _thread;
+
+	public IMiddleware NextMiddleware { get; set; }
+
+	public ConcurrentCollectMiddleware()
 	{
-		private readonly ConcurrentQueue<LogMessage> _messages = new ConcurrentQueue<LogMessage>();
-		private volatile bool _cancellationRequested = false;
-		private Thread _thread;
-
-		public IMiddleware NextMiddleware { get; set; }
-
-		public ConcurrentCollectMiddleware()
+		_thread = new Thread(ThreadAction)
 		{
-			_thread = new Thread(ThreadAction)
-			{
-				IsBackground = true
-			};
+			IsBackground = true
+		};
 
-			_thread.Start(_messages);
+		_thread.Start(_messages);
+	}
+
+	private void ThreadAction(object param)
+	{
+		var messageList = new List<LogMessage>();
+
+		if (!(param is ConcurrentQueue<LogMessage> queue))
+		{
+			return;
 		}
-
-		private void ThreadAction(object param)
+		
+		do
 		{
-			var messageList = new List<LogMessage>();
+			try
+			{
+				LogMessage message = null;
 
-			if (!(param is ConcurrentQueue<LogMessage> queue))
-			{
-				return;
-			}
-			
-			do
-			{
-				try
+				SpinWait.SpinUntil(() => queue.TryDequeue(out message) || _cancellationRequested);
+
+				if (_cancellationRequested && message == null)
 				{
-					LogMessage message = null;
-
-					SpinWait.SpinUntil(() => queue.TryDequeue(out message) || _cancellationRequested);
-
-					if (_cancellationRequested && message == null)
-					{
-						return;
-					}
-
-					do
-					{
-						messageList.Add(message);
-					}
-					while (queue.TryDequeue(out message));
-
-					NextMiddleware.Execute(messageList);
-
-					messageList.Clear();
+					return;
 				}
-				catch (Exception ex)
+
+				do
 				{
-					LogErrorHandler.Instance.Handle("Error executing a log action.", ex);
+					messageList.Add(message);
 				}
+				while (queue.TryDequeue(out message));
+
+				NextMiddleware.Execute(messageList);
+
+				messageList.Clear();
 			}
-			while (!_cancellationRequested || queue.TryDequeue(out _));
-		}
-
-		public void Execute(LogMessage message) => _messages.Enqueue(message);
-
-		public void Flush()
-		{
-			_cancellationRequested = true;
-			_thread.Join();
-
-			_cancellationRequested = false;
-			_thread = new Thread(ThreadAction)
+			catch (Exception ex)
 			{
-				IsBackground = true
-			};
-
-			_thread.Start(_messages);
-
-			NextMiddleware?.Flush();
+				LogErrorHandler.Instance.Handle("Error executing a log action.", ex);
+			}
 		}
+		while (!_cancellationRequested || queue.TryDequeue(out _));
+	}
 
-		public void Dispose()
+	public void Execute(LogMessage message) => _messages.Enqueue(message);
+
+	public void Flush()
+	{
+		_cancellationRequested = true;
+		_thread.Join();
+
+		_cancellationRequested = false;
+		_thread = new Thread(ThreadAction)
 		{
-			_cancellationRequested = true;
-			_thread.Join();
-		}
+			IsBackground = true
+		};
+
+		_thread.Start(_messages);
+
+		NextMiddleware?.Flush();
+	}
+
+	public void Dispose()
+	{
+		_cancellationRequested = true;
+		_thread.Join();
 	}
 }

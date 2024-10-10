@@ -5,26 +5,25 @@ using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 
-namespace Najlot.Log.Tests.Mocks
+namespace Najlot.Log.Tests.Mocks;
+
+[LogConfigurationName(nameof(ExecuteExceptionThrowingMiddleware))]
+public sealed class ExecuteExceptionThrowingMiddleware : IMiddleware
 {
-	[LogConfigurationName(nameof(ExecuteExceptionThrowingMiddleware))]
-	public sealed class ExecuteExceptionThrowingMiddleware : IMiddleware
+	public IMiddleware NextMiddleware { get; set; }
+
+	public ExecuteExceptionThrowingMiddleware()
 	{
-		public IMiddleware NextMiddleware { get; set; }
-
-		public ExecuteExceptionThrowingMiddleware()
-		{
-		}
-
-		public void Execute(IEnumerable<LogMessage> messages)
-		{
-			throw new Exception();
-		}
-
-		public void Flush()
-		{
-		}
-
-		public void Dispose() => Flush();
 	}
+
+	public void Execute(IEnumerable<LogMessage> messages)
+	{
+		throw new Exception();
+	}
+
+	public void Flush()
+	{
+	}
+
+	public void Dispose() => Flush();
 }

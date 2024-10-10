@@ -16,6 +16,7 @@
     <Version>4.0.0-alpha-11</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
+		<LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

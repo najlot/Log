@@ -7,36 +7,35 @@ using Najlot.Log.Tests.Configuration;
 using System.Linq;
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class HttpDestinationTests
 {
-	public class HttpDestinationTests
+	[Fact]
+	public void HttpDestinationTest()
 	{
-		[Fact]
-		public void HttpDestinationTest()
+		var config = ConfigurationReader.ReadConfiguration<HttpDestinationConfig>();
+
+		if (config == null)
 		{
-			var config = ConfigurationReader.ReadConfiguration<HttpDestinationConfig>();
+			return;
+		}
 
-			if (config == null)
-			{
-				return;
-			}
+		LogConfigurationMapper.Instance.AddToMapping<HttpDestination>();
 
-			LogConfigurationMapper.Instance.AddToMapping<HttpDestination>();
+		using var admin = LogAdministrator.CreateNew();
+		
+		admin
+			.SetLogLevel(LogLevel.Debug)
+			.SetCollectMiddleware<ConcurrentCollectMiddleware, HttpDestination>()
+			.AddMiddleware<JsonFormatMiddleware, HttpDestination>()
+			.AddHttpDestination(config.Url, config.Token);
 
-			using var admin = LogAdministrator.CreateNew();
-			
-			admin
-				.SetLogLevel(LogLevel.Debug)
-				.SetCollectMiddleware<ConcurrentCollectMiddleware, HttpDestination>()
-				.AddMiddleware<JsonFormatMiddleware, HttpDestination>()
-				.AddHttpDestination(config.Url, config.Token);
+		var logger = admin.GetLogger(typeof(HttpDestinationTests));
 
-			var logger = admin.GetLogger(typeof(HttpDestinationTests));
-
-			foreach (var i in Enumerable.Range(0, 500))
-			{
-				logger.Info(i);
-			}
+		foreach (var i in Enumerable.Range(0, 500))
+		{
+			logger.Info(i);
 		}
 	}
 }

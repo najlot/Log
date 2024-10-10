@@ -15,6 +15,7 @@
     <Authors>Najlot</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
+		<LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,131 +7,130 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class ScopeTests
 {
-	public class ScopeTests
+	public ScopeTests()
 	{
-		public ScopeTests()
+		foreach (var type in GetType().Assembly.GetTypes())
 		{
-			foreach (var type in GetType().Assembly.GetTypes())
+			if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
 			{
-				if (type.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).Length > 0)
-				{
-					LogConfigurationMapper.Instance.AddToMapping(type);
-				}
+				LogConfigurationMapper.Instance.AddToMapping(type);
 			}
 		}
+	}
 
-		[Fact]
-		public void NestedScopesMustBeLogged()
+	[Fact]
+	public void NestedScopesMustBeLogged()
+	{
+		var scopesAreCorrect = true;
+		object state = null;
+
+		using var logAdministrator = LogAdministrator.CreateNew();
+		logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
 		{
-			var scopesAreCorrect = true;
-			object state = null;
+			if (!scopesAreCorrect) return;
+			state = msg.State;
+			scopesAreCorrect = msg.RawMessage == state?.ToString();
+		}));
 
-			using var logAdministrator = LogAdministrator.CreateNew();
-			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
+		var log = logAdministrator.GetLogger(GetType());
+
+		using (log.BeginScope("scope 1"))
+		{
+			log.Info("scope 1");
+
+			using (log.BeginScope("scope 2"))
 			{
-				if (!scopesAreCorrect) return;
-				state = msg.State;
-				scopesAreCorrect = msg.RawMessage == state?.ToString();
-			}));
+				log.Info("scope 2");
+				log.Info("scope 2");
 
-			var log = logAdministrator.GetLogger(GetType());
-
-			using (log.BeginScope("scope 1"))
-			{
-				log.Info("scope 1");
-
-				using (log.BeginScope("scope 2"))
+				using (log.BeginScope("scope 3"))
 				{
-					log.Info("scope 2");
-					log.Info("scope 2");
+					log.Info("scope 3");
+				}
 
-					using (log.BeginScope("scope 3"))
+				log.Info("scope 2");
+			}
+
+			log.Info("scope 1");
+		}
+
+		Assert.True(scopesAreCorrect, "scopes are not correct");
+
+		log.Info("out of scope");
+		Assert.Null(state);
+	}
+
+	[Fact]
+	public void ScopesMustNotBeSharedBetweenThreads()
+	{
+		var error = false;
+
+		using (var logAdministrator = LogAdministrator.CreateNew())
+		{
+			logAdministrator.SetLogLevel(LogLevel.Info)
+				.AddCustomDestination(new DestinationMock((msg) =>
+				{
+					if (Environment.CurrentManagedThreadId != (int)msg.State)
 					{
-						log.Info("scope 3");
+						error = true;
 					}
+				}));
 
-					log.Info("scope 2");
+			void Action()
+			{
+				var log = logAdministrator.GetLogger("test");
+
+				using (log.BeginScope(Environment.CurrentManagedThreadId))
+				{
+					for (var i = 0; i < 10; i++) log.Info("");
 				}
-
-				log.Info("scope 1");
 			}
 
-			Assert.True(scopesAreCorrect, "scopes are not correct");
-
-			log.Info("out of scope");
-			Assert.Null(state);
+			var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
+			Parallel.Invoke(actions);
 		}
 
-		[Fact]
-		public void ScopesMustNotBeSharedBetweenThreads()
+		Assert.False(error);
+	}
+
+	[Fact]
+	public void ScopesMustNotBeSharedBetweenThreadsInTask()
+	{
+		var error = false;
+
+		using (var logAdministrator = LogAdministrator.CreateNew())
 		{
-			var error = false;
-
-			using (var logAdministrator = LogAdministrator.CreateNew())
-			{
-				logAdministrator.SetLogLevel(LogLevel.Info)
-					.AddCustomDestination(new DestinationMock((msg) =>
+			logAdministrator.SetLogLevel(LogLevel.Info)
+				.AddCustomDestination(new DestinationMock((msg) =>
+				{
+					// state must be the same thread id the message comes from
+					if (msg.RawMessage != msg.State.ToString())
 					{
-						if (Environment.CurrentManagedThreadId != (int)msg.State)
-						{
-							error = true;
-						}
-					}));
+						error = true;
+					}
+				}));
 
-				void Action()
+			void Action()
+			{
+				Task.Factory.StartNew(() =>
 				{
 					var log = logAdministrator.GetLogger("test");
 
 					using (log.BeginScope(Environment.CurrentManagedThreadId))
 					{
-						for (var i = 0; i < 10; i++) log.Info("");
+						for (var i = 0; i < 10; i++) log.Info(Environment.CurrentManagedThreadId);
 					}
-				}
-
-				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
-				Parallel.Invoke(actions);
+				}).Wait();
 			}
 
-			Assert.False(error);
+			var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
+			Parallel.Invoke(actions);
 		}
 
-		[Fact]
-		public void ScopesMustNotBeSharedBetweenThreadsInTask()
-		{
-			var error = false;
-
-			using (var logAdministrator = LogAdministrator.CreateNew())
-			{
-				logAdministrator.SetLogLevel(LogLevel.Info)
-					.AddCustomDestination(new DestinationMock((msg) =>
-					{
-						// state must be the same thread id the message comes from
-						if (msg.RawMessage != msg.State.ToString())
-						{
-							error = true;
-						}
-					}));
-
-				void Action()
-				{
-					Task.Factory.StartNew(() =>
-					{
-						var log = logAdministrator.GetLogger("test");
-
-						using (log.BeginScope(Environment.CurrentManagedThreadId))
-						{
-							for (var i = 0; i < 10; i++) log.Info(Environment.CurrentManagedThreadId);
-						}
-					}).Wait();
-				}
-
-				var actions = Enumerable.Range(0, 20).Select<int, Action>(i => Action).ToArray();
-				Parallel.Invoke(actions);
-			}
-
-			Assert.False(error);
-		}
+		Assert.False(error);
 	}
 }

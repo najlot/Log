@@ -4,17 +4,16 @@
 using System;
 using System.Collections.Generic;
 
-namespace Najlot.Log.Middleware
+namespace Najlot.Log.Middleware;
+
+/// <summary>
+/// Common interface for a middleware in the logging-pipeline
+/// </summary>
+public interface IMiddleware : IDisposable
 {
-	/// <summary>
-	/// Common interface for a middleware in the logging-pipeline
-	/// </summary>
-	public interface IMiddleware : IDisposable
-	{
-		IMiddleware NextMiddleware { get; set; }
+	IMiddleware NextMiddleware { get; set; }
 
-		void Execute(IEnumerable<LogMessage> messages);
+	void Execute(IEnumerable<LogMessage> messages);
 
-		void Flush();
-	}
+	void Flush();
 }

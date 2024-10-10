@@ -4,33 +4,32 @@
 using Najlot.Log.Middleware;
 using System.Collections.Generic;
 
-namespace Najlot.Log.Tests.Mocks
+namespace Najlot.Log.Tests.Mocks;
+
+[LogConfigurationName(nameof(AddToArgsMiddlewareMock1))]
+public sealed class AddToArgsMiddlewareMock1 : IMiddleware
 {
-	[LogConfigurationName(nameof(AddToArgsMiddlewareMock1))]
-	public sealed class AddToArgsMiddlewareMock1 : IMiddleware
+	public IMiddleware NextMiddleware { get; set; }
+
+	public AddToArgsMiddlewareMock1()
 	{
-		public IMiddleware NextMiddleware { get; set; }
-
-		public AddToArgsMiddlewareMock1()
-		{
-		}
-
-		public void Execute(IEnumerable<LogMessage> messages)
-		{
-			foreach (var message in messages)
-			{
-				var args = new List<object>(message.RawArguments);
-				args.Add(1);
-				message.RawArguments = args;
-			}
-
-			NextMiddleware.Execute(messages);
-		}
-
-		public void Flush()
-		{
-		}
-
-		public void Dispose() => Flush();
 	}
+
+	public void Execute(IEnumerable<LogMessage> messages)
+	{
+		foreach (var message in messages)
+		{
+			var args = new List<object>(message.RawArguments);
+			args.Add(1);
+			message.RawArguments = args;
+		}
+
+		NextMiddleware.Execute(messages);
+	}
+
+	public void Flush()
+	{
+	}
+
+	public void Dispose() => Flush();
 }

@@ -3,17 +3,16 @@
 
 using System;
 
-namespace Najlot.Log.Middleware
+namespace Najlot.Log.Middleware;
+
+/// <summary>
+/// Common interface for a middleware that collects messages from different threads
+/// </summary>
+public interface ICollectMiddleware : IDisposable
 {
-	/// <summary>
-	/// Common interface for a middleware that collects messages from different threads
-	/// </summary>
-	public interface ICollectMiddleware : IDisposable
-	{
-		IMiddleware NextMiddleware { get; set; }
+	IMiddleware NextMiddleware { get; set; }
 
-		void Execute(LogMessage message);
+	void Execute(LogMessage message);
 
-		void Flush();
-	}
+	void Flush();
 }

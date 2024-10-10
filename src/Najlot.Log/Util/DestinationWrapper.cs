@@ -5,22 +5,21 @@ using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System.Collections.Generic;
 
-namespace Najlot.Log.Util
+namespace Najlot.Log.Util;
+
+/// <summary>
+/// Class used for passing data from IMiddleware to IDestination
+/// </summary>
+internal sealed class DestinationWrapper : IMiddleware
 {
-	/// <summary>
-	/// Class used for passing data from IMiddleware to IDestination
-	/// </summary>
-	internal sealed class DestinationWrapper : IMiddleware
-	{
-		public IMiddleware NextMiddleware { get; set; }
-		private readonly IDestination _destination;
+	public IMiddleware NextMiddleware { get; set; }
+	private readonly IDestination _destination;
 
-		public DestinationWrapper(IDestination destination) => _destination = destination;
+	public DestinationWrapper(IDestination destination) => _destination = destination;
 
-		public void Execute(IEnumerable<LogMessage> messages) => _destination.Log(messages);
+	public void Execute(IEnumerable<LogMessage> messages) => _destination.Log(messages);
 
-		public void Flush() => _destination.Flush();
+	public void Flush() => _destination.Flush();
 
-		public void Dispose() => Flush();
-	}
+	public void Dispose() => Flush();
 }

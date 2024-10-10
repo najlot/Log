@@ -3,35 +3,34 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Najlot.Log.Extensions.Logging
+namespace Najlot.Log.Extensions.Logging;
+
+[ProviderAlias("Najlot.Log")]
+public sealed class NajlotLogProvider : ILoggerProvider
 {
-	[ProviderAlias("Najlot.Log")]
-	public sealed class NajlotLogProvider : ILoggerProvider
+	private LogAdministrator _logAdministrator;
+	private bool _disposed = false;
+
+	public NajlotLogProvider(LogAdministrator logConfigurator)
 	{
-		private LogAdministrator _logAdministrator;
-		private bool _disposed = false;
+		_logAdministrator = logConfigurator;
+	}
 
-		public NajlotLogProvider(LogAdministrator logConfigurator)
+	public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+	{
+		return new NajlotLogWrapper(_logAdministrator.GetLogger(categoryName));
+	}
+
+	public void Dispose()
+	{
+		if (_disposed)
 		{
-			_logAdministrator = logConfigurator;
+			return;
 		}
+		
+		_disposed = true;
 
-		public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
-		{
-			return new NajlotLogWrapper(_logAdministrator.GetLogger(categoryName));
-		}
-
-		public void Dispose()
-		{
-			if (_disposed)
-			{
-				return;
-			}
-			
-			_disposed = true;
-
-			_logAdministrator.Dispose();
-			_logAdministrator = null;
-		}
+		_logAdministrator.Dispose();
+		_logAdministrator = null;
 	}
 }

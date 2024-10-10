@@ -5,32 +5,31 @@ using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
 
-namespace Najlot.Log.Tests.Mocks
+namespace Najlot.Log.Tests.Mocks;
+
+public sealed class ActionMiddleware : IMiddleware
 {
-	public sealed class ActionMiddleware : IMiddleware
+	private readonly Action<IEnumerable<LogMessage>> _action;
+
+	public IMiddleware NextMiddleware { get; set; }
+
+	public ActionMiddleware(Action<IEnumerable<LogMessage>> action)
 	{
-		private readonly Action<IEnumerable<LogMessage>> _action;
+		_action = action;
+	}
 
-		public IMiddleware NextMiddleware { get; set; }
+	public void Dispose()
+	{
+		// nothing to do
+	}
 
-		public ActionMiddleware(Action<IEnumerable<LogMessage>> action)
-		{
-			_action = action;
-		}
+	public void Execute(IEnumerable<LogMessage> messages)
+	{
+		_action(messages);
+	}
 
-		public void Dispose()
-		{
-			// nothing to do
-		}
-
-		public void Execute(IEnumerable<LogMessage> messages)
-		{
-			_action(messages);
-		}
-
-		public void Flush()
-		{
-			// nothing to do
-		}
+	public void Flush()
+	{
+		// nothing to do
 	}
 }

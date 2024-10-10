@@ -3,15 +3,14 @@
 
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class CommonTests
 {
-	public class CommonTests
+	[Fact]
+	public void LogAdministratorMustBeSingleton()
 	{
-		[Fact]
-		public void LogAdministratorMustBeSingleton()
-		{
-			var instance = LogAdministrator.Instance;
-			Assert.Same(instance, LogAdministrator.Instance);
-		}
+		var instance = LogAdministrator.Instance;
+		Assert.Same(instance, LogAdministrator.Instance);
 	}
 }

@@ -7,45 +7,72 @@ using System.Linq;
 using System.Threading;
 using Xunit;
 
-namespace Najlot.Log.Tests
+namespace Najlot.Log.Tests;
+
+public class ConcurrentCollectMiddlewareTests
 {
-	public class ConcurrentCollectMiddlewareTests
+	[Fact]
+	public void MiddlewareShouldCollectAndWriteMultiple()
 	{
-		[Fact]
-		public void MiddlewareShouldCollectAndWriteMultiple()
+		var maxMessages = 0;
+
+		using var middleware = new ConcurrentCollectMiddleware
 		{
-			var maxMessages = 0;
-
-			using var middleware = new ConcurrentCollectMiddleware
+			NextMiddleware = new ActionMiddleware(messages =>
 			{
-				NextMiddleware = new ActionMiddleware(messages =>
+				Thread.Sleep(10);
+
+				var count = messages.Count();
+				if (maxMessages < count)
 				{
-					Thread.Sleep(10);
+					maxMessages = count;
+				}
+			})
+		};
 
-					var count = messages.Count();
-					if (maxMessages < count)
-					{
-						maxMessages = count;
-					}
-				})
-			};
-
-			for (var i = 0; i < 25; i++)
-			{
-				middleware.Execute(new LogMessage());
-			}
-
-			middleware.Flush();
-
-			Assert.NotEqual(0, maxMessages);
-			Assert.NotEqual(1, maxMessages);
+		for (var i = 0; i < 25; i++)
+		{
+			middleware.Execute(new LogMessage());
 		}
 
-		[Fact]
-		public void FlushShouldWriteAllMessages()
-		{
-			var messagesCount = 0;
+		middleware.Flush();
 
+		Assert.NotEqual(0, maxMessages);
+		Assert.NotEqual(1, maxMessages);
+	}
+
+	[Fact]
+	public void FlushShouldWriteAllMessages()
+	{
+		var messagesCount = 0;
+
+		using var middleware = new ConcurrentCollectMiddleware
+		{
+			NextMiddleware = new ActionMiddleware(messages =>
+			{
+				Thread.Sleep(10);
+
+				var count = messages.Count();
+				messagesCount += count;
+			})
+		};
+
+		for (var i = 0; i < 25; i++)
+		{
+			middleware.Execute(new LogMessage());
+		}
+
+		middleware.Flush();
+
+		Assert.Equal(25, messagesCount);
+	}
+
+	[Fact]
+	public void DisposeShouldWriteAllMessages()
+	{
+		var messagesCount = 0;
+
+		{
 			using var middleware = new ConcurrentCollectMiddleware
 			{
 				NextMiddleware = new ActionMiddleware(messages =>
@@ -61,36 +88,8 @@ namespace Najlot.Log.Tests
 			{
 				middleware.Execute(new LogMessage());
 			}
-
-			middleware.Flush();
-
-			Assert.Equal(25, messagesCount);
 		}
 
-		[Fact]
-		public void DisposeShouldWriteAllMessages()
-		{
-			var messagesCount = 0;
-
-			{
-				using var middleware = new ConcurrentCollectMiddleware
-				{
-					NextMiddleware = new ActionMiddleware(messages =>
-					{
-						Thread.Sleep(10);
-
-						var count = messages.Count();
-						messagesCount += count;
-					})
-				};
-
-				for (var i = 0; i < 25; i++)
-				{
-					middleware.Execute(new LogMessage());
-				}
-			}
-
-			Assert.Equal(25, messagesCount);
-		}
+		Assert.Equal(25, messagesCount);
 	}
 }

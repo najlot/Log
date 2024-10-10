@@ -3,12 +3,11 @@
 
 using System.Collections.Generic;
 
-namespace Najlot.Log.Configuration.FileSource
-{
-	public class Configurations
-	{
-		public LogLevel LogLevel { get; set; }
+namespace Najlot.Log.Configuration.FileSource;
 
-		public List<DestinationEntry> Destinations { get; set; } = new List<DestinationEntry>();
-	}
+public class Configurations
+{
+	public LogLevel LogLevel { get; set; }
+
+	public List<DestinationEntry> Destinations { get; set; } = new List<DestinationEntry>();
 }

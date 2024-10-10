@@ -3,20 +3,19 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Najlot.Log.Tests.Mocks
+namespace Najlot.Log.Tests.Mocks;
+
+public class DependencyInjectionLoggerService
 {
-	public class DependencyInjectionLoggerService
+	private readonly ILogger<DependencyInjectionLoggerService> _logger;
+
+	public DependencyInjectionLoggerService(ILogger<DependencyInjectionLoggerService> logger)
 	{
-		private readonly ILogger<DependencyInjectionLoggerService> _logger;
+		_logger = logger;
+	}
 
-		public DependencyInjectionLoggerService(ILogger<DependencyInjectionLoggerService> logger)
-		{
-			_logger = logger;
-		}
-
-		public ILogger<DependencyInjectionLoggerService> GetLogger()
-		{
-			return _logger;
-		}
+	public ILogger<DependencyInjectionLoggerService> GetLogger()
+	{
+		return _logger;
 	}
 }

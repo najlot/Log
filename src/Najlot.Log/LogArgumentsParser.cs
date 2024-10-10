@@ -6,200 +6,199 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Najlot.Log
+namespace Najlot.Log;
+
+/// <summary>
+/// Helps to work with structured messages
+/// </summary>
+public static class LogArgumentsParser
 {
-	/// <summary>
-	/// Helps to work with structured messages
-	/// </summary>
-	public static class LogArgumentsParser
+	private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> ParsedKeyCache
+		= new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
+
+	public static IReadOnlyList<KeyValuePair<string, object>> ParseArguments(string message, object[] args)
 	{
-		private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> ParsedKeyCache
-			= new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
-
-		public static IReadOnlyList<KeyValuePair<string, object>> ParseArguments(string message, object[] args)
+		if (args == null || args.Length == 0 || string.IsNullOrWhiteSpace(message))
 		{
-			if (args == null || args.Length == 0 || string.IsNullOrWhiteSpace(message))
-			{
-				return Array.Empty<KeyValuePair<string, object>>();
-			}
-
-			if (ParsedKeyCache.TryGetValue(message, out var value))
-			{
-				return CopyArgsToCached(args, value);
-			}
-
-			var arguments = new List<KeyValuePair<string, object>>();
-
-			var argId = 0;
-			var startIndex = -1;
-			
-			do
-			{
-				startIndex = FindParseStartIndex(message, startIndex);
-
-				var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
-
-				if (endIndex == -1)
-				{
-					break;
-				}
-
-				var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
-				var keyWithoutFormat = key.Split(':')[0];
-
-				startIndex = endIndex;
-
-				if (arguments.FindIndex(0, p => p.Key == keyWithoutFormat) > -1)
-				{
-					continue;
-				}
-
-				object arg = null;
-				if (argId < args.Length)
-				{
-					arg = args[argId];
-				}
-
-				arguments.Add(new KeyValuePair<string, object>(keyWithoutFormat, arg));
-
-				argId++;
-			}
-			while (true);
-
-			CacheArgumentKeys(message, arguments);
-
-			return arguments;
+			return Array.Empty<KeyValuePair<string, object>>();
 		}
 
-		private static IReadOnlyList<KeyValuePair<string, object>> CopyArgsToCached(object[] args, KeyValuePair<string, object>[] value)
+		if (ParsedKeyCache.TryGetValue(message, out var value))
 		{
-			var cached = new List<KeyValuePair<string, object>>(value);
-
-			for (var i = 0; i < cached.Count; i++)
-			{
-				if (i < args.Length)
-				{
-					cached[i] = new KeyValuePair<string, object>(cached[i].Key, args[i]);
-				}
-			}
-
-			return cached;
+			return CopyArgsToCached(args, value);
 		}
 
-		private static void CacheArgumentKeys(string message, List<KeyValuePair<string, object>> arguments)
-		{
-			var cache = new KeyValuePair<string, object>[arguments.Count];
+		var arguments = new List<KeyValuePair<string, object>>();
 
-			for (var i = 0; i < cache.Length; i++)
+		var argId = 0;
+		var startIndex = -1;
+		
+		do
+		{
+			startIndex = FindParseStartIndex(message, startIndex);
+
+			var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
+
+			if (endIndex == -1)
 			{
-				cache[i] = new KeyValuePair<string, object>(arguments[i].Key, null);
+				break;
 			}
 
-			ParsedKeyCache.TryAdd(message, cache);
+			var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
+			var keyWithoutFormat = key.Split(':')[0];
+
+			startIndex = endIndex;
+
+			if (arguments.FindIndex(0, p => p.Key == keyWithoutFormat) > -1)
+			{
+				continue;
+			}
+
+			object arg = null;
+			if (argId < args.Length)
+			{
+				arg = args[argId];
+			}
+
+			arguments.Add(new KeyValuePair<string, object>(keyWithoutFormat, arg));
+
+			argId++;
+		}
+		while (true);
+
+		CacheArgumentKeys(message, arguments);
+
+		return arguments;
+	}
+
+	private static IReadOnlyList<KeyValuePair<string, object>> CopyArgsToCached(object[] args, KeyValuePair<string, object>[] value)
+	{
+		var cached = new List<KeyValuePair<string, object>>(value);
+
+		for (var i = 0; i < cached.Count; i++)
+		{
+			if (i < args.Length)
+			{
+				cached[i] = new KeyValuePair<string, object>(cached[i].Key, args[i]);
+			}
 		}
 
-		private static int FindParseStartIndex(string message, int startIndex)
+		return cached;
+	}
+
+	private static void CacheArgumentKeys(string message, List<KeyValuePair<string, object>> arguments)
+	{
+		var cache = new KeyValuePair<string, object>[arguments.Count];
+
+		for (var i = 0; i < cache.Length; i++)
 		{
-			startIndex = message.IndexOf('{', startIndex + 1);
-
-			if (startIndex == -1 || startIndex == message.Length - 1)
-			{
-				return -1;
-			}
-
-			if (message[startIndex + 1] == '{')
-			{
-				return FindParseStartIndex(message, startIndex + 1);
-			}
-
-			return startIndex;
+			cache[i] = new KeyValuePair<string, object>(arguments[i].Key, null);
 		}
 
-		public static string InsertArguments(string message, IReadOnlyList<KeyValuePair<string, object>> arguments)
+		ParsedKeyCache.TryAdd(message, cache);
+	}
+
+	private static int FindParseStartIndex(string message, int startIndex)
+	{
+		startIndex = message.IndexOf('{', startIndex + 1);
+
+		if (startIndex == -1 || startIndex == message.Length - 1)
 		{
-			if (arguments == null || arguments.Count == 0 || string.IsNullOrWhiteSpace(message))
-			{
-				return message;
-			}
-
-			var startIndex = -1;
-
-			do
-			{
-				FindInsertStartIndex(ref message, ref startIndex);
-
-				var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
-
-				if (endIndex == -1)
-				{
-					break;
-				}
-
-				var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
-				var splittedKey = key.Split(':');
-				var keyWithoutFormat = splittedKey[0];
-
-				var index = FindKeyIndex(arguments, keyWithoutFormat);
-
-				if (index > -1)
-				{
-					var value = arguments[index].Value;
-					var valueString = ConvertValueToString(splittedKey, value);
-					message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
-					startIndex += valueString.Length - 1;
-				}
-			}
-			while (true);
-
-			return message;
-		}
-
-		private static int FindKeyIndex(IReadOnlyList<KeyValuePair<string, object>> list, string key)
-		{
-			var count = list.Count;
-
-			for (var i = 0; i < count; i++)
-			{
-				if (list[i].Key == key)
-				{
-					return i;
-				}
-			}
-
 			return -1;
 		}
 
-		private static string ConvertValueToString(string[] splittedKey, object value)
+		if (message[startIndex + 1] == '{')
 		{
-			if (splittedKey.Length > 1 && value is IFormattable formattable)
-			{
-				var format = string.Join(":", splittedKey.Skip(1));
-				return formattable.ToString(format, null);
-			}
-
-			return value == null ? string.Empty : value.ToString();
+			return FindParseStartIndex(message, startIndex + 1);
 		}
 
-		private static void FindInsertStartIndex(ref string message, ref int startIndex)
+		return startIndex;
+	}
+
+	public static string InsertArguments(string message, IReadOnlyList<KeyValuePair<string, object>> arguments)
+	{
+		if (arguments == null || arguments.Count == 0 || string.IsNullOrWhiteSpace(message))
 		{
-			startIndex = message.IndexOf('{', startIndex + 1);
+			return message;
+		}
 
-			if (startIndex == -1)
+		var startIndex = -1;
+
+		do
+		{
+			FindInsertStartIndex(ref message, ref startIndex);
+
+			var endIndex = startIndex == -1 ? -1 : message.IndexOf('}', startIndex + 1);
+
+			if (endIndex == -1)
 			{
-				return;
+				break;
 			}
 
-			if (startIndex == message.Length - 1)
-			{
-				startIndex = -1;
-				return;
-			}
+			var key = message.Substring(startIndex + 1, endIndex - startIndex - 1);
+			var splittedKey = key.Split(':');
+			var keyWithoutFormat = splittedKey[0];
 
-			if (message[startIndex + 1] == '{')
+			var index = FindKeyIndex(arguments, keyWithoutFormat);
+
+			if (index > -1)
 			{
-				message = message.Remove(startIndex, 1);
-				FindInsertStartIndex(ref message, ref startIndex);
+				var value = arguments[index].Value;
+				var valueString = ConvertValueToString(splittedKey, value);
+				message = message.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, valueString);
+				startIndex += valueString.Length - 1;
 			}
+		}
+		while (true);
+
+		return message;
+	}
+
+	private static int FindKeyIndex(IReadOnlyList<KeyValuePair<string, object>> list, string key)
+	{
+		var count = list.Count;
+
+		for (var i = 0; i < count; i++)
+		{
+			if (list[i].Key == key)
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	private static string ConvertValueToString(string[] splittedKey, object value)
+	{
+		if (splittedKey.Length > 1 && value is IFormattable formattable)
+		{
+			var format = string.Join(":", splittedKey.Skip(1));
+			return formattable.ToString(format, null);
+		}
+
+		return value == null ? string.Empty : value.ToString();
+	}
+
+	private static void FindInsertStartIndex(ref string message, ref int startIndex)
+	{
+		startIndex = message.IndexOf('{', startIndex + 1);
+
+		if (startIndex == -1)
+		{
+			return;
+		}
+
+		if (startIndex == message.Length - 1)
+		{
+			startIndex = -1;
+			return;
+		}
+
+		if (message[startIndex + 1] == '{')
+		{
+			message = message.Remove(startIndex, 1);
+			FindInsertStartIndex(ref message, ref startIndex);
 		}
 	}
 }

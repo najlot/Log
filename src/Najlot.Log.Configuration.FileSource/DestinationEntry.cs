@@ -4,15 +4,14 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Najlot.Log.Configuration.FileSource
+namespace Najlot.Log.Configuration.FileSource;
+
+public class DestinationEntry : ConfigurationEntry
 {
-	public class DestinationEntry : ConfigurationEntry
-	{
-		public List<Parameter> Parameters { get; set; }
+	public List<Parameter> Parameters { get; set; }
 
-		public ConfigurationEntry CollectMiddleware { get; set; }
+	public ConfigurationEntry CollectMiddleware { get; set; }
 
-		[XmlArrayItem("Middleware")]
-		public List<ConfigurationEntry> Middlewares { get; set; }
-	}
+	[XmlArrayItem("Middleware")]
+	public List<ConfigurationEntry> Middlewares { get; set; }
 }
