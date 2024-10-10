@@ -78,7 +78,7 @@ internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisp
 
 		var previousMiddleware = currentMiddleware;
 
-		while (!(currentMiddleware.NextMiddleware is DestinationWrapper))
+		while (currentMiddleware.NextMiddleware is not DestinationWrapper)
 		{
 			previousMiddleware = currentMiddleware;
 			currentMiddleware = currentMiddleware.NextMiddleware;
@@ -135,9 +135,7 @@ internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisp
 		return collectMiddleware;
 	}
 
-	#region IDisposable Support
-
-	private bool _disposedValue = false; // To detect redundant calls
+	private bool _disposedValue = false;
 
 	private void Dispose(bool disposing)
 	{
@@ -153,12 +151,9 @@ internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisp
 		}
 	}
 
-	// This code added to correctly implement the disposable pattern.
 	public void Dispose()
 	{
 		Dispose(true);
 		GC.SuppressFinalize(this);
 	}
-
-	#endregion IDisposable Support
 }

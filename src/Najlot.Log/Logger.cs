@@ -20,7 +20,7 @@ public sealed class Logger : ILogger
 	private volatile bool _logError;
 	private volatile bool _logFatal;
 
-	private static readonly object[] _emptyArgs = Array.Empty<object>();
+	private static readonly object[] _emptyArgs = [];
 
 	internal Logger(LogExecutor logExecutor)
 	{

@@ -47,15 +47,11 @@ public static class LogConfiguratorExtension
 					.ToList()
 			};
 
-			using (var stringWriter = new CustomStringWriter(Encoding.UTF8))
-			{
-				using (var xmlWriter = new XmlTextWriter(stringWriter) { Formatting = Formatting.Indented })
-				{
-					var xmlSerializer = new XmlSerializer(typeof(Configurations));
-					xmlSerializer.Serialize(xmlWriter, configurations);
-					File.WriteAllText(path, stringWriter.ToString(), Encoding.UTF8);
-				}
-			}
+			using var stringWriter = new CustomStringWriter(Encoding.UTF8);
+			using var xmlWriter = new XmlTextWriter(stringWriter) { Formatting = Formatting.Indented };
+			var xmlSerializer = new XmlSerializer(typeof(Configurations));
+			xmlSerializer.Serialize(xmlWriter, configurations);
+			File.WriteAllText(path, stringWriter.ToString(), Encoding.UTF8);
 		}
 		catch (Exception ex)
 		{
@@ -71,7 +67,11 @@ public static class LogConfiguratorExtension
 	/// <param name="listenForChanges">Should the changes happened at runtime be reflected to the logger</param>
 	/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>
 	/// <returns></returns>
-	public static LogAdministrator ReadConfigurationFromXmlFile(this LogAdministrator logAdministrator, string path, bool listenForChanges = true, bool writeExampleIfSourceDoesNotExists = false)
+	public static LogAdministrator ReadConfigurationFromXmlFile(
+		this LogAdministrator logAdministrator,
+		string path,
+		bool listenForChanges = true,
+		bool writeExampleIfSourceDoesNotExists = false)
 	{
 		try
 		{
@@ -111,7 +111,7 @@ public static class LogConfiguratorExtension
 		fileSystemWatcher.Changed += (object sender, FileSystemEventArgs e) =>
 		{
 			// Ensure the file is not accessed any more
-			Thread.Sleep(75);
+			Thread.Sleep(100);
 
 			try
 			{

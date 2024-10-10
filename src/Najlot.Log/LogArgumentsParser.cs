@@ -13,17 +13,16 @@ namespace Najlot.Log;
 /// </summary>
 public static class LogArgumentsParser
 {
-	private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> ParsedKeyCache
-		= new ConcurrentDictionary<string, KeyValuePair<string, object>[]>();
+	private static readonly ConcurrentDictionary<string, KeyValuePair<string, object>[]> _parsedKeyCache = [];
 
 	public static IReadOnlyList<KeyValuePair<string, object>> ParseArguments(string message, object[] args)
 	{
 		if (args == null || args.Length == 0 || string.IsNullOrWhiteSpace(message))
 		{
-			return Array.Empty<KeyValuePair<string, object>>();
+			return [];
 		}
 
-		if (ParsedKeyCache.TryGetValue(message, out var value))
+		if (_parsedKeyCache.TryGetValue(message, out var value))
 		{
 			return CopyArgsToCached(args, value);
 		}
@@ -95,7 +94,7 @@ public static class LogArgumentsParser
 			cache[i] = new KeyValuePair<string, object>(arguments[i].Key, null);
 		}
 
-		ParsedKeyCache.TryAdd(message, cache);
+		_parsedKeyCache.TryAdd(message, cache);
 	}
 
 	private static int FindParseStartIndex(string message, int startIndex)

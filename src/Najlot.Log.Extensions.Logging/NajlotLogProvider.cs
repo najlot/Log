@@ -9,8 +9,7 @@ namespace Najlot.Log.Extensions.Logging;
 public sealed class NajlotLogProvider : ILoggerProvider
 {
 	private LogAdministrator _logAdministrator;
-	private bool _disposed = false;
-
+	
 	public NajlotLogProvider(LogAdministrator logConfigurator)
 	{
 		_logAdministrator = logConfigurator;
@@ -21,16 +20,16 @@ public sealed class NajlotLogProvider : ILoggerProvider
 		return new NajlotLogWrapper(_logAdministrator.GetLogger(categoryName));
 	}
 
+	private bool _disposed = false;
+
 	public void Dispose()
 	{
-		if (_disposed)
+		if (!_disposed)
 		{
-			return;
-		}
-		
-		_disposed = true;
+			_disposed = true;
 
-		_logAdministrator.Dispose();
-		_logAdministrator = null;
+			_logAdministrator?.Dispose();
+			_logAdministrator = null;
+		}
 	}
 }

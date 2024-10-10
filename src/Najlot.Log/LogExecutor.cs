@@ -15,8 +15,8 @@ internal sealed class LogExecutor : IDisposable
 {
 	#region State Support
 
-	private readonly ThreadLocal<object> _currentState = new ThreadLocal<object>(() => null);
-	private readonly ThreadLocal<Stack<object>> _states = new ThreadLocal<Stack<object>>(() => new Stack<object>());
+	private readonly ThreadLocal<object> _currentState = new(() => null);
+	private readonly ThreadLocal<Stack<object>> _states = new(() => new Stack<object>());
 
 	public IDisposable BeginScope<T>(T state)
 	{
@@ -32,8 +32,8 @@ internal sealed class LogExecutor : IDisposable
 
 	private readonly string _category;
 	private readonly LoggerPool _loggerPool;
-	private static readonly object[] EmptyArgs = Array.Empty<object>();
-	private static readonly IReadOnlyList<KeyValuePair<string, object>> EmptyKeyValueList = Array.Empty<KeyValuePair<string, object>>();
+	private static readonly object[] _emptyArgs = [];
+	private static readonly IReadOnlyList<KeyValuePair<string, object>> _emptyKeyValueList = [];
 
 	public LogExecutor(string category, LoggerPool loggerPool)
 	{
@@ -58,8 +58,8 @@ internal sealed class LogExecutor : IDisposable
 					State = state,
 					RawMessage = string.Empty,
 					Exception = ex,
-					RawArguments = EmptyArgs,
-					Arguments = EmptyKeyValueList
+					RawArguments = _emptyArgs,
+					Arguments = _emptyKeyValueList
 				};
 
 				if (args != null)
@@ -90,9 +90,7 @@ internal sealed class LogExecutor : IDisposable
 
 	public void Flush() => _loggerPool.Flush();
 
-	#region IDisposable Support
-
-	private bool _disposedValue = false; // To detect redundant calls
+	private bool _disposedValue = false;
 
 	private void Dispose(bool disposing)
 	{
@@ -113,6 +111,4 @@ internal sealed class LogExecutor : IDisposable
 		Dispose(true);
 		GC.SuppressFinalize(this);
 	}
-
-	#endregion IDisposable Support
 }

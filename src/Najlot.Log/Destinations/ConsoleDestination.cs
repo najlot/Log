@@ -61,7 +61,7 @@ public sealed class ConsoleDestination : IDestination
 			{
 				first = false;
 				previousLogLevel = message.LogLevel;
-				SetColor(previousLogLevel);
+				SetColor(message.LogLevel);
 			}
 			else if (previousLogLevel != message.LogLevel)
 			{
@@ -82,32 +82,16 @@ public sealed class ConsoleDestination : IDestination
 
 	private static void SetColor(LogLevel logLevel)
 	{
-		switch (logLevel)
+		Console.ForegroundColor = logLevel switch
 		{
-			case LogLevel.Trace:
-				Console.ForegroundColor = ConsoleColor.DarkGray;
-				break;
-
-			case LogLevel.Debug:
-				Console.ForegroundColor = ConsoleColor.Gray;
-				break;
-
-			case LogLevel.Info:
-				Console.ForegroundColor = ConsoleColor.White;
-				break;
-
-			case LogLevel.Warn:
-				Console.ForegroundColor = ConsoleColor.Yellow;
-				break;
-
-			case LogLevel.Error:
-				Console.ForegroundColor = ConsoleColor.Red;
-				break;
-
-			case LogLevel.Fatal:
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				break;
-		}
+			LogLevel.Trace => ConsoleColor.DarkGray,
+			LogLevel.Debug => ConsoleColor.Gray,
+			LogLevel.Info => ConsoleColor.White,
+			LogLevel.Warn => ConsoleColor.Yellow,
+			LogLevel.Error => ConsoleColor.Red,
+			LogLevel.Fatal => ConsoleColor.DarkRed,
+			_ => ConsoleColor.White,
+		};
 	}
 
 	public void Flush()

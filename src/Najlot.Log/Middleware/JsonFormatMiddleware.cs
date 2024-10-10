@@ -15,7 +15,7 @@ public sealed class JsonFormatMiddleware : IMiddleware
 {
 	public IMiddleware NextMiddleware { get; set; }
 
-	private static readonly CultureInfo _enUsCultureInfo = new CultureInfo("en-US");
+	private static readonly CultureInfo _enUsCultureInfo = new("en-US");
 
 	private static void AppendJson(StringBuilder sb, string raw)
 	{

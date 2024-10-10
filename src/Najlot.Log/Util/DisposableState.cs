@@ -22,9 +22,7 @@ internal sealed class DisposableState : IDisposable
 		_states = states;
 	}
 
-	#region IDisposable Support
-
-	private bool _disposedValue = false; // To detect redundant calls
+	private bool _disposedValue = false;
 
 	public void Dispose()
 	{
@@ -34,6 +32,4 @@ internal sealed class DisposableState : IDisposable
 			_currentState.Value = _states.Pop();
 		}
 	}
-
-	#endregion IDisposable Support
 }

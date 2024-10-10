@@ -77,20 +77,14 @@ public sealed class HttpDestination : IDestination
 			requestStream.Write(bytes, 0, bytes.Length);
 		}
 
-		using (var response = (HttpWebResponse)request.GetResponse())
+		using var response = (HttpWebResponse)request.GetResponse();
+		if ((int)response.StatusCode >= 400)
 		{
-			if ((int)response.StatusCode >= 400)
-			{
-				using (var responseStream = response.GetResponseStream())
-				{
-					using (var myStreamReader = new StreamReader(responseStream, Encoding.UTF8))
-					{
-						var responseString = myStreamReader.ReadToEnd();
-						var ex = new Exception(responseString);
-						LogErrorHandler.Instance.Handle("Error writing log messages to " + Uri, ex);
-					}
-				}
-			}
+			using var responseStream = response.GetResponseStream();
+			using var myStreamReader = new StreamReader(responseStream, Encoding.UTF8);
+			var responseString = myStreamReader.ReadToEnd();
+			var ex = new Exception(responseString);
+			LogErrorHandler.Instance.Handle("Error writing log messages to " + Uri, ex);
 		}
 	}
 
@@ -99,12 +93,8 @@ public sealed class HttpDestination : IDestination
 		// Nothing to do
 	}
 
-	#region IDisposable Support
-
 	public void Dispose()
 	{
 		// Nothing to do
 	}
-
-	#endregion IDisposable Support
 }

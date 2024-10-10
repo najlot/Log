@@ -34,7 +34,7 @@ public class FileDestinationTests
 		{
 			destination.Log(new LogMessage[]
 			{
-				new LogMessage()
+				new()
 				{
 					Message = i.ToString(),
 				}

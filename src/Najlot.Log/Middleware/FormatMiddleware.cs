@@ -14,7 +14,7 @@ namespace Najlot.Log.Middleware;
 public sealed class FormatMiddleware : IMiddleware
 {
 	private const string _delimiter = " - ";
-	private static readonly CultureInfo _enUsCultureInfo = new CultureInfo("en-US");
+	private static readonly CultureInfo _enUsCultureInfo = new("en-US");
 
 	public IMiddleware NextMiddleware { get; set; }
 

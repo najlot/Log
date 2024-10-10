@@ -33,11 +33,11 @@ public class JsonFormattingMiddlewareTests
 			State = null,
 			RawMessage = "some stuff happened {count:D3} times",
 			Exception = null,
-			RawArguments = Array.Empty<object>(),
+			RawArguments = [],
 			Arguments = new List<KeyValuePair<string, object>>
 			{
-				new KeyValuePair<string, object>("count", 10),
-				new KeyValuePair<string, object>("count", 10)
+				new("count", 10),
+				new("count", 10)
 			}
 		};
 
@@ -79,11 +79,11 @@ public class JsonFormattingMiddlewareTests
 			State = null,
 			RawMessage = "some stuff happened {count:D3} times",
 			Exception = exc,
-			RawArguments = Array.Empty<object>(),
+			RawArguments = [],
 			Arguments = new List<KeyValuePair<string, object>>
 			{
-				new KeyValuePair<string, object>("count", 10),
-				new KeyValuePair<string, object>("count", 10)
+				new("count", 10),
+				new("count", 10)
 			}
 		};
 

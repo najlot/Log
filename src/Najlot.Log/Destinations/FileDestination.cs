@@ -88,7 +88,10 @@ public sealed class FileDestination : IDestination
 			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 		}
 
-		if (ShouldAutoCleanUp()) CleanUpOldFiles(path);
+		if (ShouldAutoCleanUp())
+		{
+			CleanUpOldFiles(path);
+		}
 	}
 
 	public FileDestination(string outputPath, int maxFiles, string logFilePaths, bool keepFileOpen)
@@ -109,7 +112,10 @@ public sealed class FileDestination : IDestination
 			SetStream(new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, FileOptions.WriteThrough));
 		}
 
-		if (ShouldAutoCleanUp()) CleanUpOldFiles(path);
+		if (ShouldAutoCleanUp())
+		{
+			CleanUpOldFiles(path);
+		}
 	}
 
 	public void Log(IEnumerable<LogMessage> messages)
@@ -132,7 +138,10 @@ public sealed class FileDestination : IDestination
 			{
 				_lastFilePath = path;
 				EnsureDirectoryExists(path);
-				if (ShouldAutoCleanUp()) cleanUp = true;
+				if (ShouldAutoCleanUp())
+				{
+					cleanUp = true;
+				}
 
 				if (keepFileOpen)
 				{
@@ -161,7 +170,10 @@ public sealed class FileDestination : IDestination
 				File.AppendAllText(path, sb.ToString(), _encoding);
 			}
 
-			if (cleanUp) CleanUpOldFiles(path);
+			if (cleanUp)
+			{
+				CleanUpOldFiles(path);
+			}
 		}
 		catch (DirectoryNotFoundException)
 		{
@@ -213,11 +225,6 @@ public sealed class FileDestination : IDestination
 
 	private static void EnsureDirectoryExists(string path)
 	{
-		if (File.Exists(path))
-		{
-			return;
-		}
-		
 		var dir = Path.GetDirectoryName(path);
 
 		if (!string.IsNullOrWhiteSpace(dir))
@@ -247,9 +254,7 @@ public sealed class FileDestination : IDestination
 		_stream?.Flush();
 	}
 
-	#region IDisposable Support
-
-	private bool _disposedValue = false; // To detect redundant calls
+	private bool _disposedValue = false;
 
 	public void Dispose(bool disposing)
 	{
@@ -269,6 +274,4 @@ public sealed class FileDestination : IDestination
 	{
 		Dispose(true);
 	}
-
-	#endregion IDisposable Support
 }

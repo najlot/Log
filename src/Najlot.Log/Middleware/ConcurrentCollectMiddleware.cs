@@ -15,7 +15,7 @@ namespace Najlot.Log.Middleware;
 [LogConfigurationName(nameof(ConcurrentCollectMiddleware))]
 public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 {
-	private readonly ConcurrentQueue<LogMessage> _messages = new ConcurrentQueue<LogMessage>();
+	private readonly ConcurrentQueue<LogMessage> _messages = new();
 	private volatile bool _cancellationRequested = false;
 	private Thread _thread;
 
@@ -35,7 +35,7 @@ public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 	{
 		var messageList = new List<LogMessage>();
 
-		if (!(param is ConcurrentQueue<LogMessage> queue))
+		if (param is not ConcurrentQueue<LogMessage> queue)
 		{
 			return;
 		}

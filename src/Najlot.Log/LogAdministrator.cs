@@ -134,7 +134,7 @@ public sealed class LogAdministrator : IDisposable
 			return this;
 		}
 
-		middlewareNames = Array.Empty<string>();
+		middlewareNames = [];
 		return this;
 	}
 
@@ -317,7 +317,7 @@ public sealed class LogAdministrator : IDisposable
 
 	#region IDisposable Support
 
-	private bool _disposedValue = false; // To detect redundant calls
+	private bool _disposedValue = false;
 
 	public void Dispose()
 	{

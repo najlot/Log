@@ -128,8 +128,6 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 		}
 	}
 	
-	#region IDisposable Support
-
 	private bool _disposedValue = false;
 
 	private void Dispose(bool disposing)
@@ -160,6 +158,4 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 		Dispose(true);
 		GC.SuppressFinalize(this);
 	}
-
-	#endregion IDisposable Support
 }
