@@ -15,10 +15,10 @@ namespace Najlot.Log;
 public sealed class LogAdministrator : IDisposable
 {
 	private readonly LoggerPool _loggerPool;
-	private readonly Dictionary<string, List<string>> _middlewares = new Dictionary<string, List<string>>();
-	private readonly Dictionary<string, string> _collectMiddlewares = new Dictionary<string, string>();
-	private readonly List<IMiddlewareConfigurationObserver> _observerList = new List<IMiddlewareConfigurationObserver>();
-	private readonly List<ILogLevelObserver> _loglevelObserverList = new List<ILogLevelObserver>();
+	private readonly Dictionary<string, List<string>> _middlewares = [];
+	private readonly Dictionary<string, string> _collectMiddlewares = [];
+	private readonly List<IMiddlewareConfigurationObserver> _observerList = [];
+	private readonly List<ILogLevelObserver> _loglevelObserverList = [];
 
 	private volatile LogLevel _logLevel = LogLevel.Debug;
 

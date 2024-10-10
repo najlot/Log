@@ -9,5 +9,5 @@ public class Configurations
 {
 	public LogLevel LogLevel { get; set; }
 
-	public List<DestinationEntry> Destinations { get; set; } = new List<DestinationEntry>();
+	public List<DestinationEntry> Destinations { get; set; } = [];
 }

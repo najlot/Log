@@ -19,8 +19,10 @@ public sealed class AddToArgsMiddlewareMock1 : IMiddleware
 	{
 		foreach (var message in messages)
 		{
-			var args = new List<object>(message.RawArguments);
-			args.Add(1);
+			var args = new List<object>(message.RawArguments)
+			{
+				1
+			};
 			message.RawArguments = args;
 		}
 

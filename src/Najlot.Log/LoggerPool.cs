@@ -14,9 +14,9 @@ namespace Najlot.Log;
 internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 {
 	private readonly LogAdministrator _logAdministrator;
-	private List<DestinationEntry> _destinations = new List<DestinationEntry>();
-	private readonly List<DestinationEntry> _pendingDestinations = new List<DestinationEntry>();
-	private readonly Dictionary<string, Logger> _loggerCache = new Dictionary<string, Logger>();
+	private List<DestinationEntry> _destinations = [];
+	private readonly List<DestinationEntry> _pendingDestinations = [];
+	private readonly Dictionary<string, Logger> _loggerCache = [];
 	private bool _hasDestinationsPending = false;
 
 	internal LoggerPool(LogAdministrator logAdministrator)

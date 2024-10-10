@@ -184,7 +184,7 @@ public sealed class FileDestination : IDestination
 		}
 		else
 		{
-			logFilePathsList = new List<string>();
+			logFilePathsList = [];
 		}
 
 		logFilePathsList.Add(path);
