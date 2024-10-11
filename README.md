@@ -1,8 +1,6 @@
 # Najlot.Log 
 ![NuGet Version](https://img.shields.io/nuget/v/Najlot.Log.svg)
 
-## Current state of the master branch is <B>ALPHA</B> for <B>version 4.0</B> - there will be a lot of changes following.
-## <B>Please see branch v_3.1.4 for a stable version</B>
 </br>
 
 ## Getting started:
@@ -138,8 +136,8 @@ public sealed class DebugDestination : IDestination
 Najlot.Log has a provider for Microsoft.Extensions.Logging:
 ```csharp
 using Microsoft.Extensions.Logging;
+using Najlot.Log;
 using Najlot.Log.Extensions.Logging;
-using LogLevel = Najlot.Log.LogLevel;
 
 ...
 
@@ -148,7 +146,7 @@ var loggerFactory = new LoggerFactory();
 loggerFactory.AddNajlotLog(administrator =>
 {
 	administrator
-		.SetLogLevel(LogLevel.Info)
+		.SetLogLevel(Najlot.Log.LogLevel.Info)
 		.AddConsoleDestination(true)
 		.AddFileDestination("log.txt");
 });
