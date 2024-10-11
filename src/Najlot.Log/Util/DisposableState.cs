@@ -13,10 +13,10 @@ namespace Najlot.Log.Util;
 /// </summary>
 internal sealed class DisposableState : IDisposable
 {
-	private readonly ThreadLocal<object> _currentState;
+	private readonly AsyncLocal<object> _currentState;
 	private readonly Stack<object> _states;
 
-	public DisposableState(ThreadLocal<object> state, Stack<object> states)
+	public DisposableState(AsyncLocal<object> state, Stack<object> states)
 	{
 		_currentState = state;
 		_states = states;
@@ -29,7 +29,16 @@ internal sealed class DisposableState : IDisposable
 		if (!_disposedValue)
 		{
 			_disposedValue = true;
-			_currentState.Value = _states.Pop();
+
+			try
+			{
+				_currentState.Value = _states.Pop();
+			}
+			catch (Exception ex)
+			{
+				_currentState.Value = null;
+				LogErrorHandler.Instance.Handle("Error setting back the State.", ex);
+			}
 		}
 	}
 }

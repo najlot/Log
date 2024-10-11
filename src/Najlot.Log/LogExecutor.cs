@@ -11,15 +11,17 @@ namespace Najlot.Log;
 /// <summary>
 /// Internal class for handling multiple destinations
 /// </summary>
-internal sealed class LogExecutor : IDisposable
+internal sealed class LogExecutor
 {
 	#region State Support
 
-	private readonly ThreadLocal<object> _currentState = new(() => null);
-	private readonly ThreadLocal<Stack<object>> _states = new(() => new Stack<object>());
+	private readonly AsyncLocal<object> _currentState = new();
+	private readonly AsyncLocal<Stack<object>> _states = new();
 
 	public IDisposable BeginScope<T>(T state)
 	{
+		_states.Value ??= new Stack<object>();
+
 		var states = _states.Value;
 
 		states.Push(_currentState.Value);
@@ -89,26 +91,4 @@ internal sealed class LogExecutor : IDisposable
 	}
 
 	public void Flush() => _loggerPool.Flush();
-
-	private bool _disposedValue = false;
-
-	private void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			_disposedValue = true;
-
-			if (disposing)
-			{
-				_currentState.Dispose();
-				_states.Dispose();
-			}
-		}
-	}
-
-	public void Dispose()
-	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
 }
