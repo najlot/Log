@@ -16,75 +16,75 @@ namespace Najlot.Log.Middleware;
 public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 {
 	private readonly ConcurrentQueue<LogMessage> _messages = new();
-	private volatile bool _cancellationRequested = false;
-	private Thread _thread;
+	private readonly ManualResetEventSlim _resetEvent = new(false);
+	private readonly ManualResetEventSlim _flushResetEvent = new(false);
 
-	public IMiddleware NextMiddleware { get; set; }
+	private volatile bool _cancellationRequested = false;
+	private readonly Thread _thread;
+
+	public IMiddleware? NextMiddleware { get; set; }
 
 	public ConcurrentCollectMiddleware()
 	{
-		_thread = new Thread(ThreadAction)
-		{
-			IsBackground = true
-		};
-
-		_thread.Start(_messages);
+		_thread = new Thread(ThreadAction) { IsBackground = true };
+		_thread.Start();
 	}
 
-	private void ThreadAction(object param)
+	private void ThreadAction()
 	{
-		var messageList = new List<LogMessage>();
+		while (!_cancellationRequested || !_messages.IsEmpty)
+		{
+			if (_messages.IsEmpty)
+			{
+				_resetEvent.Wait();
+				_resetEvent.Reset();
+			}
 
-		if (param is not ConcurrentQueue<LogMessage> queue)
-		{
-			return;
-		}
-		
-		do
-		{
 			try
 			{
-				LogMessage message = null;
-
-				SpinWait.SpinUntil(() => queue.TryDequeue(out message) || _cancellationRequested);
-
-				if (_cancellationRequested && message == null)
-				{
-					return;
-				}
-
-				do
-				{
-					messageList.Add(message);
-				}
-				while (queue.TryDequeue(out message));
-
-				NextMiddleware.Execute(messageList);
-
-				messageList.Clear();
+				ProcessMessages();
 			}
 			catch (Exception ex)
 			{
-				LogErrorHandler.Instance.Handle("Error executing a log action.", ex);
+				LogErrorHandler.Instance.Handle(GetType().Name + " run into an error.", ex);
 			}
 		}
-		while (!_cancellationRequested || queue.TryDequeue(out _));
 	}
 
-	public void Execute(LogMessage message) => _messages.Enqueue(message);
+	private void ProcessMessages()
+	{
+		var messages = new List<LogMessage>(_messages.Count > 4 ? _messages.Count : 4);
+
+		while (_messages.TryDequeue(out var message))
+		{
+			messages.Add(message);
+		}
+
+		if (messages.Count > 0)
+		{
+			NextMiddleware?.Execute(messages);
+		}
+
+		if (_messages.IsEmpty)
+		{
+			_flushResetEvent.Set();
+		}
+	}
+
+	public void Execute(LogMessage message)
+	{
+		_messages.Enqueue(message);
+		if (!_resetEvent.IsSet)
+		{
+			_resetEvent.Set();
+		}
+	}
 
 	public void Flush()
 	{
-		_cancellationRequested = true;
-		_thread.Join();
-
-		_cancellationRequested = false;
-		_thread = new Thread(ThreadAction)
-		{
-			IsBackground = true
-		};
-
-		_thread.Start(_messages);
+		_flushResetEvent.Reset();
+		_resetEvent.Set();
+		_flushResetEvent.Wait();
 
 		NextMiddleware?.Flush();
 	}
@@ -92,6 +92,10 @@ public sealed class ConcurrentCollectMiddleware : ICollectMiddleware
 	public void Dispose()
 	{
 		_cancellationRequested = true;
+		_resetEvent.Set();
 		_thread.Join();
+
+		_resetEvent.Dispose();
+		_flushResetEvent.Dispose();
 	}
 }
