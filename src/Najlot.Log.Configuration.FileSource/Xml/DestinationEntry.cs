@@ -1,10 +1,10 @@
 ﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
-namespace Najlot.Log.Configuration.FileSource;
+namespace Najlot.Log.Configuration.FileSource.Xml;
 
 public class DestinationEntry : ConfigurationEntry
 {

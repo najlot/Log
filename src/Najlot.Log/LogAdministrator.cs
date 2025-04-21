@@ -232,7 +232,7 @@ public sealed class LogAdministrator : IDisposable
 	public LogAdministrator AddCustomDestination<TDestination>(TDestination destination) where TDestination : IDestination, new()
 	{
 		if (destination == null) throw new ArgumentNullException(nameof(destination));
-		
+
 		_loggerPool.AddDestination(destination);
 
 		return this;
@@ -247,7 +247,7 @@ public sealed class LogAdministrator : IDisposable
 		{
 			return this;
 		}
-		
+
 		ClearMiddlewares(destinationName);
 
 		foreach (var middlewareName in middlewareNames)

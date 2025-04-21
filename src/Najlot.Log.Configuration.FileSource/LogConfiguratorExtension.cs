@@ -1,62 +1,34 @@
 ﻿// Licensed under the MIT License.
 // See LICENSE file in the project root for full license information.
 
+using Microsoft.Extensions.Configuration;
+using Najlot.Log.Configuration.FileSource.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace Najlot.Log.Configuration.FileSource;
 
-public static class LogConfiguratorExtension
+public static class LogAdministratorConfigurationExtensions
 {
-	private static void WriteXmlConfigurationFile(LogAdministrator logAdministrator, string path)
+	public static LogAdministrator ReadConfiguration(
+		this LogAdministrator logAdministrator,
+		IConfiguration configuration,
+		string sectionName = "NajlotLog")
 	{
 		try
 		{
-			logAdministrator
-				.GetLogLevel(out var logLevel)
-				.GetDestinationNames(out var destinationNames);
-
-			var configurations = new Configurations()
-			{
-				LogLevel = logLevel,
-				Destinations = destinationNames
-					.Select(name =>
-					{
-						logAdministrator
-							.GetDestinationConfiguration(name, out var configuration)
-							.GetCollectMiddlewareName(name, out var collectMiddlewareName)
-							.GetMiddlewareNames(name, out var middlewareNames);
-
-						return new DestinationEntry
-						{
-							Name = name,
-							Parameters = configuration
-								.Select(c => new Parameter { Name = c.Key, Value = c.Value })
-								.ToList(),
-							CollectMiddleware = new ConfigurationEntry { Name = collectMiddlewareName },
-							Middlewares = middlewareNames
-								.Select(n => new ConfigurationEntry { Name = n })
-								.ToList(),
-						};
-					})
-					.ToList()
-			};
-
-			using var stringWriter = new CustomStringWriter(Encoding.UTF8);
-			using var xmlWriter = new XmlTextWriter(stringWriter) { Formatting = Formatting.Indented };
-			var xmlSerializer = new XmlSerializer(typeof(Configurations));
-			xmlSerializer.Serialize(xmlWriter, configurations);
-			File.WriteAllText(path, stringWriter.ToString(), Encoding.UTF8);
+			var section = configuration.GetSection(sectionName);
+			var configs = section.Get<Configurations>();
+			ConfigurationIoService.ApplyConfigs(configs, logAdministrator);
 		}
 		catch (Exception ex)
 		{
-			LogErrorHandler.Instance.Handle("Error writing xml configuration file", ex);
+			LogErrorHandler.Instance.Handle("Error reading configuration", ex);
 		}
+
+		return logAdministrator;
 	}
 
 	/// <summary>
@@ -73,40 +45,81 @@ public static class LogConfiguratorExtension
 		bool listenForChanges = true,
 		bool writeExampleIfSourceDoesNotExists = false)
 	{
+		var service = new Xml.XmlConfigurationService();
+		ReadFromFile(logAdministrator, service, path, listenForChanges, writeExampleIfSourceDoesNotExists);
+		return logAdministrator;
+	}
+
+	/// <summary>
+	/// Reads configuration from an Json file
+	/// </summary>
+	/// <param name="logAdministrator">LogAdministrator instance</param>
+	/// <param name="path">Path to the Json file</param>
+	/// <param name="listenForChanges">Should the changes happened at runtime be reflected to the logger</param>
+	/// <param name="writeExampleIfSourceDoesNotExists">Should an example be written when file does not exist</param>
+	/// <returns></returns>
+	public static LogAdministrator ReadConfigurationFromJsonFile(
+		this LogAdministrator logAdministrator,
+		string path,
+		bool listenForChanges = true,
+		bool writeExampleIfSourceDoesNotExists = false)
+	{
+		var service = new Json.JsonConfigurationService();
+		ReadFromFile(logAdministrator, service, path, listenForChanges, writeExampleIfSourceDoesNotExists);
+		return logAdministrator;
+	}
+
+	private static void ReadFromFile(
+		this LogAdministrator logAdministrator,
+		IConfigurationService service,
+		string path,
+		bool listenForChanges = true,
+		bool writeExampleIfSourceDoesNotExists = false)
+	{
 		try
 		{
 			if (File.Exists(path))
 			{
-				ReadConfiguration(path, logAdministrator);
+				ConfigurationIoService.ReadFromFile(path, service, logAdministrator);
 
 				if (listenForChanges)
 				{
-					EnableChangeListener(logAdministrator, path);
+					EnableChangeListener(logAdministrator, service, path);
 				}
 			}
 			else if (writeExampleIfSourceDoesNotExists)
 			{
-				WriteXmlConfigurationFile(logAdministrator, path);
+				ConfigurationIoService.WriteToFile(path, service, logAdministrator);
 			}
 		}
 		catch (Exception ex)
 		{
-			LogErrorHandler.Instance.Handle("Error reading xml configuration file", ex);
+			LogErrorHandler.Instance.Handle("Error reading configuration file", ex);
 		}
-
-		return logAdministrator;
 	}
 
-	private static void EnableChangeListener(LogAdministrator logAdministrator, string path)
-	{
-		var dir = Path.GetDirectoryName(path);
+	private static readonly Dictionary<string, FileSystemWatcher> _fileSystemWatcher = [];
 
-		if (string.IsNullOrWhiteSpace(dir))
+	private static void EnableChangeListener(LogAdministrator logAdministrator, IConfigurationService service, string path)
+	{
+		path = Path.GetFullPath(path);
+		var directory = Path.GetDirectoryName(path);
+		var fileName = Path.GetFileName(path);
+
+		if (string.IsNullOrWhiteSpace(directory))
 		{
-			dir = Directory.GetCurrentDirectory();
+			directory = Directory.GetCurrentDirectory();
 		}
 
-		var fileSystemWatcher = new FileSystemWatcher(dir, Path.GetFileName(path));
+		if (_fileSystemWatcher.TryGetValue(path, out var fileSystemWatcher))
+		{
+			fileSystemWatcher.EnableRaisingEvents = false;
+			fileSystemWatcher.Dispose();
+			_fileSystemWatcher.Remove(path);
+		}
+
+		fileSystemWatcher = new FileSystemWatcher(directory, fileName);
+		_fileSystemWatcher[path] = fileSystemWatcher;
 
 		fileSystemWatcher.Changed += (object sender, FileSystemEventArgs e) =>
 		{
@@ -115,50 +128,15 @@ public static class LogConfiguratorExtension
 
 			try
 			{
-				ReadConfiguration(path, logAdministrator);
+				ConfigurationIoService.ReadFromFile(path, service, logAdministrator);
 			}
 			catch (Exception ex)
 			{
-				LogErrorHandler.Instance.Handle("Error reading xml configuration file", ex);
+				LogErrorHandler.Instance.Handle("Error reading configuration file", ex);
 			}
 		};
 
 		fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
 		fileSystemWatcher.EnableRaisingEvents = true;
-	}
-
-	private static void ReadConfiguration(string path, LogAdministrator logAdministrator)
-	{
-		var xmlSerializer = new XmlSerializer(typeof(Configurations));
-		Configurations fileConfigurations;
-
-		using (var streamReader = new StreamReader(path))
-		{
-			fileConfigurations = xmlSerializer.Deserialize(streamReader) as Configurations;
-		}
-
-		logAdministrator.SetLogLevel(fileConfigurations.LogLevel);
-
-		foreach (var config in fileConfigurations.Destinations)
-		{
-			var parameterDictionary = config.Parameters
-				.ToDictionary(parameter => parameter.Name, parameter => parameter.Value);
-
-			logAdministrator.SetDestinationConfiguration(config.Name, parameterDictionary);
-
-			if (!string.IsNullOrWhiteSpace(config.CollectMiddleware?.Name))
-			{
-				logAdministrator.SetCollectMiddleware(config.Name, config.CollectMiddleware?.Name);
-			}
-
-			if (config.Middlewares != null)
-			{
-				var names = config.Middlewares
-					.Select(m => m.Name)
-					.Where(m => !string.IsNullOrWhiteSpace(m));
-
-				logAdministrator.SetMiddlewareNames(config.Name, names);
-			}
-		}
 	}
 }

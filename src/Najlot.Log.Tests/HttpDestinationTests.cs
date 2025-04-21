@@ -24,7 +24,7 @@ public class HttpDestinationTests
 		LogConfigurationMapper.Instance.AddToMapping<HttpDestination>();
 
 		using var admin = LogAdministrator.CreateNew();
-		
+
 		admin
 			.SetLogLevel(LogLevel.Debug)
 			.SetCollectMiddleware<ConcurrentCollectMiddleware, HttpDestination>()

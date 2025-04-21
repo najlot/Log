@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Najlot.Log.Configuration.FileSource;
+namespace Najlot.Log.Configuration.FileSource.Xml;
 
 public class Configurations
 {

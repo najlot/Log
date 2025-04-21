@@ -9,7 +9,7 @@ namespace Najlot.Log.Extensions.Logging;
 public sealed class NajlotLogProvider : ILoggerProvider
 {
 	private LogAdministrator _logAdministrator;
-	
+
 	public NajlotLogProvider(LogAdministrator logConfigurator)
 	{
 		_logAdministrator = logConfigurator;

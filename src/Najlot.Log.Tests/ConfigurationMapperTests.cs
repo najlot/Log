@@ -19,7 +19,7 @@ public class ConfigurationMapperTests
 			{
 				continue;
 			}
-			
+
 			var name = mapper.GetName(type);
 			Assert.NotNull(name);
 			Assert.NotNull(mapper.GetType(name));

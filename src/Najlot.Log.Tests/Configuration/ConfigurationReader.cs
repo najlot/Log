@@ -17,7 +17,7 @@ public static class ConfigurationReader
 			{
 				return null;
 			}
-			
+
 			Directory.CreateDirectory(configDir);
 
 			File.WriteAllText(configPath + ".example", JsonConvert.SerializeObject(new T()));

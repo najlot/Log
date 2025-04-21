@@ -155,10 +155,10 @@ public class Configuration_can_append_middlewares
 	}
 
 	[Fact]
-	public void With_Configuration_File()
+	public void With_XML_Configuration_File()
 	{
 		LogMessage message = null;
-		const string path = "AddToArgsMiddlewareMock1And2.config";
+		const string path = nameof(With_XML_Configuration_File) + ".config";
 
 		using (var logAdministrator = LogAdministrator.CreateNew())
 		{
@@ -182,6 +182,50 @@ public class Configuration_can_append_middlewares
 			var logger = logAdministrator.GetLogger("");
 
 			logAdministrator.ReadConfigurationFromXmlFile(path, false, false);
+
+			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
+			{
+				message = msg;
+			}));
+
+			logger.Fatal("{Nr2}{Nr1}");
+
+			logAdministrator.GetCollectMiddlewareName(nameof(DestinationMock), out var collectMiddlewareName);
+			Assert.Equal(nameof(ConcurrentCollectMiddleware), collectMiddlewareName);
+		}
+
+		Assert.Equal("1", message.RawArguments[0].ToString());
+		Assert.Equal("2", message.RawArguments[1].ToString());
+	}
+
+	[Fact]
+	public void With_Json_Configuration_File()
+	{
+		LogMessage message = null;
+		const string path = nameof(With_Json_Configuration_File) + ".json";
+
+		using (var logAdministrator = LogAdministrator.CreateNew())
+		{
+			logAdministrator.SetCollectMiddleware<ConcurrentCollectMiddleware, DestinationMock>();
+
+			logAdministrator.AddMiddleware<AddToArgsMiddlewareMock1, DestinationMock>();
+			logAdministrator.AddMiddleware<AddToArgsMiddlewareMock2, DestinationMock>();
+
+			logAdministrator.AddCustomDestination(new DestinationMock((msg) => { }));
+
+			if (File.Exists(path))
+			{
+				File.Delete(path);
+			}
+
+			logAdministrator.ReadConfigurationFromJsonFile(path, false, true);
+		}
+
+		using (var logAdministrator = LogAdministrator.CreateNew())
+		{
+			var logger = logAdministrator.GetLogger("");
+
+			logAdministrator.ReadConfigurationFromJsonFile(path, false, false);
 
 			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
 			{

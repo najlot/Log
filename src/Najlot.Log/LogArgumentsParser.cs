@@ -31,7 +31,7 @@ public static class LogArgumentsParser
 
 		var argId = 0;
 		var startIndex = -1;
-		
+
 		do
 		{
 			startIndex = FindParseStartIndex(message, startIndex);

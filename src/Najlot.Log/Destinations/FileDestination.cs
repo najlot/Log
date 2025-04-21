@@ -261,7 +261,7 @@ public sealed class FileDestination : IDestination
 		if (!_disposedValue)
 		{
 			_disposedValue = true;
-			
+
 			if (disposing)
 			{
 				_stream?.Dispose();

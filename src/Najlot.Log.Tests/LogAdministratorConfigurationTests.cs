@@ -18,7 +18,7 @@ public class LogAdministratorConfigurationTests
 
 		logAdministrator.GetDestinationConfiguration(nameof(ConsoleDestination), out var consoleDestinationConfiguration);
 
-		Assert.Equal(1, consoleDestinationConfiguration.Count);
+		Assert.Single(consoleDestinationConfiguration);
 		Assert.Contains("UseColors", consoleDestinationConfiguration.Keys);
 
 		logAdministrator.GetDestinationConfiguration(nameof(FileDestination), out var fileDestinationConfiguration);

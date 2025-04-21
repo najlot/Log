@@ -119,7 +119,7 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 
 		return logger;
 	}
-	
+
 	public void NotifyLogLevelChanged(LogLevel logLevel)
 	{
 		foreach (var entry in _loggerCache.Values.ToArray())
@@ -127,7 +127,7 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 			entry.SetupLogLevel(logLevel);
 		}
 	}
-	
+
 	private bool _disposedValue = false;
 
 	private void Dispose(bool disposing)

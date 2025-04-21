@@ -14,9 +14,9 @@ public sealed class DestinationMock : IDestination
 
 	public DestinationMock()
 	{
-		
+
 	}
-	
+
 	public DestinationMock(Action<LogMessage> logAction)
 	{
 		_logAction = logAction;

@@ -137,7 +137,7 @@ public class ExtensionsLoggingTests
 		Assert.Contains("Info logged!", content);
 		Assert.Contains("Trace logged!", content);
 		Assert.Contains("Warning logged!", content);
-		
+
 		Assert.Contains("My Scope", content);
 
 		Assert.Contains("Critical logged with scope!", content);
@@ -160,7 +160,7 @@ public class ExtensionsLoggingTests
 		Assert.Contains("Structured Info, 0 logged!", content);
 		Assert.Contains("Structured Trace, 0 logged!", content);
 		Assert.Contains("Structured Warning, 0 logged!", content);
-		
+
 		Assert.Contains("Structured Critical, 0123 logged!", content);
 		Assert.Contains("Structured Debug, 0123 logged!", content);
 		Assert.Contains("Structured Error, 0123 logged!", content);

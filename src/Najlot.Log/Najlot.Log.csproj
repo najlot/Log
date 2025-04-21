@@ -13,15 +13,15 @@
     <PackageTags>najlot;log;logging;logger;najlot.log</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Simple and yet powerful logging library with performance and extensibility in mind.</Description>
-    <Version>4.0.1</Version>
+    <Version>4.0.2</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
-		<LangVersion>latest</LangVersion>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+    <LangVersion>latest</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\Najlot\README.md">
+    <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

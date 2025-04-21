@@ -60,7 +60,7 @@ internal static class LogDestinationConfigurator
 			var attribute = property?.GetCustomAttributes(typeof(LogConfigurationNameAttribute), true).FirstOrDefault();
 
 			if (attribute is LogConfigurationNameAttribute nameAttribute
-			    && configuration.TryGetValue(nameAttribute.Name, out var val))
+				&& configuration.TryGetValue(nameAttribute.Name, out var val))
 			{
 				if (val == null)
 				{

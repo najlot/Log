@@ -4,7 +4,7 @@
 using System.IO;
 using System.Text;
 
-namespace Najlot.Log.Configuration.FileSource;
+namespace Najlot.Log.Configuration.FileSource.Xml;
 
 /// <summary>
 /// StringWriter that allows to change its encoding
