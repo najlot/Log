@@ -5,6 +5,7 @@ using Najlot.Log.Destinations;
 using Najlot.Log.Middleware;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 
 namespace Najlot.Log;
@@ -235,6 +236,29 @@ public sealed class LogAdministrator : IDisposable
 
 		_loggerPool.AddDestination(destination);
 
+		return this;
+	}
+
+	/// <summary>
+	/// Adds a custom destination by name.
+	/// </summary>
+	/// <param name="destinationName"></param>
+	/// <returns></returns>
+	/// <exception cref="ArgumentNullException"></exception>
+	public LogAdministrator AddDestination(string destinationName)
+	{
+		var destinationType = LogConfigurationMapper.Instance.GetType(destinationName);
+		var destination = (IDestination)Activator.CreateInstance(destinationType);
+		if (destination == null) throw new ArgumentNullException(nameof(destination));
+
+		_loggerPool.AddDestination(destination);
+
+		return this;
+	}
+
+	public LogAdministrator RemoveDestination(string destinationName)
+	{
+		_loggerPool.RemoveDestination(destinationName);
 		return this;
 	}
 

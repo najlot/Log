@@ -100,14 +100,14 @@ internal sealed class DestinationEntry : IMiddlewareConfigurationObserver, IDisp
 		DisposeMiddlewares(oldCollectMiddleware);
 	}
 
-	private static void DisposeMiddlewares(ICollectMiddleware collectMiddleware)
+	internal static void DisposeMiddlewares(ICollectMiddleware collectMiddleware)
 	{
 		var middleware = collectMiddleware.NextMiddleware;
-		collectMiddleware.Dispose();
+		collectMiddleware?.Dispose();
 
 		do
 		{
-			middleware.Dispose();
+			middleware?.Dispose();
 			middleware = middleware.NextMiddleware;
 		}
 		while (middleware != null);

@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Configuration.FileSource.Models;
 
-internal class Configurations
+internal class LogConfiguration
 {
 	public LogLevel LogLevel { get; set; }
 
-	public List<DestinationEntry> Destinations { get; set; } = [];
+	public List<LogDestinationEntry> Destinations { get; set; } = [];
 }

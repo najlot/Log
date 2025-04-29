@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace Najlot.Log.Configuration.FileSource.Models;
 
-internal class DestinationEntry
+internal class LogDestinationEntry
 {
 	public string Name { get; set; } = string.Empty;
 
 	public Dictionary<string, string> Parameters { get; set; } = [];
 
-	public MiddlewareEntry CollectMiddleware { get; set; }
+	public LogMiddlewareEntry CollectMiddleware { get; set; }
 
-	public List<MiddlewareEntry> Middlewares { get; set; }
+	public List<LogMiddlewareEntry> Middlewares { get; set; }
 }

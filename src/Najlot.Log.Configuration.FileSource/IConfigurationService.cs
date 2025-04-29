@@ -7,7 +7,7 @@ namespace Najlot.Log.Configuration.FileSource;
 
 internal interface IConfigurationService
 {
-	Configurations ReadFromString(string content);
+	LogConfiguration ReadFromString(string content);
 
-	string WriteToString(Configurations configurations);
+	string WriteToString(LogConfiguration configurations);
 }

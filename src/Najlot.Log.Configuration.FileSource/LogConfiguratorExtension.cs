@@ -20,8 +20,8 @@ public static class LogAdministratorConfigurationExtensions
 		try
 		{
 			var section = configuration.GetSection(sectionName);
-			var configs = section.Get<Configurations>();
-			ConfigurationIoService.ApplyConfigs(configs, logAdministrator);
+			var configs = section.Get<LogConfiguration>();
+			ConfigurationIoService.ApplyConfiguration(logAdministrator, configs);
 		}
 		catch (Exception ex)
 		{

@@ -14,24 +14,24 @@ internal class XmlConfigurationService : IConfigurationService
 	private XmlSerializer _serializer;
 	private XmlSerializer Serializer => _serializer ??= new(typeof(Configurations));
 
-	public Models.Configurations ReadFromString(string content)
+	public Models.LogConfiguration ReadFromString(string content)
 	{
 		using var stringReader = new StringReader(content);
 		var configurations = Serializer.Deserialize(stringReader) as Configurations;
 
-		return new Models.Configurations()
+		return new Models.LogConfiguration()
 		{
 			LogLevel = configurations.LogLevel,
 			Destinations = configurations.Destinations
-				.Select(c => new Models.DestinationEntry
+				.Select(c => new Models.LogDestinationEntry
 				{
 					Name = c.Name,
-					CollectMiddleware = new Models.MiddlewareEntry
+					CollectMiddleware = new Models.LogMiddlewareEntry
 					{
 						Name = c.CollectMiddleware.Name,
 					},
 					Parameters = c.Parameters.ToDictionary(parameter => parameter.Name, parameter => parameter.Value),
-					Middlewares = c.Middlewares.Select(m => new Models.MiddlewareEntry
+					Middlewares = c.Middlewares.Select(m => new Models.LogMiddlewareEntry
 					{
 						Name = m.Name,
 					}).ToList(),
@@ -39,7 +39,7 @@ internal class XmlConfigurationService : IConfigurationService
 		};
 	}
 
-	public string WriteToString(Models.Configurations configurations)
+	public string WriteToString(Models.LogConfiguration configurations)
 	{
 		var xmlConfig = new Configurations
 		{

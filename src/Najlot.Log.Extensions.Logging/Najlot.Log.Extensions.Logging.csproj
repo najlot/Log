@@ -8,10 +8,10 @@
     <PackageProjectUrl>https://github.com/najlot/Log</PackageProjectUrl>
     <RepositoryUrl>https://github.com/najlot/Log</RepositoryUrl>
     <PackageTags>najlot;log;logging;logger;najlot.log;extensions.logging;najlot.log.extensions.logging</PackageTags>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Najlot.Log "wrapper" for Microsoft.Extensions.Logging</Description>
-    <Version>4.0.2</Version>
+    <Version>4.0.3</Version>
     <Authors>Najlot</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>

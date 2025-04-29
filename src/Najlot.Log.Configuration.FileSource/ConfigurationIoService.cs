@@ -3,6 +3,7 @@
 
 using Najlot.Log.Configuration.FileSource.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Najlot.Log.Configuration.FileSource;
@@ -17,7 +18,7 @@ internal static class ConfigurationIoService
 				.GetLogLevel(out var logLevel)
 				.GetDestinationNames(out var destinationNames);
 
-			var configurations = new Configurations()
+			var configurations = new LogConfiguration()
 			{
 				LogLevel = logLevel,
 				Destinations = destinationNames
@@ -28,13 +29,13 @@ internal static class ConfigurationIoService
 							.GetCollectMiddlewareName(name, out var collectMiddlewareName)
 							.GetMiddlewareNames(name, out var middlewareNames);
 
-						return new DestinationEntry
+						return new LogDestinationEntry
 						{
 							Name = name,
 							Parameters = configuration.ToDictionary(c => c.Key, c => c.Value),
-							CollectMiddleware = new MiddlewareEntry { Name = collectMiddlewareName },
+							CollectMiddleware = new LogMiddlewareEntry { Name = collectMiddlewareName },
 							Middlewares = middlewareNames
-								.Select(n => new MiddlewareEntry { Name = n })
+								.Select(n => new LogMiddlewareEntry { Name = n })
 								.ToList(),
 						};
 					})
@@ -52,15 +53,27 @@ internal static class ConfigurationIoService
 	public static void ReadFromFile(string path, IConfigurationService service, LogAdministrator logAdministrator)
 	{
 		var configs = service.ReadFromFile(path);
-		ApplyConfigs(configs, logAdministrator);
+		logAdministrator.ApplyConfiguration(configs);
 	}
 
-	public static void ApplyConfigs(Configurations configs, LogAdministrator logAdministrator)
+	public static void ApplyConfiguration(this LogAdministrator logAdministrator, LogConfiguration configs)
 	{
+		logAdministrator.GetDestinationNames(out var destinationNames);
+		List<string> destinationsToDrop = new(destinationNames);
+
 		logAdministrator.SetLogLevel(configs.LogLevel);
 
 		foreach (var config in configs.Destinations)
 		{
+			if (!destinationsToDrop.Contains(config.Name))
+			{
+				logAdministrator.AddDestination(config.Name);
+			}
+			else
+			{
+				destinationsToDrop.Remove(config.Name);
+			}
+
 			logAdministrator.SetDestinationConfiguration(config.Name, config.Parameters);
 
 			if (!string.IsNullOrWhiteSpace(config.CollectMiddleware?.Name))
@@ -76,6 +89,11 @@ internal static class ConfigurationIoService
 
 				logAdministrator.SetMiddlewareNames(config.Name, names);
 			}
+		}
+
+		foreach (var name in destinationsToDrop)
+		{
+			logAdministrator.RemoveDestination(name);
 		}
 	}
 }

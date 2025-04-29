@@ -16,8 +16,9 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 	private readonly LogAdministrator _logAdministrator;
 	private List<DestinationEntry> _destinations = [];
 	private readonly List<DestinationEntry> _pendingDestinations = [];
+	private readonly List<string> _removeDestinations = [];
 	private readonly Dictionary<string, Logger> _loggerCache = [];
-	private bool _hasDestinationsPending = false;
+	private bool _hasDestinationChanges = false;
 
 	internal LoggerPool(LogAdministrator logAdministrator)
 	{
@@ -25,15 +26,32 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 		_logAdministrator.AttachObserver(this);
 	}
 
-	internal void AddDestination<T>(T destination) where T : IDestination, new()
+	internal void AddDestination<T>(T destination) where T : IDestination
 	{
+		var names = GetDestinations().Select(d => d.DestinationName).ToArray();
 		var entry = CreateDestinationEntry(destination);
+
+		if (names.Contains(entry.DestinationName))
+		{
+			entry.Dispose();
+			return;
+		}
 
 		_logAdministrator.AttachObserver(entry);
 
 		lock (_pendingDestinations) _pendingDestinations.Add(entry);
 
-		_hasDestinationsPending = true;
+		_hasDestinationChanges = true;
+	}
+
+	internal void RemoveDestination(string destinationName)
+	{
+		lock (_pendingDestinations)
+		{
+			_removeDestinations.Add(destinationName);
+		}
+
+		_hasDestinationChanges = true;
 	}
 
 	private DestinationEntry CreateDestinationEntry<T>(T destination) where T : IDestination
@@ -53,21 +71,28 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 
 	internal IEnumerable<DestinationEntry> GetDestinations()
 	{
-		if (_hasDestinationsPending)
+		if (_hasDestinationChanges)
 		{
 			lock (_pendingDestinations)
 			{
-				if (_hasDestinationsPending)
+				if (_hasDestinationChanges)
 				{
-					_destinations = new List<DestinationEntry>(_destinations);
-
-					foreach (var destination in _pendingDestinations)
-					{
-						_destinations.Add(destination);
-					}
+					_destinations = [
+						.. _destinations,
+						.. _pendingDestinations];
 
 					_pendingDestinations.Clear();
-					_hasDestinationsPending = false;
+
+					var toRemove = _destinations.Where(d => _removeDestinations.Contains(d.DestinationName)).ToArray();
+					foreach (var destination in toRemove)
+					{
+						_destinations.Remove(destination);
+						destination.Dispose();
+					}
+
+					_removeDestinations.Clear();
+
+					_hasDestinationChanges = false;
 				}
 			}
 		}
@@ -77,7 +102,8 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 
 	internal void Flush()
 	{
-		foreach (var entry in GetDestinations())
+		var destinations = GetDestinations();
+		foreach (var entry in destinations)
 		{
 			entry.CollectMiddleware.Flush();
 
@@ -142,7 +168,8 @@ internal sealed class LoggerPool : ILogLevelObserver, IDisposable
 				_logAdministrator.DetachObserver(this);
 				_loggerCache.Clear();
 
-				foreach (var destination in GetDestinations())
+				var destinations = GetDestinations();
+				foreach (var destination in destinations)
 				{
 					destination.Dispose();
 				}

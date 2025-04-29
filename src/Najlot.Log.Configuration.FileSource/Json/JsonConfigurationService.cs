@@ -20,12 +20,12 @@ internal class JsonConfigurationService : IConfigurationService
 		WriteIndented = true
 	};
 
-	public Configurations ReadFromString(string content)
+	public LogConfiguration ReadFromString(string content)
 	{
-		return JsonSerializer.Deserialize<Configurations>(content, Options);
+		return JsonSerializer.Deserialize<LogConfiguration>(content, Options);
 	}
 
-	public string WriteToString(Configurations configurations)
+	public string WriteToString(LogConfiguration configurations)
 	{
 		return JsonSerializer.Serialize(configurations, Options);
 	}

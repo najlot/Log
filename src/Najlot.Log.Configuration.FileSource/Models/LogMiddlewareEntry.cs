@@ -3,7 +3,7 @@
 
 namespace Najlot.Log.Configuration.FileSource.Models;
 
-internal class MiddlewareEntry
+internal class LogMiddlewareEntry
 {
 	public string Name { get; set; } = string.Empty;
 }

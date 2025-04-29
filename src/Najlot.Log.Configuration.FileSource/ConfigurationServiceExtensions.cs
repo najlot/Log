@@ -9,13 +9,13 @@ namespace Najlot.Log.Configuration.FileSource;
 
 internal static class ConfigurationServiceExtensions
 {
-	public static Configurations ReadFromFile(this IConfigurationService service, string path)
+	public static LogConfiguration ReadFromFile(this IConfigurationService service, string path)
 	{
 		var content = File.ReadAllText(path);
 		return service.ReadFromString(content);
 	}
 
-	public static void WriteToFile(this IConfigurationService service, string path, Configurations configurations)
+	public static void WriteToFile(this IConfigurationService service, string path, LogConfiguration configurations)
 	{
 		var content = service.WriteToString(configurations);
 		File.WriteAllText(path, content, Encoding.UTF8);

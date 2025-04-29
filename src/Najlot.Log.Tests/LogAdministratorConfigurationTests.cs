@@ -3,6 +3,7 @@
 
 using Najlot.Log.Destinations;
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 
 namespace Najlot.Log.Tests;
@@ -56,5 +57,107 @@ public class LogAdministratorConfigurationTests
 		Assert.True(destination.KeepFileOpen);
 		Assert.Equal(10, destination.MaxFiles);
 		Assert.Null(destination.LogFilesPath);
+	}
+
+	[Fact]
+	public void ConfigurationAddsOneDestination()
+	{
+		var logFileName = nameof(ConfigurationAddsOneDestination) + ".log";
+
+		if (File.Exists(logFileName))
+		{
+			File.Delete(logFileName);
+		}
+
+		{
+			using var admin = LogAdministrator.CreateNew();
+
+			for (int i = 0; i < 10; i++)
+			{
+				admin.AddDestination(nameof(FileDestination));
+
+				admin.SetDestinationConfiguration(nameof(FileDestination), new Dictionary<string, string>
+				{
+					["OutputPath"] = logFileName,
+					["KeepFileOpen"] = "false",
+					["MaxFiles"] = null,
+					["LogFilesPath"] = null
+				});
+			}
+
+			var logger = admin.GetLogger(typeof(LogAdministratorConfigurationTests));
+			logger.Error("Test #message");
+
+			admin.GetDestinationNames(out var destinationNames);
+			Assert.Single(destinationNames);
+		}
+
+		var content = File.ReadAllText(logFileName);
+		Assert.Equal(2, content.Split('#').Length);
+	}
+
+	[Fact]
+	public void ConfigurationCanAddDestinations()
+	{
+		var logFileName = nameof(ConfigurationCanAddDestinations) + ".log";
+
+		if (File.Exists(logFileName))
+		{
+			File.Delete(logFileName);
+		}
+
+		{
+			using var admin = LogAdministrator.CreateNew();
+
+			admin.AddDestination(nameof(FileDestination));
+
+			admin.SetDestinationConfiguration(nameof(FileDestination), new Dictionary<string, string>
+			{
+				["OutputPath"] = logFileName,
+				["KeepFileOpen"] = "false",
+				["MaxFiles"] = null,
+				["LogFilesPath"] = null
+			});
+
+			var logger = admin.GetLogger(typeof(LogAdministratorConfigurationTests));
+			logger.Error("Test message");
+		}
+
+		var content = File.ReadAllText(logFileName);
+		Assert.Contains("Test message", content);
+	}
+
+	[Fact]
+	public void ConfigurationCanRemoveDestinations()
+	{
+		var logFileName = nameof(ConfigurationCanRemoveDestinations) + ".log";
+
+		if (File.Exists(logFileName))
+		{
+			File.Delete(logFileName);
+		}
+
+		using var admin = LogAdministrator.CreateNew();
+
+		admin.AddDestination(nameof(FileDestination));
+
+		admin.SetDestinationConfiguration(nameof(FileDestination), new Dictionary<string, string>
+		{
+			["OutputPath"] = logFileName,
+			["KeepFileOpen"] = "false",
+			["MaxFiles"] = null,
+			["LogFilesPath"] = null
+		});
+
+		var logger = admin.GetLogger(typeof(LogAdministratorConfigurationTests));
+		logger.Error("Test message");
+
+		admin.RemoveDestination(nameof(FileDestination));
+
+		logger.Error("Unlogged message");
+
+		var content = File.ReadAllText(logFileName);
+		Assert.Contains("Test message", content);
+		Assert.DoesNotContain("Unlogged message", content);
 	}
 }

@@ -181,12 +181,12 @@ public class Configuration_can_append_middlewares
 		{
 			var logger = logAdministrator.GetLogger("");
 
-			logAdministrator.ReadConfigurationFromXmlFile(path, false, false);
-
 			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
 			{
 				message = msg;
 			}));
+
+			logAdministrator.ReadConfigurationFromXmlFile(path, false, false);
 
 			logger.Fatal("{Nr2}{Nr1}");
 
@@ -225,12 +225,12 @@ public class Configuration_can_append_middlewares
 		{
 			var logger = logAdministrator.GetLogger("");
 
-			logAdministrator.ReadConfigurationFromJsonFile(path, false, false);
-
 			logAdministrator.AddCustomDestination(new DestinationMock((msg) =>
 			{
 				message = msg;
 			}));
+
+			logAdministrator.ReadConfigurationFromJsonFile(path, false, false);
 
 			logger.Fatal("{Nr2}{Nr1}");
 
