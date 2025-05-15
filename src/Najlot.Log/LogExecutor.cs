@@ -15,8 +15,8 @@ internal sealed class LogExecutor
 {
 	#region State Support
 
-	private readonly AsyncLocal<object> _currentState = new();
-	private readonly AsyncLocal<Stack<object>> _states = new();
+	private static readonly AsyncLocal<object> _currentState = new();
+	private static readonly AsyncLocal<Stack<object>> _states = new();
 
 	public IDisposable BeginScope<T>(T state)
 	{
